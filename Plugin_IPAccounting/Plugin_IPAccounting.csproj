@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{ABBED088-C034-4DD8-84C3-4A62559E5535}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Plugin_IPAccounting</RootNamespace>
+    <AssemblyName>Plugin_IPAccounting</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Simsang\bin\Debug\plugins\IPAccounting\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Simsang\bin\Release\Plugins\IPAccounting\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main\1_Presentation\ManageServices\2_Task\TaskFacade.cs" />
+    <Compile Include="Main\1_Presentation\ManageServices\3_Infrastructure\InfrastructureFacade.cs" />
+    <Compile Include="Main\1_Presentation\ManageServices\Config\IObservable.cs" />
+    <Compile Include="Main\1_Presentation\ManageServices\Config\IObserver.cs" />
+    <Compile Include="Main\3_Domain\DomainFacade.cs" />
+    <Compile Include="Main\4_Infrastructure\InfrastructureFacade.cs" />
+    <Compile Include="Main\1_Presentation\ManageServices\1_Presentation\ManageServices.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main\1_Presentation\ManageServices\1_Presentation\ManageServices.Designer.cs">
+      <DependentUpon>ManageServices.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Main\1_Presentation\Plugin_IPAccountingUC.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Main\1_Presentation\Plugin_IPAccountingUC.Designer.cs">
+      <DependentUpon>Plugin_IPAccountingUC.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Main\Config\Config.cs" />
+    <Compile Include="Main\Config\IObservable.cs" />
+    <Compile Include="Main\Config\IObserver.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Main\Config\AccountingItem.cs" />
+    <Compile Include="Main\1_Presentation\ManageServices\Config\ServiceRecord.cs" />
+    <Compile Include="Main\2_Task\TaskFacade.cs" />
+    <EmbeddedResource Include="Main\1_Presentation\ManageServices\1_Presentation\ManageServices.resx">
+      <DependentUpon>ManageServices.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Main\1_Presentation\Plugin_IPAccountingUC.resx">
+      <DependentUpon>Plugin_IPAccountingUC.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Interface\PluginInterface.csproj">
+      <Project>{0494ACA5-DB6C-4C0B-A610-6156C3EB7761}</Project>
+      <Name>PluginInterface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Add_Service.jpg" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,800 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Threading;
+using System.Net.NetworkInformation;
+using System.Text.RegularExpressions;
+using System.Diagnostics;
+using System.Reflection;
+using System.IO;
+using System.Configuration;
+
+using Simsang.Plugin;
+using Plugin.Main.Systems;
+using Plugin.Main.Systems.Config;
+using ManageSystems = Plugin.Main.Systems.ManageSystems;
+
+
+namespace Plugin.Main
+{
+
+  public partial class PluginSystemsUC : UserControl, IPlugin, IObserver
+  {
+
+    #region DATATYPES
+
+    private enum EntryType
+    {
+      Empty,
+      Half,
+      Full
+    }
+
+    #endregion
+
+
+    #region MEMBERS
+
+    private IPluginHost cHost;
+    private List<String> cTargetList;
+    private BindingList<SystemRecord> cSystems;
+    public BindingList<ManageSystems.SystemPattern> cSystemPatterns;
+    private String cPatternFilePath = @"plugins\Systems\Plugin_SystemsOS_Patterns.xml";
+    private TaskFacade cTask;
+
+    #endregion
+
+
+    #region PUBLIC
+
+    /// <summary>
+    /// Constructor.
+    /// Instantiate the UserControl.
+    /// </summary>
+    public PluginSystemsUC()
+    {
+      InitializeComponent();
+
+      #region DATAGRID HEADER
+
+      DGV_Systems.AutoGenerateColumns = false;
+
+      DataGridViewTextBoxColumn cMACCol = new DataGridViewTextBoxColumn();
+      cMACCol.DataPropertyName = "SrcMAC";
+      cMACCol.Name = "SrcMAC";
+      cMACCol.HeaderText = "MAC address";
+      cMACCol.ReadOnly = true;
+      cMACCol.Width = 120;
+      cMACCol.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+      DGV_Systems.Columns.Add(cMACCol);
+
+
+      DataGridViewTextBoxColumn cSrcIPCol = new DataGridViewTextBoxColumn();
+      cSrcIPCol.DataPropertyName = "SrcIP";
+      cSrcIPCol.Name = "SrcIP";
+      cSrcIPCol.HeaderText = "Source IP";
+      cSrcIPCol.Width = 140;
+      cSrcIPCol.ReadOnly = true;
+      cSrcIPCol.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+      DGV_Systems.Columns.Add(cSrcIPCol);
+
+      DataGridViewTextBoxColumn cAppURLCol = new DataGridViewTextBoxColumn();
+      cAppURLCol.DataPropertyName = "OperatingSystem";
+      cAppURLCol.Name = "OperatingSystem";
+      cAppURLCol.HeaderText = "Operating System";
+      cAppURLCol.ReadOnly = true;
+      cAppURLCol.Width = 200; // 373;
+      cAppURLCol.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+      DGV_Systems.Columns.Add(cAppURLCol);
+
+      DataGridViewTextBoxColumn cHWVendorCol = new DataGridViewTextBoxColumn();
+      cHWVendorCol.DataPropertyName = "HWVendor";
+      cHWVendorCol.Name = "HWVendor";
+      cHWVendorCol.HeaderText = "Hardware vendor";
+      cHWVendorCol.ReadOnly = true;
+      cHWVendorCol.Width = 200; // 373;
+      cHWVendorCol.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+      DGV_Systems.Columns.Add(cHWVendorCol);
+
+
+      DataGridViewTextBoxColumn cLastSeenCol = new DataGridViewTextBoxColumn();
+      cLastSeenCol.DataPropertyName = "LastSeen";
+      cLastSeenCol.Name = "LastSeen";
+      cLastSeenCol.HeaderText = "Last seen";
+      cLastSeenCol.ReadOnly = true;
+      //cLastSeenCol.Width = 120;
+      cLastSeenCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+      cLastSeenCol.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+      DGV_Systems.Columns.Add(cLastSeenCol);
+
+
+      cSystems = new BindingList<SystemRecord>();
+      DGV_Systems.DataSource = cSystems;
+      #endregion
+
+
+
+      /*
+       * Plugin configuration 
+       */
+      Config = new PluginProperties()
+      {
+        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
+        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        PluginName = "Systems",
+        PluginDescription = "Listing detected client systems, their OS type and the timestamp when it was last seen.",
+        PluginVersion = "0.7",
+        Ports = "TCP:80;TCP:443;",
+        IsActive = true
+      };
+
+      cTask = TaskFacade.getInstance(this);
+      cSystemPatterns = new BindingList<ManageSystems.SystemPattern>();
+    }
+
+    #endregion
+
+
+    #region PRIVATE
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMAC"></param>
+    /// <returns></returns>
+    private DataGridViewRow GetRowByMAC(String pMAC)
+    {
+      DataGridViewRow lRetVal = null;
+
+      if (DGV_Systems.RowCount > 0)
+      {
+        foreach (DataGridViewRow lRow in DGV_Systems.Rows)
+        {
+          if (lRow.Cells["SrcMAC"].Value.ToString() == pMAC)
+          {
+            lRetVal = lRow;
+            break;
+          } //if (lRow.Cel ...
+        } // foreach (DataG...
+      } // if (DGV_Syste...
+
+      return (lRetVal);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pSrcMAC"></param>
+    /// <param name="pSrcIP"></param>
+    /// <returns></returns>
+    private EntryType FullEntryExists(String pSrcMAC, String pSrcIP)
+    {
+      EntryType lRetVal = EntryType.Empty;
+
+      if (cSystems != null && cSystems.Count > 0)
+      {
+        foreach (SystemRecord lSystem in cSystems)
+        {
+          String lSrcMACReal = pSrcMAC.Replace('-', ':');
+          String lSystemMacReal = lSystem.SrcMAC.Replace('-', ':');
+
+          if (lSystemMacReal == lSrcMACReal && lSystem.SrcIP == pSrcIP && lSystem.OperatingSystem.Length > 0)
+          {
+            lRetVal = EntryType.Full;
+            break;
+          }
+          else if (lSystemMacReal == lSrcMACReal && lSystem.SrcIP == pSrcIP)
+          {
+            lRetVal = EntryType.Half;
+            break;
+          }
+        } // foreach (System...
+      } // if (mSyste...
+
+      return (lRetVal);
+    }
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pSrcMAC"></param>
+    /// <param name="pSrcIP"></param>
+    /// <param name="pOS"></param>
+    /// <returns></returns>
+    private bool SetOS(String pSrcMAC, String pSrcIP, String pOS)
+    {
+      bool lRetVal = false;
+
+      if (cSystems != null && cSystems.Count > 0)
+      {
+
+        foreach (SystemRecord lSystem in cSystems)
+        {
+          String lSrcMACReal = pSrcMAC.Replace('-', ':');
+          String lSystemMacReal = lSystem.SrcMAC.Replace('-', ':');
+
+          if (lSrcMACReal == lSystemMacReal && lSystem.SrcIP == pSrcIP)
+          {
+            lSystem.OperatingSystem = pOS;
+            lRetVal = true;
+            break;
+          } // if (lSystem.Sr ...
+        } // foreach (System...
+      } // if (mSyste...
+
+
+      return (lRetVal);
+    }
+
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pUserAgent"></param>
+    /// <returns></returns>
+    private String GetOperatingSystem(String pUserAgent)
+    {
+      String lRetVal = String.Empty;
+
+      foreach (ManageSystems.SystemPattern lTempSys in cSystemPatterns)
+      {
+        if (pUserAgent != null && Regex.Match(pUserAgent, @lTempSys.SystemPatternString, RegexOptions.IgnoreCase).Success)
+        {
+          lRetVal = lTempSys.SystemName;
+          break;
+        } // if (lSplit2.L.. 
+      }
+
+      return (lRetVal);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMAC"></param>
+    /// <returns></returns>
+    private DataGridViewRow ListEntryExists(String pMAC)
+    {
+      DataGridViewRow lRetVal = null;
+
+      foreach (DataGridViewRow lRow in DGV_Systems.Rows)
+      {
+        if (lRow.Cells["SrcMAC"].Value.ToString() == pMAC)
+        {
+          lRetVal = lRow;
+          break;
+        } // if (lSys.Src...
+      } // foreach (Systems...
+
+      return (lRetVal);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void readSystemPatterns()
+    {
+      //BindingList<SystemPattern> lSystemPatterns = null;
+      //FileStream lFS = null;
+      //XmlSerializer lXMLSerial;
+
+      //try
+      //{
+      //  lFS = new FileStream(cPatternFilePath, FileMode.Open);
+      //  lXMLSerial = new XmlSerializer(cSystemPatterns.GetType());
+      //  lSystemPatterns = (BindingList<SystemPattern>)lXMLSerial.Deserialize(lFS);
+      //}
+      //catch (FileNotFoundException)
+      //{
+      //  return;
+      //}
+      //catch (Exception lEx)
+      //{
+      //  MessageBox.Show(lEx.StackTrace);
+      //  return;
+      //}
+      //finally
+      //{
+      //  if (lFS != null)
+      //    lFS.Close();
+      //}
+      ///*
+      // * Clear and repopulate DataGridView.
+      // */
+      //if (lSystemPatterns != null && lSystemPatterns.Count > 0)
+      //{
+      //  cSystemPatterns.Clear();
+      //  foreach (SystemPattern lTmpPattern in lSystemPatterns)
+      //    cSystemPatterns.Add(lTmpPattern);
+      //}
+    }
+
+    #endregion
+
+
+    #region PROPERTIES
+
+    public Control PluginControl { get { return (this); } }
+    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
+
+    #endregion
+
+
+    #region IPlugin Member
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public PluginProperties Config { set; get; }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public delegate void onInitDelegate();
+    public void onInit()
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new onInitDelegate(onInit), new object[] { });
+        return;
+      } // if (InvokeRequired)
+
+      cHost.PluginSetStatus(this, "grey");
+      readSystemPatterns();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public delegate void onStartAttackDelegate();
+    public void onStartAttack()
+    {
+      if (Config.IsActive)
+      {
+        if (InvokeRequired)
+        {
+          BeginInvoke(new onStartAttackDelegate(onStartAttack), new object[] { });
+          return;
+        } // if (InvokeRequired)
+
+        // Add all system from ARP scan to the list
+        cTask.removeAllRecords();
+
+        foreach (Tuple<String, String, String> lTmp in cHost.GetAllReachableSystems())
+          cTask.addRecord(new SystemRecord(lTmp.Item1, lTmp.Item2, String.Empty, lTmp.Item3, String.Empty, String.Empty));
+
+        cHost.PluginSetStatus(this, "green");
+      } // if (cIsActiv...
+    }
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public delegate void onStopAttackDelegate();
+    public void onStopAttack()
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new onStopAttackDelegate(onStopAttack), new object[] { });
+        return;
+      } // if (InvokeRequired)
+
+      cHost.PluginSetStatus(this, "grey");
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public delegate String getDataDelegate();
+    public String getData()
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new getDataDelegate(getData), new object[] { });
+        return ("");
+      } // if (InvokeRequired)
+
+      return ("");
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pSessionID"></param>
+    /// <returns></returns>
+    public delegate String onGetSessionDataDelegate(String pSessionID);
+    public String onGetSessionData(String pSessionID)
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new onGetSessionDataDelegate(onGetSessionData), new object[] { pSessionID });
+        return (String.Empty);
+      } // if (InvokeRequired)
+
+      String lRetVal = String.Empty;
+
+      lRetVal = cTask.getSessionData(pSessionID);
+
+      return (lRetVal);
+    }
+
+
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public delegate void onShutDownDelegate();
+    public void onShutDown()
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new onShutDownDelegate(onShutDown), new object[] { });
+        return;
+      } // if (Invoke
+    }
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public delegate void onResetPluginDelegate();
+    public void onResetPlugin()
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new onResetPluginDelegate(onResetPlugin), new object[] { });
+        return;
+      } // if (InvokeRequired)
+
+
+      if (cSystems != null)
+        cTask.removeAllRecords();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pSessionName"></param>
+    public delegate void onLoadSessionDataFromFileDelegate(String pSessionName);
+    public void onLoadSessionDataFromFile(String pSessionName)
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new onLoadSessionDataFromFileDelegate(onLoadSessionDataFromFile), new object[] { pSessionName });
+        return;
+      } // if (InvokeRequired)
+
+      cTask.loadSessionData(pSessionName);
+    }
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pSessionData"></param>
+    public delegate void onLoadSessionDataFromStringDelegate(String pSessionData);
+    public void onLoadSessionDataFromString(String pSessionData)
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new onLoadSessionDataFromStringDelegate(onLoadSessionDataFromString), new object[] { pSessionData });
+        return;
+      } // if (InvokeRequired)
+
+      cTask.loadSessionDataFromString(pSessionData);
+    }
+
+
+    /// <summary>
+    /// Remove session file with serialized data.
+    /// </summary>
+    /// <param name="pSessionName"></param>
+    public delegate void onDeleteSessionDataDelegate(String pSessionName);
+    public void onDeleteSessionData(String pSessionName)
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new onDeleteSessionDataDelegate(onDeleteSessionData), new object[] { pSessionName });
+        return;
+      } // if (InvokeRequired)
+
+      cTask.deleteSession(pSessionName);
+    }
+
+
+
+
+    /// <summary>
+    /// Serialize session data
+    /// </summary>
+    /// <param name="pSessionName"></param>
+    public delegate void onSaveSessionDataDelegate(String pSessionName);
+    public void onSaveSessionData(String pSessionName)
+    {
+      if (Config.IsActive)
+      {
+        if (InvokeRequired)
+        {
+          BeginInvoke(new onSaveSessionDataDelegate(onSaveSessionData), new object[] { pSessionName });
+          return;
+        } // if (InvokeRequired)
+
+        cTask.saveSession(pSessionName);
+      } // if (cIsActiv...
+    }
+
+
+
+
+    /// <summary>
+    /// New input data arrived
+    /// </summary>
+    /// <param name="pData"></param>
+    public delegate void onNewDataDelegate(String pData);
+    public void onNewData(String pData)
+    {
+      if (Config.IsActive)
+      {
+        if (InvokeRequired)
+        {
+          BeginInvoke(new onNewDataDelegate(onNewData), new object[] { pData });
+          return;
+        } // if (InvokeRequired)
+
+        try
+        {
+          if (pData != null && pData.Length > 0)
+          {
+            String[] lSplitter = Regex.Split(pData, @"\|\|");
+
+            if (lSplitter.Length == 7)
+            {
+              String lProto = lSplitter[0];
+              String lSMAC = lSplitter[1];
+              String lSIP = lSplitter[2];
+              String lSPort = lSplitter[3];
+              String lDIP = lSplitter[4];
+              String lDPort = lSplitter[5];
+              String lData = lSplitter[6];
+              String lOperatingSystem = String.Empty;
+              String lUserAgent = String.Empty;
+              Match lMatchUserAgent;
+              int lLastPosition = -1;
+              EntryType lEntryType = FullEntryExists(lSMAC, lSIP);
+              DataGridViewRow lTabelRow;
+
+
+              /*
+               * Determine the operating system due to the HTTP User-Agent string.
+               */
+              if (((lMatchUserAgent = Regex.Match(lData, @"\.\.User-Agent\s*:\s*(.+?)\.\.", RegexOptions.IgnoreCase))).Success)
+              {
+                try
+                {
+                  lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+                  lUserAgent = lMatchUserAgent.Groups[1].Value.ToString();
+                  lOperatingSystem = GetOperatingSystem(lUserAgent);
+                }
+                catch (Exception lEx)
+                {
+                  cHost.LogMessage(String.Format("PluginSystemsMainUC::NewData(0) : {0} - {1}", lEx.Message, lEx.StackTrace));
+                }
+
+                try
+                {
+                  if (lEntryType != EntryType.Full && lOperatingSystem.Length > 0) //!ListEntryExists(lMAC))
+                  {
+                    if (lEntryType == EntryType.Empty)
+                      cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, lOperatingSystem, String.Empty));
+                    else if (lEntryType == EntryType.Half)
+                      SetOS(lSMAC, lSIP, lOperatingSystem);
+
+
+                    if ((lTabelRow = GetRowByMAC(lSMAC)) != null)
+                      lTabelRow.Cells["OperatingSystem"].ToolTipText = lUserAgent;
+
+
+                    DGV_Systems.Refresh();
+                    if (lLastPosition >= 0)
+                      DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+                  }
+                  else if (lSIP.Length > 0 && lSMAC.Length > 0)
+                  {
+                    lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+                    cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));
+                    DGV_Systems.Refresh();
+
+                    if (lLastPosition >= 0)
+                      DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+                  }
+                }
+                catch (Exception lEx)
+                {
+                  cHost.LogMessage(String.Format("PluginSystemsMainUC::NewData(1) : {0} - {1}", lEx.Message, lEx.StackTrace));
+                }
+
+                /*
+                 * The operating system cant be determined.
+                 */
+              }
+              else if (lEntryType == EntryType.Empty && lSIP.Length > 0 && lSMAC.Length > 0)
+              {
+                lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+                cTask.addRecord(new SystemRecord(lSMAC, lSIP, String.Empty, lUserAgent, String.Empty, String.Empty));
+                DGV_Systems.Refresh();
+
+                if (lLastPosition >= 0)
+                  DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+              } // if (lDstPort...
+
+
+
+              /*
+               * Updating LastSeen column.
+               */
+              using (DataGridViewRow lRow = ListEntryExists(lSMAC))
+              {
+                if (lRow != null && lRow.Cells["LastSeen"] != null)
+                  lRow.Cells["LastSeen"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+              }
+
+            } // if (lSplit.Leng..
+          } // if (pData.Leng...
+        }
+        catch (Exception lEx)
+        {
+          MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.ToString()));
+        }
+      } // if (cIsActiv...
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pTargetList"></param>
+    public void SetTargets(List<String> pTargetList)
+    {
+      cTargetList = pTargetList;
+    }
+
+    #endregion
+
+
+    #region EVENTS
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void TSMI_Clear_Click(object sender, EventArgs e)
+    {
+      cTask.removeAllRecords();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void DGV_Systems_MouseUp(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Right)
+      {
+        CMS_Systems.Show(DGV_Systems, e.Location);
+      }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void DGV_Systems_MouseUp_1(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Right)
+      {
+        try
+        {
+          DataGridView.HitTestInfo hti = DGV_Systems.HitTest(e.X, e.Y);
+          if (hti.RowIndex >= 0)
+            CMS_Systems.Show(DGV_Systems, e.Location);
+        }
+        catch (Exception lEx) { }
+      }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void deleteEntryToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      int lCurIndex = DGV_Systems.CurrentCell.RowIndex;
+      cTask.removeRecordAt(lCurIndex);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void DGV_Systems_DoubleClick(object sender, EventArgs e)
+    {
+      ManageSystems.Form_ManageSystems lManageSystems = new ManageSystems.Form_ManageSystems(cHost);
+      lManageSystems.ShowDialog();
+      readSystemPatterns();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void DGV_Systems_MouseDown(object sender, MouseEventArgs e)
+    {
+      try
+      {
+        DataGridView.HitTestInfo hti = DGV_Systems.HitTest(e.X, e.Y);
+
+        if (hti.RowIndex >= 0)
+        {
+          DGV_Systems.ClearSelection();
+          DGV_Systems.Rows[hti.RowIndex].Selected = true;
+          DGV_Systems.CurrentCell = DGV_Systems.Rows[hti.RowIndex].Cells[0];
+        }
+      }
+      catch (Exception)
+      {
+        DGV_Systems.ClearSelection();
+      }
+    }
+
+    #endregion
+
+
+    #region OBSERVER INTERFACE METHODS
+
+    public void update(List<SystemRecord> pRecordList)
+    {
+      pRecordList.Clear();
+      foreach (SystemRecord lTmp in pRecordList)
+        cSystems.Add(new SystemRecord(lTmp.SrcMAC, lTmp.SrcIP, lTmp.UserAgent, lTmp.HWVendor, lTmp.OperatingSystem, lTmp.LastSeen));
+
+      DGV_Systems.Refresh();
+    }
+
+    #endregion
+
+  }
+}
