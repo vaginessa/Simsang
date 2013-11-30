@@ -96,14 +96,10 @@ namespace Plugin.Main.Session.ManageSessions
       /*
        * Check Host and Cookie regex
        */
-      try
-      { new Regex(@pRecord.SessionPatternString).Match("randomString.Lalala()"); }
-      catch (ArgumentException)
+      try 
       {
-        throw new Exception("Host regex is invalid");
+        new Regex(@pRecord.SessionPatternString); 
       }
-
-      try { new Regex(@pRecord.SessionPatternString); }
       catch (ArgumentException)
       {
         throw new Exception("Session cookies regex is invalid");

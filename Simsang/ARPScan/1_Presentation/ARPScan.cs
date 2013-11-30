@@ -279,66 +279,40 @@ namespace Simsang.ARPScan.Main
       }
 
 
+      mTargetList.Clear();
+
 
       /*
-       * Check if start/stop addresses are correct.
+       * Set GUI parameters
        */
-      if (lStartIP == null || lStartIP.Length == 0)
+      BT_Close.Enabled = false;
+      BT_Scan.Enabled = false;
+
+      RB_Netrange.Enabled = false;
+      RB_Subnet.Enabled = false;
+
+      if (RB_Netrange.Checked)
       {
-        MessageBox.Show("You didn't define a start IP", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        TB_Netrange1.ReadOnly = true;
+        TB_Netrange2.ReadOnly = true;
+
+        TB_Netrange1.Enabled = false;
+        TB_Netrange2.Enabled = false;
       }
-      else if (lStopIP == null || lStopIP.Length == 0)
+      this.Cursor = Cursors.WaitCursor;
+      DGV_Targets.Cursor = Cursors.WaitCursor;
+
+
+      try
       {
-        MessageBox.Show("You didn't define a stop IP", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        cARPScan.startARPScan(mIfcID, lStartIP, lStopIP, updateTextBox, setARPScanBTOnStopped);
       }
-      else if (!Regex.Match(lStartIP, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$").Success)
+      catch (Exception lEx)
       {
-        MessageBox.Show("Something is wrong with the start IP", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+        MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        setARPScanBTOnStopped();
       }
-      else if (!Regex.Match(lStopIP, @"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$").Success)
-      {
-        MessageBox.Show("Something is wrong with the stop IP", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-      }
-      else
-      {
-        /*
-         * Initiate scan process.
-         */
-        mTargetList.Clear();
-
-
-        /*
-         * Set GUI parameters
-         */
-        BT_Close.Enabled = false;
-        BT_Scan.Enabled = false;
-
-        RB_Netrange.Enabled = false;
-        RB_Subnet.Enabled = false;
-
-        if (RB_Netrange.Checked)
-        {
-          TB_Netrange1.ReadOnly = true;
-          TB_Netrange2.ReadOnly = true;
-
-          TB_Netrange1.Enabled = false;
-          TB_Netrange2.Enabled = false;
-        }
-        this.Cursor = Cursors.WaitCursor;
-        DGV_Targets.Cursor = Cursors.WaitCursor;
-
-
-        try
-        {
-          cARPScan.startARPScan(mIfcID, lStartIP, lStopIP, updateTextBox, setARPScanBTOnStopped);
-        }
-        catch (Exception lEx)
-        {
-          LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-          MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-          setARPScanBTOnStopped();
-        }
-      } // if (File.Exists...
     }
 
 
