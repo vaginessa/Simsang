@@ -586,28 +586,29 @@
       // TSMI_GetUpdates
       // 
       this.TSMI_GetUpdates.Name = "TSMI_GetUpdates";
-      this.TSMI_GetUpdates.Size = new System.Drawing.Size(182, 22);
+      this.TSMI_GetUpdates.Size = new System.Drawing.Size(190, 22);
       this.TSMI_GetUpdates.Text = "Check for updates ...";
       this.TSMI_GetUpdates.Click += new System.EventHandler(this.getUpdatesToolStripMenuItem_Click);
       // 
       // TSMI_Debugging
       // 
       this.TSMI_Debugging.Name = "TSMI_Debugging";
-      this.TSMI_Debugging.Size = new System.Drawing.Size(182, 22);
+      this.TSMI_Debugging.Size = new System.Drawing.Size(190, 22);
       this.TSMI_Debugging.Text = "Debuggin (is off)";
       this.TSMI_Debugging.Click += new System.EventHandler(this.debugginOnToolStripMenuItem_Click);
       // 
       // TSMI_LogConsole
       // 
       this.TSMI_LogConsole.Name = "TSMI_LogConsole";
-      this.TSMI_LogConsole.Size = new System.Drawing.Size(182, 22);
+      this.TSMI_LogConsole.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
+      this.TSMI_LogConsole.Size = new System.Drawing.Size(190, 22);
       this.TSMI_LogConsole.Text = "Log console ...";
       this.TSMI_LogConsole.Click += new System.EventHandler(this.logConsoleToolStripMenuItem_Click);
       // 
       // TSMI_Contribute
       // 
       this.TSMI_Contribute.Name = "TSMI_Contribute";
-      this.TSMI_Contribute.Size = new System.Drawing.Size(182, 22);
+      this.TSMI_Contribute.Size = new System.Drawing.Size(190, 22);
       this.TSMI_Contribute.Text = "Contribute ...";
       this.TSMI_Contribute.Click += new System.EventHandler(this.TSMI_Contribute_Click);
       // 

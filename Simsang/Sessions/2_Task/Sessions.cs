@@ -6,15 +6,14 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
 using System.Windows.Forms;
 
 using Simsang.Plugin;
+using Simsang.Session.Config;
 
 
 
-namespace Simsang
+namespace Simsang.Session
 {
   public partial class Sessions : Form
   {
@@ -22,9 +21,9 @@ namespace Simsang
     #region MEMBERS
 
     private BindingList<SessionRecord> mSessionRecord;
-    private static String mSessionDir = String.Format("{0}{1}", Directory.GetCurrentDirectory(), Config.SessionDir);
     private ACMain mACMain;
     private static Sessions mInstance;
+    private TaskFacade mTask;
 
     #endregion
 
@@ -34,6 +33,9 @@ namespace Simsang
     public Sessions(ACMain pACMain)
     {
       InitializeComponent();
+
+      mACMain = pACMain;
+      
 
       #region Datagrid header
 
@@ -77,10 +79,12 @@ namespace Simsang
 
       #endregion
 
-      mACMain = pACMain;
+
       mSessionRecord = new BindingList<SessionRecord>();
-      LoadSessionData();
       DGV_Sessions.DataSource = mSessionRecord;
+
+      mTask = TaskFacade.getInstance();
+      LoadSessionData();
     }
 
 
@@ -103,24 +107,13 @@ namespace Simsang
     /// </summary>
     /// <param name="pSessionFileName"></param>
     /// <param name="pPluginList"></param>
-    public static void RemoveSession(String pSessionFileName, IPlugin[] pPluginList)
+    public void removeSession(String pSessionName, IPlugin[] pPluginList)
     {
-      String lFileName = String.Empty;
-
-
       /*
-       * Save main session information.
+       * Remove simsang session data.
        */
-      try
-      {
-        lFileName = String.Format("{0}{1}", mSessionDir, pSessionFileName);
-        if (File.Exists(lFileName))
-          File.Delete(lFileName);
-      }
-      catch (Exception lEx)
-      {
-        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-      }
+      mTask.removeSession(pSessionName);
+
 
       /*
        * Remove plugin session data.
@@ -130,7 +123,7 @@ namespace Simsang
         try
         {
           if (lPlugin != null)
-            lPlugin.onDeleteSessionData(Path.GetFileNameWithoutExtension(pSessionFileName));
+            lPlugin.onDeleteSessionData(Path.GetFileNameWithoutExtension(pSessionName));
         }
         catch (Exception lEx)
         {
@@ -148,46 +141,24 @@ namespace Simsang
     public bool loadSession(String pSessionFileName)
     {
       bool lRetVal = false;
+      AttackSession AttackSession;
 
       if (!String.IsNullOrEmpty(pSessionFileName))
       {
         /*
          * Load main GUI session data.
          */
-        String lSessionFilePath = String.Format("{0}{1}.xml", mSessionDir, pSessionFileName);
-        FileStream lFS = null;
-        XmlSerializer lXMLSerial;
-        AttackSession lAttackSession;
-        String lStartIP = String.Empty;
-        String lStopIP = String.Empty;
+        String lSessionName = String.Format("{0}.xml", pSessionFileName);
+        AttackSession = mTask.loadSession(pSessionFileName);
 
-
-        try
-        {
-          lFS = new FileStream(lSessionFilePath, FileMode.Open);
-          lXMLSerial = new XmlSerializer(typeof(AttackSession));
-          lAttackSession = (AttackSession)lXMLSerial.Deserialize(lFS);
-
-          mACMain.SetStartIP(lAttackSession.StartIP);
-          mACMain.SetStopIP(lAttackSession.StopIP);
-          mACMain.SetSessionName(lAttackSession.Name);
-        }
-        catch (Exception lEx)
-        {
-          LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-          return (lRetVal);
-        }
-        finally
-        {
-          if (lFS != null)
-            lFS.Close();
-        }
-
+        mACMain.SetStartIP(AttackSession.StartIP);
+        mACMain.SetStopIP(AttackSession.StopIP);
+        mACMain.SetSessionName(AttackSession.Name);
 
         /*
          * Load plugin session data
          */
-        if (!String.IsNullOrEmpty(lSessionFilePath))
+        if (!String.IsNullOrEmpty(lSessionName))
         {
           foreach (IPlugin lPlugIn in mACMain.PluginsModule.PluginList)
           {
@@ -201,27 +172,16 @@ namespace Simsang
       return (lRetVal);
     }
 
+
+    public void getSessionByName(String pSessionName)
+    {
+      mTask.getSessionByName(pSessionName);
+    }
+
     #endregion
 
 
     #region PRIVATE
-
-    /// <summary>
-    /// Close Sessions GUI on Escape.
-    /// </summary>
-    /// <param name="keyData"></param>
-    /// <returns></returns>
-    protected override bool ProcessDialogKey(Keys keyData)
-    {
-      if (keyData == Keys.Escape)
-      {
-        this.Close();
-        return true;
-      }
-      else
-        return base.ProcessDialogKey(keyData);
-    }
-
 
     /// <summary>
     /// 
@@ -229,7 +189,7 @@ namespace Simsang
     private void LoadSessionData()
     {
       mSessionRecord.Clear();
-      List<AttackSession> lSessionRecord = AttackSession.GetAllSessions(mSessionDir);
+      List<AttackSession> lSessionRecord = mTask.getAllSessions();
 
       if (lSessionRecord != null && lSessionRecord.Count > 0)
       {
@@ -237,7 +197,7 @@ namespace Simsang
         {
           try
           {
-            //                        mSessionRecord.Add(new SessionRecord(lSess.FileName, lSess.Name, lSess.Description, lSess.StartTime, lSess.StopTime));
+            //mSessionRecord.Add(new SessionRecord(lSess.FileName, lSess.Name, lSess.Description, lSess.StartTime, lSess.StopTime));
             mSessionRecord.Add(new SessionRecord(lSess.SessionFileName, lSess.Name, lSess.Description, lSess.StartTime, lSess.StopTime));
           }
           catch (Exception lEx)
@@ -264,7 +224,6 @@ namespace Simsang
     }
 
 
-
     /// <summary>
     /// 
     /// </summary>
@@ -289,7 +248,6 @@ namespace Simsang
     }
 
 
-
     /// <summary>
     /// 
     /// </summary>
@@ -300,46 +258,7 @@ namespace Simsang
       String lSessionFilePath = String.Empty;
       String lFileName = String.Empty;
 
-      try
-      {
-        lFileName = Path.GetFileNameWithoutExtension(DGV_Sessions.CurrentRow.Cells[0].Value.ToString());
-        lSessionFilePath = String.Format("{0}{1}.xml", mSessionDir, lFileName);
-
-      }
-      catch (Exception lEx)
-      {
-        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-      }
-
-      /*
-       * Load main GUI session data.
-       */
-      FileStream lFS = null;
-      XmlSerializer lXMLSerial;
-      AttackSession lAttackSession;
-      String lStartIP = String.Empty;
-      String lStopIP = String.Empty;
-
-      try
-      {
-        lFS = new FileStream(lSessionFilePath, FileMode.Open);
-        lXMLSerial = new XmlSerializer(typeof(AttackSession));
-        lAttackSession = (AttackSession)lXMLSerial.Deserialize(lFS);
-
-        mACMain.SetStartIP(lAttackSession.StartIP);
-        mACMain.SetStopIP(lAttackSession.StopIP);
-        mACMain.SetSessionName(lAttackSession.Name);
-      }
-      catch (Exception lEx)
-      {
-        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-      }
-      finally
-      {
-        if (lFS != null)
-          lFS.Close();
-      }
-
+      lFileName = Path.GetFileNameWithoutExtension(DGV_Sessions.CurrentRow.Cells[0].Value.ToString());
 
       /*
        * Load plugin session data
@@ -369,7 +288,7 @@ namespace Simsang
 
         if (lSessionName.Length > 0 && lSessionFileName.Length > 0)
         {
-          RemoveSession(lSessionFileName, mACMain.PluginsModule.PluginList);
+          removeSession(lSessionFileName, mACMain.PluginsModule.PluginList);
           LoadSessionData();
         }
       }
@@ -416,6 +335,24 @@ namespace Simsang
       this.Hide();
       e.Cancel = true;
     }
+
+
+    /// <summary>
+    /// Close Sessions GUI on Escape.
+    /// </summary>
+    /// <param name="keyData"></param>
+    /// <returns></returns>
+    protected override bool ProcessDialogKey(Keys keyData)
+    {
+      if (keyData == Keys.Escape)
+      {
+        this.Close();
+        return true;
+      }
+      else
+        return base.ProcessDialogKey(keyData);
+    }
+
     #endregion
 
   }

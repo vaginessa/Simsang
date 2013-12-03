@@ -29,6 +29,7 @@ using Simsang.MACVendors;
 using Simsang.MiniBrowser;
 using Simsang.LogConsole.Main;
 using Simsang.SessionsExport;
+using Simsang.Session.Config;
 
 
 namespace Simsang
@@ -48,9 +49,11 @@ namespace Simsang
     private InputModule mInputModule;
     private PluginModule mPluginModule;
     private AttackSession mCurrentSession;
-    private String mCurrentIPAddress = String.Empty;
+    private String mCurrentIPAddress;
     private Browser cMiniBrowser;
     private bool mAttackStarted;
+    private Session.Sessions mSessionPresentationFacade;
+    private Session.TaskFacade mSessionTaskFacade;
 
     #endregion
 
@@ -165,9 +168,12 @@ namespace Simsang
       mTargetList = new BindingList<string>();
       mInputModule = new InputModule(this);
       mPluginModule = new PluginModule(this);
-      mCurrentSession = new AttackSession(Directory.GetCurrentDirectory() + Config.SessionDir);
+      mSessionPresentationFacade = Session.Sessions.getInstance(this);
+      mSessionTaskFacade = Session.TaskFacade.getInstance();
+      //mCurrentSession = new AttackSession(Directory.GetCurrentDirectory() + Config.SessionDir);
+      mCurrentSession = new AttackSession();
       mCurrentSession.StartTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-
+      
       // Check Pcap version
       try
       {
@@ -202,13 +208,6 @@ namespace Simsang
       catch (Exception) { }
       try { Config.CommonLanguateRuntime = Environment.Version.ToString(); }
       catch (Exception) { }
-
-
-      /*
-       * Init LogConsole
-       */
-      LogConsole.Main.LogConsole.initLogConsole();
-
 
       /*
        * Check if an other instance is running.
@@ -267,12 +266,12 @@ namespace Simsang
 
 
       /*
-       * Hide all plugins with status "off"
+       * Hide all plugins what have the status "off"
        */
       mPluginModule.CloseInactivePlugins();
 
       // And at last a new session
-      //            TB_Session.Text = GetNewSessionName();
+      // TB_Session.Text = GetNewSessionName();
 
 
       if (CB_Interfaces.Items.Count <= 0)
@@ -455,7 +454,7 @@ namespace Simsang
 
         foreach (XElement lTmp in la.Elements())
         {
-          if (lTmp.Name.LocalName.ToString() == "AttackSession")
+          if (lTmp.Name.LocalName.ToString() == "TaskFacade")
           {
             String lSessionFile = String.Format("{0}{1}{2}.xml", Directory.GetCurrentDirectory(), Config.SessionDir, lSessionFileName);
             if (File.Exists(lSessionFile))
@@ -587,7 +586,7 @@ namespace Simsang
               XDocument lXMLDoc = XDocument.Load(pSessionFile);
               String lSessionName = lXMLDoc.Element("SessionExport").Element("Session").Attribute("filename").Value.ToString();
 
-              if (!Sessions.getInstance(this).loadSession(lSessionName))
+              if (!Session.Sessions.getInstance(this).loadSession(lSessionName))
                 MessageBox.Show("An error occurred while loading session " + lSessionName, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception lEx)
@@ -920,10 +919,8 @@ namespace Simsang
     /// <param name="e"></param>
     private void listToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      Sessions.getInstance(this).ShowDialog();
+      Session.Sessions.getInstance(this).ShowDialog();
     }
-
-
 
 
     /// <summary>
@@ -937,18 +934,19 @@ namespace Simsang
         MessageBox.Show("You didn't define a session name", "Info - Session", MessageBoxButtons.OK, MessageBoxIcon.Information);
       else
       {
-        AttackSession lASession = mCurrentSession.GetSessionByName(TB_Session.Text);
+        
+        AttackSession lASession = Simsang.Session.TaskFacade.getInstance().getSessionByName(TB_Session.Text);
+////        AttackSession lASession = mCurrentSession.getSessionByName(TB_Session.Text);
 
         if (lASession != null)
         {
           String lMsg = "A session with this name exists already!\nDo you want to overwrite the existing session data?";
           if (MessageBox.Show(lMsg, "Info - Session", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-            Sessions.RemoveSession(lASession.SessionFileName, PluginsModule.PluginList);
-          //                        Sessions.RemoveSession(lASession.FileName, PluginsModule.PluginList);
-          else
+//            Simsang.Session.TaskFacade.getInstance().removeSession(lASession.SessionFileName, PluginsModule.PluginList);
+//          //Sessions.removeSession(lASession.FileName, PluginsModule.PluginList);
+//          else
             return;
         } // if (lASess...
-
 
         /*
          * Save main session information.
@@ -960,9 +958,9 @@ namespace Simsang
         mCurrentSession.StopIP = TB_StopIP.Text;
         mCurrentSession.StopTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
         mCurrentSession.Name = TB_Session.Text;
-        mCurrentSession.SaveSessionData();
+        mCurrentSession.SessionFileName = String.Format("{0}.xml", DateTime.Now.ToString("yyyyMMdd_hhmmssff"));
 
-
+        mSessionTaskFacade.SaveSessionData(mCurrentSession);
 
         /*
          * Save plugin session data.
@@ -973,15 +971,13 @@ namespace Simsang
           {
             if (lPlugin != null)
               lPlugin.onSaveSessionData(Path.GetFileNameWithoutExtension(mCurrentSession.SessionFileName));
-            //                            lPlugin.onSaveSessionData(mCurrentSession.FileName);
+            //lPlugin.onSaveSessionData(mCurrentSession.FileName);
           }
           catch (Exception lEx)
           {
             LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
           }
         } // foreach (IP...
-
-
 
         /*
          * Initialize new session.

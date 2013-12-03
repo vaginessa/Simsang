@@ -83,7 +83,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simsang", "Simsang", "{D927
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simsang", "Simsang", "{FF0DF012-7035-4266-B8C2-30D9A9E7C5A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTests", "NUnitTests\NUnitTests.csproj", "{94F87C36-C15D-40CE-94A9-6EF9A041BE5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTests_Plugins", "NUnitTests\NUnitTests_Plugins.csproj", "{94F87C36-C15D-40CE-94A9-6EF9A041BE5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTests_Simsang", "NUnitTests_Simsang\NUnitTests_Simsang.csproj", "{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -509,6 +511,18 @@ Global
 		{94F87C36-C15D-40CE-94A9-6EF9A041BE5A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{94F87C36-C15D-40CE-94A9-6EF9A041BE5A}.Release|Win32.ActiveCfg = Release|Any CPU
 		{94F87C36-C15D-40CE-94A9-6EF9A041BE5A}.Release|x86.ActiveCfg = Release|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -547,5 +561,6 @@ Global
 		{8F32617F-2809-4DA1-A35F-8A84F9B141C8} = {62A80090-1E03-41FD-8BBF-2FDC00358FBD}
 		{FF0DF012-7035-4266-B8C2-30D9A9E7C5A8} = {62A80090-1E03-41FD-8BBF-2FDC00358FBD}
 		{94F87C36-C15D-40CE-94A9-6EF9A041BE5A} = {62A80090-1E03-41FD-8BBF-2FDC00358FBD}
+		{902F2679-F0FB-4C2E-BE0A-C8E8F7CEC35C} = {62A80090-1E03-41FD-8BBF-2FDC00358FBD}
 	EndGlobalSection
 EndGlobal

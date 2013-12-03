@@ -99,13 +99,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ARPScan\2_Infrastructure\ProcessARPScan.cs" />
+    <Compile Include="ARPScan\2_Task\TaskFacade.cs" />
+    <Compile Include="ARPScan\3_Infrastructure\InfrastructureFacade.cs" />
     <Compile Include="ARPScan\1_Presentation\ARPScan.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ARPScan\1_Presentation\ARPScan.Designer.cs">
       <DependentUpon>ARPScan.cs</DependentUpon>
     </Compile>
+    <Compile Include="ARPScan\Config\ARPScanConfig.cs" />
     <Compile Include="ARPScan\Config\TargetRecord.cs" />
     <Compile Include="Config\ConfigNetworkIfc.cs" />
     <Compile Include="Contribute\2_Infrastructure\ContributeHTTP.cs" />
@@ -128,18 +130,21 @@
     <Compile Include="Contribute\2_Infrastructure\ContributeMail.cs" />
     <Compile Include="MAC vendors\MACVendor.cs" />
     <Compile Include="Plugins\PluginModule.cs" />
-    <Compile Include="Sessions\1_Presentation\AttackSession.cs" />
+    <Compile Include="Sessions\2_Task\TaskFacade.cs" />
     <Compile Include="Sessions\1_Presentation\SessionExport.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Sessions\1_Presentation\SessionExport.Designer.cs">
       <DependentUpon>SessionExport.cs</DependentUpon>
     </Compile>
+    <Compile Include="Sessions\3_Infrastructure\InfrastructureFacade.cs" />
+    <Compile Include="Sessions\Config\AttackSession.cs" />
+    <Compile Include="Sessions\Config\SessionConfig.cs" />
     <Compile Include="Sessions\Config\SessionRecord.cs" />
-    <Compile Include="Sessions\1_Presentation\Sessions.cs">
+    <Compile Include="Sessions\2_Task\Sessions.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Sessions\1_Presentation\Sessions.Designer.cs">
+    <Compile Include="Sessions\2_Task\Sessions.Designer.cs">
       <DependentUpon>Sessions.cs</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
@@ -188,7 +193,7 @@
     <EmbeddedResource Include="Sessions\1_Presentation\SessionExport.resx">
       <DependentUpon>SessionExport.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Sessions\1_Presentation\Sessions.resx">
+    <EmbeddedResource Include="Sessions\2_Task\Sessions.resx">
       <DependentUpon>Sessions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Updates\Main\Presentation\FormNewVersion.resx">

@@ -15,7 +15,7 @@ using System.Xml.Linq;
 using System.Collections;
 
 using Simsang.MACVendors;
-using Simsang.ARPScan.Main.Infrastructure;
+using Simsang.ARPScan.Main.Config;
 
 
 namespace Simsang.ARPScan.Main
@@ -34,7 +34,7 @@ namespace Simsang.ARPScan.Main
     private String mLocalIP;
     private ACMain mACMain;
     private BindingList<TargetRecord> mTargetRecord;
-    private ProcessARPScan cARPScan;
+    private TaskFacade cTask;
 
     #endregion
 
@@ -87,7 +87,6 @@ namespace Simsang.ARPScan.Main
       mStatusCol.DataPropertyName = "status";
       mStatusCol.Name = "status";
       mStatusCol.HeaderText = "Status";
-      //        mStatusCol.ReadOnly = true;
       mStatusCol.Visible = true;
       mStatusCol.MinimumWidth = 72;
       mStatusCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -102,7 +101,10 @@ namespace Simsang.ARPScan.Main
 
       #endregion
 
-      cARPScan = ProcessARPScan.getInstance();
+      mTargetRecord = new BindingList<TargetRecord>();
+      DGV_Targets.DataSource = mTargetRecord;
+
+      cTask = TaskFacade.getInstance();
     }
 
 
@@ -228,7 +230,7 @@ namespace Simsang.ARPScan.Main
 
       try
       {
-        cARPScan.stopARPScan();
+        cTask.stopARPScan();
       }
       catch (Exception lEx)
       {
@@ -241,7 +243,7 @@ namespace Simsang.ARPScan.Main
        */
       try
       {
-        cARPScan.killAllRunningARPScans();
+        cTask.killAllRunningARPScans();
       }
       catch { }
 
@@ -305,7 +307,18 @@ namespace Simsang.ARPScan.Main
 
       try
       {
-        cARPScan.startARPScan(mIfcID, lStartIP, lStopIP, updateTextBox, setARPScanBTOnStopped);
+        ARPScanConfig lARPConf = new ARPScanConfig()
+        {
+          InterfaceID = mIfcID,
+          GatewayIP = mGatewayIP,
+          LocalIP = mLocalIP,
+          StartIP = mStartIP,
+          StopIP = mStopIP,
+          OnDataReceived = updateTextBox,
+          OnARPScanStopped = setARPScanBTOnStopped,
+          IsDebuggingOn = Simsang.Config.DebugOn()
+        };
+        cTask.startARPScan(lARPConf);
       }
       catch (Exception lEx)
       {
@@ -316,13 +329,12 @@ namespace Simsang.ARPScan.Main
     }
 
 
-
     /// <summary>
     /// 
     /// </summary>
     /// <param name="pData"></param>
-    private delegate void updateTextBoxDelegate(String pData);
-    private void updateTextBox(String pData)
+    public delegate void updateTextBoxDelegate(String pData);
+    public void updateTextBox(String pData)
     {
       if (InvokeRequired)
       {
@@ -378,6 +390,7 @@ namespace Simsang.ARPScan.Main
         LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
       }
     }
+
 
     #endregion
 
@@ -600,7 +613,6 @@ namespace Simsang.ARPScan.Main
       else
         return base.ProcessDialogKey(keyData);
     }
-
 
     #endregion
 

@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Text.RegularExpressions;
 
+using Simsang.Session.Config;
 
 
 
@@ -22,6 +23,7 @@ namespace Simsang.SessionsExport
     private BindingList<SessionRecord> mSessionRecord;
     private static String mSessionDir = String.Format("{0}{1}", Directory.GetCurrentDirectory(), Config.SessionDir);
     private ACMain mACMain;
+    private Simsang.Session.TaskFacade cTaskFacade;
 
     #endregion
 
@@ -81,6 +83,7 @@ namespace Simsang.SessionsExport
 
       mACMain = pACMain;
 
+cTaskFacade = Simsang.Session.TaskFacade.getInstance();
       mSessionRecord = new BindingList<SessionRecord>();
       LoadSessionData();
       DGV_Sessions.DataSource = mSessionRecord;
@@ -99,7 +102,7 @@ namespace Simsang.SessionsExport
     private void LoadSessionData()
     {
       mSessionRecord.Clear();
-      List<AttackSession> lSessionRecord = AttackSession.GetAllSessions(mSessionDir);
+      List<AttackSession> lSessionRecord = cTaskFacade.getAllSessions();
 
       if (lSessionRecord != null && lSessionRecord.Count > 0)
       {
@@ -107,7 +110,7 @@ namespace Simsang.SessionsExport
         {
           try
           {
-            //            mSessionRecord.Add(new SessionRecord(lSess.FileName, lSess.Name, lSess.Description, lSess.StartTime, lSess.StopTime));
+            //mSessionRecord.Add(new SessionRecord(lSess.FileName, lSess.Name, lSess.Description, lSess.StartTime, lSess.StopTime));
             mSessionRecord.Add(new SessionRecord(lSess.SessionFileName, lSess.Name, lSess.Description, lSess.StartTime, lSess.StopTime));
           }
           catch (Exception lEx)
@@ -118,10 +121,6 @@ namespace Simsang.SessionsExport
       } // if (lSessionRecord ...
     }
 
-    #endregion
-
-
-    #region PRIVATE
 
     /// <summary>
     /// Close Sessions GUI on Escape.
