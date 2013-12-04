@@ -15,13 +15,13 @@ using Simsang.Session.Config;
 
 namespace Simsang.Session
 {
-  public partial class Sessions : Form
+  public partial class Sessions : Form, IObserver
   {
 
     #region MEMBERS
 
     private BindingList<SessionRecord> mSessionRecord;
-    private ACMain mACMain;
+    private SimsangMain mACMain;
     private static Sessions mInstance;
     private TaskFacade mTask;
 
@@ -30,12 +30,12 @@ namespace Simsang.Session
 
     #region PUBLIC
 
-    public Sessions(ACMain pACMain)
+    public Sessions(SimsangMain pACMain)
     {
       InitializeComponent();
 
       mACMain = pACMain;
-      
+
 
       #region Datagrid header
 
@@ -84,7 +84,8 @@ namespace Simsang.Session
       DGV_Sessions.DataSource = mSessionRecord;
 
       mTask = TaskFacade.getInstance();
-      LoadSessionData();
+      mTask.addObserver(this);
+      mTask.findAllSessions();
     }
 
 
@@ -93,7 +94,7 @@ namespace Simsang.Session
     /// </summary>
     /// <param name="pACMain"></param>
     /// <returns></returns>
-    public static Sessions getInstance(ACMain pACMain)
+    public static Sessions getInstance(SimsangMain pACMain)
     {
       if (mInstance == null)
         mInstance = new Sessions(pACMain);
@@ -106,66 +107,27 @@ namespace Simsang.Session
     /// 
     /// </summary>
     /// <param name="pSessionFileName"></param>
-    /// <param name="pPluginList"></param>
-    public void removeSession(String pSessionName, IPlugin[] pPluginList)
-    {
-      /*
-       * Remove simsang session data.
-       */
-      mTask.removeSession(pSessionName);
-
-
-      /*
-       * Remove plugin session data.
-       */
-      foreach (IPlugin lPlugin in pPluginList)
-      {
-        try
-        {
-          if (lPlugin != null)
-            lPlugin.onDeleteSessionData(Path.GetFileNameWithoutExtension(pSessionName));
-        }
-        catch (Exception lEx)
-        {
-          LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-        }
-      } // foreach (IP...
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="pSessionFileName"></param>
     /// <returns></returns>
-    public bool loadSession(String pSessionFileName)
+    public bool loadSession(String pSessionName)
     {
       bool lRetVal = false;
       AttackSession AttackSession;
 
-      if (!String.IsNullOrEmpty(pSessionFileName))
+      if (!String.IsNullOrEmpty(pSessionName))
       {
-        /*
-         * Load main GUI session data.
-         */
-        String lSessionName = String.Format("{0}.xml", pSessionFileName);
-        AttackSession = mTask.loadSession(pSessionFileName);
+        // Load main GUI session data.
+        AttackSession = mTask.loadSession(pSessionName);
 
         mACMain.SetStartIP(AttackSession.StartIP);
         mACMain.SetStopIP(AttackSession.StopIP);
         mACMain.SetSessionName(AttackSession.Name);
 
-        /*
-         * Load plugin session data
-         */
-        if (!String.IsNullOrEmpty(lSessionName))
+        // Load plugin session data
+        foreach (IPlugin lPlugIn in mACMain.PluginsModule.PluginList)
         {
-          foreach (IPlugin lPlugIn in mACMain.PluginsModule.PluginList)
-          {
-            try { lPlugIn.onLoadSessionDataFromFile(pSessionFileName); }
-            catch { }
-          }
-        } // if (lSessionFil...
+          try { lPlugIn.onLoadSessionDataFromFile(pSessionName); }
+          catch { }
+        }
         lRetVal = true;
       } // if (!String....
 
@@ -173,39 +135,13 @@ namespace Simsang.Session
     }
 
 
-    public void getSessionByName(String pSessionName)
-    {
-      mTask.getSessionByName(pSessionName);
-    }
-
-    #endregion
-
-
-    #region PRIVATE
-
     /// <summary>
     /// 
     /// </summary>
-    private void LoadSessionData()
+    /// <param name="pSessionName"></param>
+    public void getSessionByName(String pSessionName)
     {
-      mSessionRecord.Clear();
-      List<AttackSession> lSessionRecord = mTask.getAllSessions();
-
-      if (lSessionRecord != null && lSessionRecord.Count > 0)
-      {
-        foreach (AttackSession lSess in lSessionRecord)
-        {
-          try
-          {
-            //mSessionRecord.Add(new SessionRecord(lSess.FileName, lSess.Name, lSess.Description, lSess.StartTime, lSess.StopTime));
-            mSessionRecord.Add(new SessionRecord(lSess.SessionFileName, lSess.Name, lSess.Description, lSess.StartTime, lSess.StopTime));
-          }
-          catch (Exception lEx)
-          {
-            LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-          }
-        } // foreach (Attac...
-      } // if (lSessionRecord ...
+      mTask.getSessionByName(pSessionName);
     }
 
     #endregion
@@ -231,16 +167,21 @@ namespace Simsang.Session
     /// <param name="e"></param>
     private void DGV_Session_MouseUp(object sender, MouseEventArgs e)
     {
+      DataGridView.HitTestInfo hti;
+
       if (e.Button == MouseButtons.Right)
       {
         try
         {
-          DataGridView.HitTestInfo hti = DGV_Sessions.HitTest(e.X, e.Y);
-          if (hti.RowIndex >= 0)
+          hti  = DGV_Sessions.HitTest(e.X, e.Y);
+
+          // If cell selection is valid
+          if (hti.ColumnIndex >= 0 && hti.RowIndex >= 0)
           {
             DGV_Sessions.CurrentRow.Selected = false;
+            DGV_Sessions.CurrentCell = DGV_Sessions.Rows[hti.RowIndex].Cells[hti.ColumnIndex];
             DGV_Sessions.Rows[hti.RowIndex].Selected = true;
-            CMS_SessionMgmt.Show(DGV_Sessions, e.Location);
+            CMS_SessionMgmt.Show(DGV_Sessions, new Point(e.X, e.Y));
           }
         }
         catch (Exception) { }
@@ -258,14 +199,15 @@ namespace Simsang.Session
       String lSessionFilePath = String.Empty;
       String lFileName = String.Empty;
 
-      lFileName = Path.GetFileNameWithoutExtension(DGV_Sessions.CurrentRow.Cells[0].Value.ToString());
-
-      /*
-       * Load plugin session data
-       */
-      if (lSessionFilePath.Length > 0)
-        foreach (IPlugin lPlugIn in mACMain.PluginsModule.PluginList)
-          lPlugIn.onLoadSessionDataFromFile(lFileName);
+      try
+      {
+        lFileName = Path.GetFileNameWithoutExtension(DGV_Sessions.CurrentRow.Cells[0].Value.ToString());
+        loadSession(lFileName);
+      }
+      catch (Exception lEx)
+      {
+        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+      }
 
       Hide();
     }
@@ -286,11 +228,29 @@ namespace Simsang.Session
         lSessionName = DGV_Sessions.CurrentRow.Cells[1].Value.ToString();
         lSessionFileName = DGV_Sessions.CurrentRow.Cells[0].Value.ToString();
 
+        /*
+         *  Remove main session file and plugin session files.
+         */
         if (lSessionName.Length > 0 && lSessionFileName.Length > 0)
         {
-          removeSession(lSessionFileName, mACMain.PluginsModule.PluginList);
-          LoadSessionData();
-        }
+          mTask.removeSession(lSessionFileName);
+
+          foreach (IPlugin lPlugin in mACMain.PluginsModule.PluginList)
+          {
+            try
+            {
+              if (lPlugin != null)
+                lPlugin.onDeleteSessionData(Path.GetFileNameWithoutExtension(lSessionFileName));
+            }
+            catch (Exception lEx)
+            {
+              LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+            }
+          } // foreach (IP...
+
+          // Reload session listing
+          mTask.findAllSessions();
+        } // if (lSession...
       }
       catch (Exception lEx)
       {
@@ -351,6 +311,35 @@ namespace Simsang.Session
       }
       else
         return base.ProcessDialogKey(keyData);
+    }
+
+    #endregion
+
+
+    #region IOBSERVER
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="oDict"></param>
+    public void update(List<AttackSession> pRecords)
+    {
+      mSessionRecord.Clear();
+
+      if (pRecords != null && pRecords.Count > 0)
+      {
+        foreach (AttackSession lSess in pRecords)
+        {
+          try
+          {
+            mSessionRecord.Add(new SessionRecord(lSess.SessionFileName, lSess.Name, lSess.Description, lSess.StartTime, lSess.StopTime));
+          }
+          catch (Exception lEx)
+          {
+            LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+          }
+        } // foreach (Attac...
+      } // if (lSessionRecord ...
     }
 
     #endregion

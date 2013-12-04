@@ -18,7 +18,7 @@ namespace Simsang
 
     #region MEMBERS
 
-    private ACMain mACMain;
+    private SimsangMain mACMain;
     private Thread[] mInputWorkerThread = new Thread[Config.PipeInstances];
     private static bool mStopThreads = false;
     private NamedPipeServerStream[] mPipeStream = new NamedPipeServerStream[Config.PipeInstances];
@@ -33,7 +33,7 @@ namespace Simsang
     /// 
     /// </summary>
     /// <param name="pACMain"></param>
-    public InputModule(ACMain pACMain)
+    public InputModule(SimsangMain pACMain)
     {
       mACMain = pACMain;
     }

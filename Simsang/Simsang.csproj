@@ -139,12 +139,14 @@
     </Compile>
     <Compile Include="Sessions\3_Infrastructure\InfrastructureFacade.cs" />
     <Compile Include="Sessions\Config\AttackSession.cs" />
+    <Compile Include="Sessions\Config\IObservable.cs" />
+    <Compile Include="Sessions\Config\IObserver.cs" />
     <Compile Include="Sessions\Config\SessionConfig.cs" />
     <Compile Include="Sessions\Config\SessionRecord.cs" />
-    <Compile Include="Sessions\2_Task\Sessions.cs">
+    <Compile Include="Sessions\1_Presentation\Sessions.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Sessions\2_Task\Sessions.Designer.cs">
+    <Compile Include="Sessions\1_Presentation\Sessions.Designer.cs">
       <DependentUpon>Sessions.cs</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
@@ -193,7 +195,7 @@
     <EmbeddedResource Include="Sessions\1_Presentation\SessionExport.resx">
       <DependentUpon>SessionExport.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Sessions\2_Task\Sessions.resx">
+    <EmbeddedResource Include="Sessions\1_Presentation\Sessions.resx">
       <DependentUpon>Sessions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Updates\Main\Presentation\FormNewVersion.resx">

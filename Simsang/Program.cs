@@ -38,7 +38,7 @@ namespace Simsang
         Application.CurrentCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        ACMain lSimsangGUI = new ACMain(args);
+        SimsangMain lSimsangGUI = new SimsangMain(args);
 
         Application.Run(lSimsangGUI);
 

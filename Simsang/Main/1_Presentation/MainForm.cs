@@ -35,7 +35,7 @@ using Simsang.Session.Config;
 namespace Simsang
 {
 
-  public partial class ACMain : Form
+  public partial class SimsangMain : Form
   {
 
     #region MEMBERS
@@ -117,7 +117,7 @@ namespace Simsang
     /// 
     /// </summary>
     /// <param name="args"></param>
-    public ACMain(String[] args)
+    public SimsangMain(String[] args)
     {
       InitializeComponent();
 

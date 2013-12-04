@@ -1,6 +1,6 @@
 ﻿namespace Simsang
 {
-    partial class ACMain
+    partial class SimsangMain
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -47,7 +47,7 @@
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ACMain));
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SimsangMain));
       this.GB_Interfaces = new System.Windows.Forms.GroupBox();
       this.BT_Attack = new System.Windows.Forms.Button();
       this.TB_Session = new System.Windows.Forms.TextBox();
@@ -640,7 +640,7 @@
       this.WB_Ads.Visible = false;
       this.WB_Ads.WebBrowserShortcutsEnabled = false;
       // 
-      // ACMain
+      // SimsangMain
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -655,7 +655,7 @@
       this.MainMenuStrip = this.MS_MainWindow;
       this.MaximizeBox = false;
       this.MinimumSize = new System.Drawing.Size(723, 578);
-      this.Name = "ACMain";
+      this.Name = "SimsangMain";
       this.Text = " Simsang ";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ACMain_FormClosing);
       this.GB_Interfaces.ResumeLayout(false);

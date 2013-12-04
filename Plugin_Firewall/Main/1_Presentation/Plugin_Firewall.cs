@@ -560,6 +560,7 @@ namespace Plugin.Main
     private void DGV_FWRules_MouseUp(object sender, MouseEventArgs e)
     {
       DataGridView.HitTestInfo hitTestInfo;
+
       if (e.Button == MouseButtons.Right)
       {
         hitTestInfo = DGV_FWRules.HitTest(e.X, e.Y);

@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
 using System.Configuration;
+using System.Text.RegularExpressions;
 
 using Simsang.Session.Config;
 
@@ -66,7 +67,6 @@ namespace Simsang.Session
       try
       {
         lSessionFilePath = String.Format(@"{0}\{1}.xml", mSessionDir, pSessionName);
-
       }
       catch (Exception lEx)
       {
@@ -172,6 +172,44 @@ namespace Simsang.Session
       }
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public String readMainSessionData(String pSessionFileName)
+    {
+      String lSessionFilePath = String.Format("{0}{1}.xml", mSessionDir, pSessionFileName);
+      String lSessionData = File.ReadAllText(lSessionFilePath);
+
+      return (lSessionData);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void writeSessionExportFile(String pPathSessionFile, String pDataString)
+    {
+      try
+      {
+        if (!String.IsNullOrEmpty(pDataString))
+        {
+          if (Regex.Match(pDataString, @"<\s*\?\s*xml.*?>", RegexOptions.IgnoreCase).Success)
+            pDataString = Regex.Replace(pDataString, @"<\s*\?\s*xml.*?>", String.Empty, RegexOptions.IgnoreCase);
+
+          using (StreamWriter lSW = new StreamWriter(pPathSessionFile))
+          {
+            lSW.Write(pDataString);
+          } // using (Strea...
+        } // if (!String....
+      }
+      catch (Exception lEx)
+      {
+        LogConsole.Main.LogConsole.pushMsg(String.Format("Export session: ", lEx.Message));
+        throw new Exception(String.Format("Unable to export session : {0}", lEx.Message));
+      }
+    }
+
     #endregion
 
 
@@ -186,7 +224,6 @@ namespace Simsang.Session
     }
 
     #endregion
-
 
   }
 }

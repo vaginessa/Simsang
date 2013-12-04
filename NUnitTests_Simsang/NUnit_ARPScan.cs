@@ -139,7 +139,7 @@ namespace NU_Simsang
     //{
     //  InfrastructureFacade lInfrastructure = InfrastructureFacade.getInstance();
     //  BindingList<String> lTargetList = new BindingList<string>();
-    //  Simsang.ACMain lACMain = new Simsang.ACMain(null);
+    //  Simsang.SimsangMain lACMain = new Simsang.SimsangMain(null);
     //  ARPScan lARPScan = ARPScan.GetInstance(lACMain, ref lTargetList);
     //  lARPScan.updateTextBox("<arp><type>mytype</type><ip>myip</ip><mac>mymac</mac></arp>");
     //}

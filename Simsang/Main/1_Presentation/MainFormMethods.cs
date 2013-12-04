@@ -27,7 +27,7 @@ using Simsang.Wifi;
 namespace Simsang
 {
 
-  public partial class ACMain
+  public partial class SimsangMain
   {
 
     #region MEMBERS

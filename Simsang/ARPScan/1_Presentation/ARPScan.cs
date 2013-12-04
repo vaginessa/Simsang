@@ -32,7 +32,7 @@ namespace Simsang.ARPScan.Main
     private String mStopIP;
     private String mGatewayIP;
     private String mLocalIP;
-    private ACMain mACMain;
+    private SimsangMain mACMain;
     private BindingList<TargetRecord> mTargetRecord;
     private TaskFacade cTask;
 
@@ -115,7 +115,7 @@ namespace Simsang.ARPScan.Main
     /// <param name="pACMain"></param>
     /// <param name="pTargetList"></param>
     /// <returns></returns>
-    public static ARPScan GetInstance(ACMain pACMain, ref BindingList<String> pTargetList)
+    public static ARPScan GetInstance(SimsangMain pACMain, ref BindingList<String> pTargetList)
     {
       if (mARPScan == null)
         mARPScan = new ARPScan();
@@ -141,7 +141,7 @@ namespace Simsang.ARPScan.Main
     /// </summary>
     /// <param name="pACMain"></param>
     /// <param name="pTargetList"></param>
-    public static void InitARPScan(ACMain pACMain, ref BindingList<String> pTargetList)
+    public static void InitARPScan(SimsangMain pACMain, ref BindingList<String> pTargetList)
     {
       if (mARPScan == null)
         mARPScan = GetInstance(pACMain, ref pTargetList);
@@ -157,7 +157,7 @@ namespace Simsang.ARPScan.Main
     /// <param name="pStopIP"></param>
     /// <param name="pGatewayIP"></param>
     /// <param name="pTargetList"></param>
-    public static void showARPScanGUI(ACMain pACMain, String pIfcID, String pStartIP, String pStopIP, String pGatewayIP, ref BindingList<String> pTargetList)
+    public static void showARPScanGUI(SimsangMain pACMain, String pIfcID, String pStartIP, String pStopIP, String pGatewayIP, ref BindingList<String> pTargetList)
     {
       mARPScan = GetInstance(pACMain, ref pTargetList);
       mARPScan.ShowDialog();
@@ -173,7 +173,7 @@ namespace Simsang.ARPScan.Main
     /// </summary>
     /// <param name="pACMain"></param>
     /// <param name="pTargetList"></param>
-    private void resetValues(ACMain pACMain, ref BindingList<String> pTargetList)
+    private void resetValues(SimsangMain pACMain, ref BindingList<String> pTargetList)
     {
       mACMain = pACMain;
       mTargetList = pTargetList;

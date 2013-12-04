@@ -19,7 +19,7 @@ namespace Simsang
 
     #region MEMBERS
 
-    private ACMain mACMain;
+    private SimsangMain mACMain;
     private IPlugin[] mPluginList;
     private Hashtable mPluginPosition = new Hashtable();
 
@@ -32,7 +32,7 @@ namespace Simsang
     /// 
     /// </summary>
     /// <param name="pACMain"></param>
-    public PluginModule(ACMain pACMain)
+    public PluginModule(SimsangMain pACMain)
     {
       mACMain = pACMain;
     }
