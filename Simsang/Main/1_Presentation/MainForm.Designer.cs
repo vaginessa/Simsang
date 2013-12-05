@@ -567,6 +567,7 @@
       // 
       // TSMI_DHCPPoisoning
       // 
+      this.TSMI_DHCPPoisoning.Enabled = false;
       this.TSMI_DHCPPoisoning.Name = "TSMI_DHCPPoisoning";
       this.TSMI_DHCPPoisoning.Size = new System.Drawing.Size(162, 22);
       this.TSMI_DHCPPoisoning.Text = "DHCP poisoning";

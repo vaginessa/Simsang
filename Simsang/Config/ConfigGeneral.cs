@@ -15,7 +15,8 @@ namespace Simsang
     public static readonly String LogFile = "Logfile.txt";
 
     public static readonly String ToolName = "Simsang";
-    public static readonly String ToolVersion = "1.9.0";
+    public static readonly String ToolVersion = "2.0.0";
+    public static readonly String VersionType = "Full version";
     public static readonly String BuglistURL = "http://www.buglist.io/";
     public static readonly String UpdateURL = "http://www.buglist.io/downloads.php";
     public static readonly String CurrentVersionURL = "http://buglist.io/download/currentVersion.php";

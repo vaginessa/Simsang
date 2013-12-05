@@ -134,7 +134,12 @@ namespace Plugin.Main.Systems
       String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
       String lRetVal = String.Empty;
 
-      lRetVal = File.ReadAllText(lSessionFilePath);
+      try
+      {
+        lRetVal = File.ReadAllText(lSessionFilePath);
+      }
+      catch (Exception)
+      { }
 
       return (lRetVal);
     }

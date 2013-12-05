@@ -41,9 +41,9 @@
       // GB_SessionExport
       // 
       this.GB_SessionExport.Controls.Add(this.DGV_Sessions);
-      this.GB_SessionExport.Location = new System.Drawing.Point(13, 23);
+      this.GB_SessionExport.Location = new System.Drawing.Point(12, 11);
       this.GB_SessionExport.Name = "GB_SessionExport";
-      this.GB_SessionExport.Size = new System.Drawing.Size(532, 226);
+      this.GB_SessionExport.Size = new System.Drawing.Size(532, 240);
       this.GB_SessionExport.TabIndex = 0;
       this.GB_SessionExport.TabStop = false;
       this.GB_SessionExport.Text = " Sessions ";
@@ -71,14 +71,14 @@
       dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
       dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.DGV_Sessions.DefaultCellStyle = dataGridViewCellStyle2;
-      this.DGV_Sessions.Location = new System.Drawing.Point(15, 26);
+      this.DGV_Sessions.Location = new System.Drawing.Point(14, 24);
       this.DGV_Sessions.MultiSelect = false;
       this.DGV_Sessions.Name = "DGV_Sessions";
       this.DGV_Sessions.ReadOnly = true;
       this.DGV_Sessions.RowHeadersVisible = false;
       this.DGV_Sessions.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.DGV_Sessions.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.DGV_Sessions.Size = new System.Drawing.Size(502, 183);
+      this.DGV_Sessions.Size = new System.Drawing.Size(502, 199);
       this.DGV_Sessions.TabIndex = 0;
       this.DGV_Sessions.DoubleClick += new System.EventHandler(this.DGV_Sessions_DoubleClick);
       // 
@@ -88,7 +88,7 @@
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(557, 263);
       this.Controls.Add(this.GB_SessionExport);
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MaximizeBox = false;
       this.MinimizeBox = false;

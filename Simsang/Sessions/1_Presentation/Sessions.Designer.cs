@@ -46,9 +46,9 @@
       // 
       this.GB_Session.Controls.Add(this.DGV_Sessions);
       this.GB_Session.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.GB_Session.Location = new System.Drawing.Point(13, 23);
+      this.GB_Session.Location = new System.Drawing.Point(11, 8);
       this.GB_Session.Name = "GB_Session";
-      this.GB_Session.Size = new System.Drawing.Size(532, 226);
+      this.GB_Session.Size = new System.Drawing.Size(532, 243);
       this.GB_Session.TabIndex = 0;
       this.GB_Session.TabStop = false;
       this.GB_Session.Text = " Sessions ";
@@ -68,7 +68,7 @@
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
       this.DGV_Sessions.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.DGV_Sessions.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      this.DGV_Sessions.Location = new System.Drawing.Point(15, 26);
+      this.DGV_Sessions.Location = new System.Drawing.Point(15, 23);
       this.DGV_Sessions.MultiSelect = false;
       this.DGV_Sessions.Name = "DGV_Sessions";
       this.DGV_Sessions.ReadOnly = true;
@@ -78,7 +78,7 @@
       this.DGV_Sessions.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DGV_Sessions.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.DGV_Sessions.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.DGV_Sessions.Size = new System.Drawing.Size(502, 183);
+      this.DGV_Sessions.Size = new System.Drawing.Size(502, 206);
       this.DGV_Sessions.TabIndex = 0;
       this.DGV_Sessions.DoubleClick += new System.EventHandler(this.DGV_Sessions_DoubleClick);
       this.DGV_Sessions.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DGV_Session_MouseUp);
@@ -111,7 +111,7 @@
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(557, 263);
       this.Controls.Add(this.GB_Session);
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MaximizeBox = false;
       this.MinimizeBox = false;

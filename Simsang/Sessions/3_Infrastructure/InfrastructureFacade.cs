@@ -45,7 +45,7 @@ namespace Simsang.Session
       String lFileName = String.Empty;
       try
       {
-        lFileName = String.Format("{0}{1}", mSessionDir, pSessionFileName);
+        lFileName = String.Format(@"{0}\{1}", mSessionDir, pSessionFileName);
         if (File.Exists(lFileName))
           File.Delete(lFileName);
       }
@@ -178,7 +178,7 @@ namespace Simsang.Session
     /// </summary>
     public String readMainSessionData(String pSessionFileName)
     {
-      String lSessionFilePath = String.Format("{0}{1}.xml", mSessionDir, pSessionFileName);
+      String lSessionFilePath = String.Format(@"{0}\{1}.xml", mSessionDir, pSessionFileName);
       String lSessionData = File.ReadAllText(lSessionFilePath);
 
       return (lSessionData);

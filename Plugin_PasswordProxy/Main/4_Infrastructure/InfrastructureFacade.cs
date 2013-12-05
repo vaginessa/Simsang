@@ -175,7 +175,12 @@ namespace Plugin.Main.HTTPProxy
       String lRetVal = String.Empty;
       String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
 
-      lRetVal = File.ReadAllText(lSessionFilePath);
+      try
+      {
+        lRetVal = File.ReadAllText(lSessionFilePath);
+      }
+      catch (Exception)
+      { }
 
       return (lRetVal);
     }

@@ -919,7 +919,7 @@ namespace Simsang
     /// <param name="e"></param>
     private void listToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      Session.Sessions.getInstance(this).ShowDialog();
+      Session.Sessions.getInstance(this).showDialogWindow();
     }
 
 

@@ -185,18 +185,26 @@ namespace Simsang.SessionsExport
       catch (Exception lEx)
       {
         LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+        MessageBox.Show(String.Format("Exception occurred while exporting session \"{0}\"\r\n{1}", lSessionName, lEx.Message), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         return;
       }
 
-      SFD_SessionExport.FileName = String.Format("{0}.{1}", lSessionFileName, Config.SimsangFileExtension);
-      SFD_SessionExport.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-      SFD_SessionExport.Filter = String.Format("Simsang session files | *.{0}", Config.SimsangFileExtension);
-
-      if (SFD_SessionExport.ShowDialog() == DialogResult.OK)
+      try
       {
-        cTaskFacade.writeSessionExportFile(SFD_SessionExport.FileName, lDataString);
-        MessageBox.Show(String.Format("Session \"{0}\" exported successfully.", lSessionName), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-      } // if (SFD_Ses...
+        SFD_SessionExport.FileName = String.Format("{0}.{1}", lSessionFileName, Config.SimsangFileExtension);
+        SFD_SessionExport.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        SFD_SessionExport.Filter = String.Format("Simsang session files | *.{0}", Config.SimsangFileExtension);
+
+        if (SFD_SessionExport.ShowDialog() == DialogResult.OK)
+        {
+          cTaskFacade.writeSessionExportFile(SFD_SessionExport.FileName, lDataString);
+          MessageBox.Show(String.Format("Session \"{0}\" exported successfully.", lSessionName), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        } // if (SFD_Ses...
+      }
+      catch (Exception lEx)
+      {
+        MessageBox.Show(String.Format("Exception msg: {0}\r\n{1}", lEx.Message, lEx.StackTrace));
+      }
     }
 
 

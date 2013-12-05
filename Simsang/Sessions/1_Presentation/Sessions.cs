@@ -106,6 +106,16 @@ namespace Simsang.Session
     /// <summary>
     /// 
     /// </summary>
+    public void showDialogWindow()
+    {
+      mTask.findAllSessions();
+      this.ShowDialog();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="pSessionFileName"></param>
     /// <returns></returns>
     public bool loadSession(String pSessionName)

@@ -48,9 +48,9 @@ namespace Simsang
     public void setAppTitle(String pTitle)
     {
       if (pTitle.Length > 0)
-        Text = String.Format("{0} {1:0.0} - {2} ({3})", Config.ToolName, Config.ToolVersion, "", pTitle);
+        Text = String.Format("{0}  {1:0.0} - {2} ({3})", Config.ToolName, Config.ToolVersion, Config.VersionType, pTitle);
       else
-        Text = String.Format("{0} {1:0.0} - {2}", Config.ToolName, Config.ToolVersion, "");
+        Text = String.Format("{0}  {1:0.0} - {2}", Config.ToolName, Config.ToolVersion, Config.VersionType);
     }
 
 
