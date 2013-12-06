@@ -118,7 +118,8 @@ namespace Plugin.Main.HTTPProxy
       }
       catch (Exception lEx)
       {
-        System.Windows.Forms.MessageBox.Show(String.Format("Error occurred: {0}\r\n{1}", lEx.Message, lEx.StackTrace), "Error");
+        String lMessage = String.Format("HTTPProxy::loadSessionData() : {0}", lEx.Message);
+        cPlugin.Host.LogMessage(lMessage);
       }
       finally
       {

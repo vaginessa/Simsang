@@ -131,9 +131,28 @@ namespace Simsang.Session
     /// <summary>
     /// 
     /// </summary>
+    public String readFileData(String pSessionFileName)
+    {
+      return (cInfrastructure.readFileData(pSessionFileName));
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
     public void writeSessionExportFile(String pPathSessionFile, String pDataString)
     {
       cInfrastructure.writeSessionExportFile(pPathSessionFile, pDataString);
+    }
+
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void writeFileData(String pFilePath, String pData)
+    {
+      cInfrastructure.writeFileData(pFilePath, pData);
     }
 
     #endregion

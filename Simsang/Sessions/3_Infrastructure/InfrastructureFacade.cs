@@ -86,7 +86,7 @@ namespace Simsang.Session
       {
         lFS = new FileStream(lSessionFilePath, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(AttackSession));
-        lAttackSession = (AttackSession)lXMLSerial.Deserialize(lFS);
+        lAttackSession = (AttackSession) lXMLSerial.Deserialize(lFS);
       }
       catch (Exception lEx)
       {
@@ -127,7 +127,7 @@ namespace Simsang.Session
         {
           lFS = new FileStream(lSessionFile.FullName, FileMode.Open);
           lXMLSerial = new XmlSerializer(typeof(AttackSession));
-          AttackSession lAttackSession = (AttackSession)lXMLSerial.Deserialize(lFS);
+          AttackSession lAttackSession = (AttackSession) lXMLSerial.Deserialize(lFS);
           lRetVal.Add(lAttackSession);
         }
         catch (Exception lEx)
@@ -179,7 +179,37 @@ namespace Simsang.Session
     public String readMainSessionData(String pSessionFileName)
     {
       String lSessionFilePath = String.Format(@"{0}\{1}.xml", mSessionDir, pSessionFileName);
-      String lSessionData = File.ReadAllText(lSessionFilePath);
+      String lSessionData = String.Empty;
+
+      try
+      {
+        if (File.Exists(lSessionFilePath))
+          lSessionData = readFileData(lSessionFilePath);
+      }
+      catch (Exception)
+      {
+      }
+
+      return (lSessionData);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public String readFileData(String pFilePath)
+    {
+      String lSessionData = String.Empty;
+
+      try
+      {
+        if (!String.IsNullOrEmpty(pFilePath))
+          if (File.Exists(pFilePath))
+            lSessionData = File.ReadAllText(pFilePath);
+      }
+      catch (Exception)
+      {
+      }
 
       return (lSessionData);
     }
@@ -207,6 +237,24 @@ namespace Simsang.Session
       {
         LogConsole.Main.LogConsole.pushMsg(String.Format("Export session: ", lEx.Message));
         throw new Exception(String.Format("Unable to export session : {0}", lEx.Message));
+      }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void writeFileData(String pFilePath, String pData)
+    {
+
+      try
+      {
+        if (!String.IsNullOrEmpty(pFilePath) && !String.IsNullOrEmpty(pData))
+          if (File.Exists(pFilePath))
+            File.WriteAllText(pFilePath, pData);
+      }
+      catch (Exception)
+      {
       }
     }
 

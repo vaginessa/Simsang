@@ -440,21 +440,20 @@ namespace Simsang
         String lSessionFileName = String.Empty;
         XDocument lXMLDoc = null;
 
-        lSessionData = File.ReadAllText(pSessionFileName);
+        lSessionData = Simsang.Session.TaskFacade.getInstance().readFileData(pSessionFileName);
+
         if (!String.IsNullOrEmpty(lSessionData))
-        {
           lXMLDoc = XDocument.Parse(lSessionData);
-        } // if (!Strin...
 
         /*
          * Process session data
          */
-        XElement la = lXMLDoc.Element("SessionExport").Element("Session");
-        lSessionFileName = la.Attribute("filename").Value.ToString();
+        XElement lSession = lXMLDoc.Element("SessionExport").Element("Session");
+        lSessionFileName = lSession.Attribute("filename").Value.ToString();
 
-        foreach (XElement lTmp in la.Elements())
+        foreach (XElement lTmp in lSession.Elements())
         {
-          if (lTmp.Name.LocalName.ToString() == "TaskFacade")
+          if (lTmp.Name.LocalName.ToString() == "AttackSession")
           {
             String lSessionFile = String.Format("{0}{1}{2}.xml", Directory.GetCurrentDirectory(), Config.SessionDir, lSessionFileName);
             if (File.Exists(lSessionFile))
@@ -471,8 +470,7 @@ namespace Simsang
               File.Delete(lSessionFile);
             } // if (lTmp...
 
-
-            File.WriteAllText(lSessionFile, lTmp.ToString());
+            Simsang.Session.TaskFacade.getInstance().writeSessionExportFile(lSessionFile, lTmp.ToString());
             break;
           } // if (lTmp.Name...
         } // foreach (XElement...
@@ -514,17 +512,16 @@ namespace Simsang
                 LogConsole.Main.LogConsole.pushMsg(lErrorMsg);
               }
 
-
               try
               {
                 lData = lTmpElement.FirstNode.ToString();
-                File.WriteAllText(lSessionFile, lData);
+                Simsang.Session.TaskFacade.getInstance().writeFileData(lSessionFile, lData);
+//                File.WriteAllText(lSessionFile, lData);
               }
               catch (Exception lEx)
               {
                 String lErrorMsg = String.Format("Error occurred while creating {0}\r\n{1}", lSessionFileName, lEx.Message);
                 LogConsole.Main.LogConsole.pushMsg(lErrorMsg);
-
                 lOccurredErrors = String.Format("\r\n{0}\r\n", lOccurredErrors);
               }
             } // if (lTmpEle...
@@ -566,13 +563,13 @@ namespace Simsang
                */
               if (!String.IsNullOrEmpty(lFuncRetVal))
               {
-                lFuncRetVal = String.Format("The following errors occurred while importing {0}:\r\n{1}\r\n", pSessionFile, lFuncRetVal);
+                lFuncRetVal = String.Format("The following errors occurred while importing {0}:\r\nMessage: {1}\r\n", pSessionFile, lFuncRetVal);
                 MessageBox.Show(lFuncRetVal, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
               } // if (!Strin...
             }
             catch (Exception lEx)
             {
-              String lErrorMsg = String.Format("An error occurred while importing session {0}\r\n{1}", pSessionFile, lEx.Message);
+              String lErrorMsg = String.Format("An error occurred while importing session {0}\r\nMessage: {1}", pSessionFile, lEx.Message);
               LogConsole.Main.LogConsole.pushMsg(lErrorMsg);
               MessageBox.Show(lErrorMsg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
