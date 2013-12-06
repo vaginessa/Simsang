@@ -45,7 +45,7 @@ namespace Simsang.Session
       String lFileName = String.Empty;
       try
       {
-        lFileName = String.Format(@"{0}\{1}", mSessionDir, pSessionFileName);
+        lFileName = String.Format(@"{0}\{1}.xml", mSessionDir, pSessionFileName);
         if (File.Exists(lFileName))
           File.Delete(lFileName);
       }
@@ -154,9 +154,13 @@ namespace Simsang.Session
       XmlSerializer lSerializer;
       FileStream lFS = null;
 
+
+      lSessionFile = String.Format(@"{0}\{1}.xml", mSessionDir, Path.GetFileNameWithoutExtension(pAttackSession.SessionFileName));
+      if (File.Exists(lSessionFile))
+        throw new Exception("A session with this name already exists");
+
       try
       {
-        lSessionFile = String.Format(@"{0}\{1}", mSessionDir, pAttackSession.SessionFileName);
         lSerializer = new XmlSerializer(typeof(AttackSession));
         lFS = new FileStream(lSessionFile, FileMode.Create);
         lSerializer.Serialize(lFS, pAttackSession);

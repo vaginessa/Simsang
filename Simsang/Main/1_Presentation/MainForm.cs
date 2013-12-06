@@ -516,7 +516,6 @@ namespace Simsang
               {
                 lData = lTmpElement.FirstNode.ToString();
                 Simsang.Session.TaskFacade.getInstance().writeFileData(lSessionFile, lData);
-//                File.WriteAllText(lSessionFile, lData);
               }
               catch (Exception lEx)
               {
@@ -592,7 +591,6 @@ namespace Simsang
               LogConsole.Main.LogConsole.pushMsg(lErrorMsg);
               MessageBox.Show(lErrorMsg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
           } // if (File.E...
         }
         catch (Exception lEx)
@@ -873,8 +871,6 @@ namespace Simsang
     }
 
 
-
-
     /// <summary>
     /// 
     /// </summary>
@@ -933,7 +929,6 @@ namespace Simsang
       {
         
         AttackSession lASession = Simsang.Session.TaskFacade.getInstance().getSessionByName(TB_Session.Text);
-////        AttackSession lASession = mCurrentSession.getSessionByName(TB_Session.Text);
 
         if (lASession != null)
         {
@@ -955,7 +950,7 @@ namespace Simsang
         mCurrentSession.StopIP = TB_StopIP.Text;
         mCurrentSession.StopTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
         mCurrentSession.Name = TB_Session.Text;
-        mCurrentSession.SessionFileName = String.Format("{0}.xml", DateTime.Now.ToString("yyyyMMdd_hhmmssff"));
+        mCurrentSession.SessionFileName = String.Format("{0}", DateTime.Now.ToString("yyyyMMdd_hhmmssff"));
 
         mSessionTaskFacade.SaveSessionData(mCurrentSession);
 
@@ -967,8 +962,7 @@ namespace Simsang
           try
           {
             if (lPlugin != null)
-              lPlugin.onSaveSessionData(Path.GetFileNameWithoutExtension(mCurrentSession.SessionFileName));
-            //lPlugin.onSaveSessionData(mCurrentSession.FileName);
+              lPlugin.onSaveSessionData(mCurrentSession.SessionFileName);
           }
           catch (Exception lEx)
           {
