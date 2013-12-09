@@ -40,6 +40,7 @@ namespace Simsang
 
     #region MEMBERS
 
+    private static SimsangMain mInstance;
     private Process mSnifferProc;
     private Process mPoisoningEngProc;
     private NetworkInterface[] mNCards;
@@ -117,7 +118,18 @@ namespace Simsang
     /// 
     /// </summary>
     /// <param name="args"></param>
-    public SimsangMain(String[] args)
+    /// <returns></returns>
+    public static SimsangMain getInstance(String[] args)
+    {
+      return mInstance ?? (mInstance = new SimsangMain(args));
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="args"></param>
+    private SimsangMain(String[] args)
     {
       InitializeComponent();
 
@@ -315,7 +327,7 @@ namespace Simsang
       {
         if (NetworkInterface.GetAllNetworkInterfaces().Any(x => x.OperationalStatus == OperationalStatus.Up))
         {
-          if (UpdatesBinaries.IsUpdateAvailable())
+          if (UpdatesBinaries.getInstance().IsUpdateAvailable())
           {
             SimsangUpdates.FormNewVersion lNewVersion = new SimsangUpdates.FormNewVersion();
             lNewVersion.TopMost = true;
@@ -422,115 +434,6 @@ namespace Simsang
       }
     }
 
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="pSessionFileName"></param>
-    /// <param name="pImportForced"></param>
-    /// <returns></returns>
-    public String importSessionData(String pSessionFileName, bool pImportForced = false)
-    {
-      String lRetVal = String.Empty;
-
-      if (!String.IsNullOrEmpty(pSessionFileName))
-      {
-        String lSessionData = String.Empty;
-        String lSessionFileName = String.Empty;
-        XDocument lXMLDoc = null;
-
-        lSessionData = Simsang.Session.TaskFacade.getInstance().readFileData(pSessionFileName);
-
-        if (!String.IsNullOrEmpty(lSessionData))
-          lXMLDoc = XDocument.Parse(lSessionData);
-
-        /*
-         * Process session data
-         */
-        XElement lSession = lXMLDoc.Element("SessionExport").Element("Session");
-        lSessionFileName = lSession.Attribute("filename").Value.ToString();
-
-        foreach (XElement lTmp in lSession.Elements())
-        {
-          if (lTmp.Name.LocalName.ToString() == "AttackSession")
-          {
-            String lSessionFile = String.Format("{0}{1}{2}.xml", Directory.GetCurrentDirectory(), Config.SessionDir, lSessionFileName);
-            if (File.Exists(lSessionFile))
-            {
-              if (pImportForced == false)
-              {
-                DialogResult lDR = DialogResult.No;
-
-                lDR = MessageBox.Show("This session already exists.\r\nDo you want to overwrite it?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if (lDR == DialogResult.No)
-                  return (String.Empty);
-              } // if (pImp...
-
-              File.Delete(lSessionFile);
-            } // if (lTmp...
-
-            Simsang.Session.TaskFacade.getInstance().writeSessionExportFile(lSessionFile, lTmp.ToString());
-            break;
-          } // if (lTmp.Name...
-        } // foreach (XElement...
-
-
-
-        /*
-         * Process plugin data
-         */
-        String lPluginName = String.Empty;
-        XElement lAllPlugins = null;
-        String lOccurredErrors = String.Empty;
-
-        var query = from plugin in lXMLDoc.Descendants("SessionExport")
-                    select plugin.Element("Plugins");
-
-
-        if ((lAllPlugins = query.SingleOrDefault()) != null)
-        {
-          XDocument lPluginsInSession = XDocument.Parse(lAllPlugins.ToString());
-
-          foreach (XElement lTmpElement in lPluginsInSession.Descendants("Plugin"))
-          {
-            if (lTmpElement.HasElements)
-            {
-              String lName = lTmpElement.Attribute("name").Value.ToString();
-              String lPluginDirName = lTmpElement.Attribute("dirname").Value.ToString();
-              String lSessionFile = String.Format("{0}\\{1}{2}{3}{4}.xml", Directory.GetCurrentDirectory(), Config.PluginDir, lPluginDirName, Config.SessionDir, lSessionFileName);
-              String lData = String.Empty;
-
-              try
-              {
-                if (File.Exists(lSessionFile))
-                  File.Delete(lSessionFile);
-              }
-              catch (Exception lEx)
-              {
-                String lErrorMsg = String.Format("Error occurred while deleting {0}\r\n{1}", lSessionFileName, lEx.Message);
-                LogConsole.Main.LogConsole.pushMsg(lErrorMsg);
-              }
-
-              try
-              {
-                lData = lTmpElement.FirstNode.ToString();
-                Simsang.Session.TaskFacade.getInstance().writeFileData(lSessionFile, lData);
-              }
-              catch (Exception lEx)
-              {
-                String lErrorMsg = String.Format("Error occurred while creating {0}\r\n{1}", lSessionFileName, lEx.Message);
-                LogConsole.Main.LogConsole.pushMsg(lErrorMsg);
-                lOccurredErrors = String.Format("\r\n{0}\r\n", lOccurredErrors);
-              }
-            } // if (lTmpEle...
-          } // foreach (XElem...
-        } // if ((lAllPlug...
-      } // if (!String...
-
-      return (lRetVal);
-    }
-
     #endregion
 
 
@@ -555,16 +458,16 @@ namespace Simsang
 
             try
             {
-              String lFuncRetVal = importSessionData(pSessionFile);
+              mSessionTaskFacade.importSessionFile(pSessionFile);
 
               /*
                * Show error message if errors occurred during the import procedure
                */
-              if (!String.IsNullOrEmpty(lFuncRetVal))
-              {
-                lFuncRetVal = String.Format("The following errors occurred while importing {0}:\r\nMessage: {1}\r\n", pSessionFile, lFuncRetVal);
-                MessageBox.Show(lFuncRetVal, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-              } // if (!Strin...
+              //if (!String.IsNullOrEmpty(lFuncRetVal))
+              //{
+              //  lFuncRetVal = String.Format("The following errors occurred while importing {0}:\r\nMessage: {1}\r\n", pSessionFile, lFuncRetVal);
+              //  MessageBox.Show(lFuncRetVal, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+              //} // if (!Strin...
             }
             catch (Exception lEx)
             {
@@ -720,8 +623,8 @@ namespace Simsang
 
       setPluginsStopped();
       // 3. Stop data input thread
-      //            if (mStopThread == false)
-      //                mInputModule.stopInputThreads();
+      // if (mStopThread == false)
+      //     mInputModule.stopInputThreads();
 
       // 4. Shut down all plugins
       mPluginModule.StopAllPlugins();
@@ -836,7 +739,7 @@ namespace Simsang
         {
           if (NetworkInterface.GetAllNetworkInterfaces().Any(x => x.OperationalStatus == OperationalStatus.Up))
           {
-            if (UpdatesBinaries.IsUpdateAvailable())
+            if (UpdatesBinaries.getInstance().IsUpdateAvailable())
             {
               SimsangUpdates.FormNewVersion lNewVersion = new SimsangUpdates.FormNewVersion();
               lNewVersion.TopMost = true;
@@ -978,7 +881,7 @@ namespace Simsang
         mCurrentSession.Name = String.Empty;
         mCurrentSession.Description = String.Empty;
 
-        MessageBox.Show("The session was saved.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        MessageBox.Show(String.Format("The new session \"{0}\" was saved successfully.", TB_Session.Text), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
       } // if (TB_S...
     }
 
@@ -1194,20 +1097,8 @@ namespace Simsang
 
         try
         {
-          String lFuncRetVal = importSessionData(OFD_ImportSession.FileName);
-
-          /*
-           * Show error message if errors occurred during the import procedure
-           */
-          if (!String.IsNullOrEmpty(lFuncRetVal))
-          {
-            lFuncRetVal = String.Format("The following errors occurred while importing {0}:\r\n{1}\r\n", lSessionFileName, lFuncRetVal);
-            MessageBox.Show(lFuncRetVal, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-          }
-          else
-          {
-            MessageBox.Show(String.Format("Session {0} imported successfully.", lSessionFileName), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-          } // if (!Strin...
+          mSessionTaskFacade.importSessionFile(OFD_ImportSession.FileName);
+          MessageBox.Show(String.Format("Session {0} imported successfully.", lSessionFileName), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         catch (Exception lEx)
         {

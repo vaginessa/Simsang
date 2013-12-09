@@ -131,9 +131,9 @@ namespace Simsang.Session
     /// <summary>
     /// 
     /// </summary>
-    public String readFileData(String pSessionFileName)
+    public String readFileData(String pFilePath)
     {
-      return (cInfrastructure.readFileData(pSessionFileName));
+      return (cInfrastructure.readFileData(pFilePath));
     }
 
 
@@ -153,6 +153,17 @@ namespace Simsang.Session
     public void writeFileData(String pFilePath, String pData)
     {
       cInfrastructure.writeFileData(pFilePath, pData);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pSessionFileName"></param>
+    /// <param name="pOverwriteExistingSession"></param>
+    public void importSessionFile(String pSessionFileName, bool pOverwriteExistingSession = false)
+    {
+      cInfrastructure.importSessionFile(pSessionFileName, pOverwriteExistingSession);
     }
 
     #endregion

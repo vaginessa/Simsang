@@ -228,7 +228,6 @@
     <None Include="img\Start.jpg" />
     <None Include="img\Stop.jpg" />
     <None Include="img\Hosts.jpg" />
-    <Content Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Interface\PluginInterface.csproj">

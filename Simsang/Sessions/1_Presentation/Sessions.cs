@@ -236,7 +236,7 @@ namespace Simsang.Session
       try
       {
         lSessionName = DGV_Sessions.CurrentRow.Cells[1].Value.ToString();
-        lSessionFileName = DGV_Sessions.CurrentRow.Cells[0].Value.ToString();
+        lSessionFileName = Path.GetFileNameWithoutExtension(DGV_Sessions.CurrentRow.Cells[0].Value.ToString());
 
         /*
          *  Remove main session file and plugin session files.

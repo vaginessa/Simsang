@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.IO;
 using System.Configuration;
@@ -260,6 +261,110 @@ namespace Simsang.Session
       catch (Exception)
       {
       }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pSessionFileName"></param>
+    /// <param name="pOverwriteExistingSession"></param>
+    public void importSessionFile(String pSessionFileName, bool pImportEnforced = false)
+    {
+      if (!String.IsNullOrEmpty(pSessionFileName))
+      {
+        String lSessionData = String.Empty;
+        String lSessionFileName = String.Empty;
+        XDocument lXMLDoc = null;
+
+        lSessionData = Simsang.Session.TaskFacade.getInstance().readFileData(pSessionFileName);
+
+        if (!String.IsNullOrEmpty(lSessionData))
+          lXMLDoc = XDocument.Parse(lSessionData);
+
+        /*
+         * Process session data
+         */
+        try
+        {
+          XElement lSession = lXMLDoc.Element("SessionExport").Element("Session");
+          lSessionFileName = lSession.Attribute("filename").Value.ToString();
+
+          foreach (XElement lTmp in lSession.Elements())
+          {
+            if (lTmp.Name.LocalName.ToString() == "AttackSession")
+            {
+              String lSessionFile = String.Format(@"{0}\{1}.xml", mSessionDir, lSessionFileName);
+              if (File.Exists(lSessionFile))
+              {
+                if (pImportEnforced == false)
+                  throw new Exception("A session with this name already exists");
+
+                File.Delete(lSessionFile);
+              } // if (lTmp...
+
+              writeSessionExportFile(lSessionFile, lTmp.ToString());
+              break;
+            } // if (lTmp.Name...
+          } // foreach (XElement...
+
+        }
+        catch (NullReferenceException lEx)
+        {
+          throw new Exception("Something is wrong with the file structure");
+        }
+
+
+        /*
+         * Process plugin data
+         */
+        String lPluginName = String.Empty;
+        XElement lAllPlugins = null;
+        String lOccurredErrors = String.Empty;
+
+        var query = from plugin in lXMLDoc.Descendants("SessionExport")
+                    select plugin.Element("Plugins");
+
+
+        if ((lAllPlugins = query.SingleOrDefault()) != null)
+        {
+          XDocument lPluginsInSession = XDocument.Parse(lAllPlugins.ToString());
+
+          foreach (XElement lTmpElement in lPluginsInSession.Descendants("Plugin"))
+          {
+            if (lTmpElement.HasElements)
+            {
+              String lName = lTmpElement.Attribute("name").Value.ToString();
+              String lPluginDirName = lTmpElement.Attribute("dirname").Value.ToString();
+              String lSessionFile = String.Format("{0}\\{1}{2}{3}{4}.xml", Directory.GetCurrentDirectory(), Simsang.Config.PluginDir, lPluginDirName, Simsang.Config.SessionDir, lSessionFileName);
+              String lData = String.Empty;
+
+              try
+              {
+                if (File.Exists(lSessionFile))
+                  File.Delete(lSessionFile);
+              }
+              catch (Exception lEx)
+              {
+                String lErrorMsg = String.Format("Error occurred while deleting {0}\r\n{1}", lSessionFileName, lEx.Message);
+                LogConsole.Main.LogConsole.pushMsg(lErrorMsg);
+              }
+
+              try
+              {
+                lData = lTmpElement.FirstNode.ToString();
+                Simsang.Session.TaskFacade.getInstance().writeFileData(lSessionFile, lData);
+              }
+              catch (Exception lEx)
+              {
+                String lErrorMsg = String.Format("Error occurred while creating {0}\r\n{1}", lSessionFileName, lEx.Message);
+                LogConsole.Main.LogConsole.pushMsg(lErrorMsg);
+                lOccurredErrors = String.Format("\r\n{0}\r\n", lOccurredErrors);
+              }
+            } // if (lTmpEle...
+          } // foreach (XElem...
+        } // if ((lAllPlug...
+      } // if (!String...      
     }
 
     #endregion

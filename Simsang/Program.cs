@@ -27,9 +27,9 @@ namespace Simsang
         MessageBox.Show(lMsg, "Error",
         MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-        /*
-         * Start GUI
-         */
+      /*
+       * Start GUI
+       */
       }
       else
       {
@@ -38,8 +38,7 @@ namespace Simsang
         Application.CurrentCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        SimsangMain lSimsangGUI = new SimsangMain(args);
-
+        SimsangMain lSimsangGUI = Simsang.SimsangMain.getInstance(args);
         Application.Run(lSimsangGUI);
 
         //try
