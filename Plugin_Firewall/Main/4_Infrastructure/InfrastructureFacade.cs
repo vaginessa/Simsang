@@ -46,34 +46,6 @@ namespace Plugin.Main.Firewall
     #endregion
 
 
-    #region PRIVATE
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    private String GetSessionDir()
-    {
-      String lRetVal = String.Empty;
-
-      lRetVal = String.Format("{0}{1}", cPlugin.Config.BaseDir, cPlugin.Config.SessionDir);
-
-      try
-      {
-        if (!Directory.Exists(lRetVal))
-          Directory.CreateDirectory(lRetVal);
-      }
-      catch (Exception lEx)
-      {
-        cPlugin.Host.LogMessage(lEx.StackTrace);
-      }
-
-      return (lRetVal);
-    }
-
-    #endregion
-
-
     #region SESSION
 
 
@@ -88,7 +60,7 @@ namespace Plugin.Main.Firewall
       BindingList<T> lRecords = null;
       FileStream lFS = null;
       XmlSerializer lXMLSerial;
-      String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
+      String lSessionFilePath = String.Format(@"{0}\{1}.xml", cPlugin.Config.SessionDir, pSessionName);
 
       try
       {
@@ -113,7 +85,7 @@ namespace Plugin.Main.Firewall
     /// <param name="pSessionName"></param>
     public void deleteSession(String pSessionName)
     {
-      String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
+      String lSessionFilePath = String.Format(@"{0}\{1}.xml", cPlugin.Config.SessionDir, pSessionName);
 
       if (File.Exists(lSessionFilePath))
         File.Delete(lSessionFilePath);
@@ -128,7 +100,7 @@ namespace Plugin.Main.Firewall
     public String getSessionData(String pSessionName)
     {
       String lRetVal = String.Empty;
-      String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
+      String lSessionFilePath = String.Format(@"{0}\{1}.xml", cPlugin.Config.SessionDir, pSessionName);
 
       try
       {
@@ -154,7 +126,7 @@ namespace Plugin.Main.Firewall
       {
         XmlSerializer lSerializer;
         FileStream lFS = null;
-        String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
+        String lSessionFilePath = String.Format(@"{0}\{1}.xml", cPlugin.Config.SessionDir, pSessionName);
 
         try
         {

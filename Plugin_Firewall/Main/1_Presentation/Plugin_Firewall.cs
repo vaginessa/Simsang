@@ -33,7 +33,7 @@ namespace Plugin.Main
 
     #region PUBLIC
 
-    public PluginFirewallUC()
+    public PluginFirewallUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -118,14 +118,19 @@ namespace Plugin.Main
 
       #endregion
 
+      /*
+       * Plugin configuration
+       */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "Firewall",
         PluginDescription = "Letting pass or blocking client systems data packets.",
-        PluginVersion = "0.4",
+        PluginVersion = "0.5",
         Ports = "",
         IsActive = true
       };

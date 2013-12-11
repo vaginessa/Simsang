@@ -37,7 +37,7 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    public PluginDNSRequestsUC()
+    public PluginDNSRequestsUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -93,13 +93,20 @@ namespace Plugin.Main
 
       #endregion
 
+
+      /*
+       * Plugin configuration
+       */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
+
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "DNS requests",
         PluginDescription = "Listing client systems DNS requests.",
-        PluginVersion = "0.5",
+        PluginVersion = "0.6",
         Ports = "UDP:53;",
         IsActive = true
       };

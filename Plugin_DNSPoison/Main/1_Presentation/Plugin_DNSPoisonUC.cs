@@ -36,7 +36,7 @@ namespace Plugin.Main
 
     #region PUBLIC
 
-    public PluginDNSPoisonUC()
+    public PluginDNSPoisonUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -65,13 +65,19 @@ namespace Plugin.Main
 
       #endregion
 
+
+      /*
+       * Plugin configuration
+       */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "DNS Poison",
         PluginDescription = "Poisoning systems DNS request and servers DNS responses.",
-        PluginVersion = "0.10",
+        PluginVersion = "0.11",
         Ports = "",
         IsActive = true
       };

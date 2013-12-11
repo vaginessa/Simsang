@@ -40,15 +40,6 @@ namespace Simsang
         Application.SetCompatibleTextRenderingDefault(false);
         SimsangMain lSimsangGUI = Simsang.SimsangMain.getInstance(args);
         Application.Run(lSimsangGUI);
-
-        //try
-        //{
-        //  Application.Run(lSimsangGUI);
-        //}
-        //catch (Exception lEx)
-        //{
-        //  MessageBox.Show(String.Format("Msg: {0}\r\n\r\n{1}", lEx.Message, lEx.StackTrace));
-        //}
       }
     }
   }

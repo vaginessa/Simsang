@@ -18,10 +18,10 @@ namespace Simsang
 
     #region MEMBERS
 
-    private String mPluginName = String.Empty;
-    private String mPluginDescription = String.Empty;
-    private String mVersion = String.Empty;
-    private String mActive = String.Empty;
+    private String mPluginName;
+    private String mPluginDescription;
+    private String mVersion;
+    private String mActive;
     public event PropertyChangedEventHandler PropertyChanged;
 
     #endregion

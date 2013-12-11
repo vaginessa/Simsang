@@ -42,7 +42,7 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    public PluginIPAccountingUC()
+    public PluginIPAccountingUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -54,18 +54,19 @@ namespace Plugin.Main
       PropertyInfo pi = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
       pi.SetValue(DGV_TrafficData, true, null);
 
-
-
       /*
        * Plugin configuration
        */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
+
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "IP accounting",
         PluginDescription = "Listing data traffic statistics.",
-        PluginVersion = "0.7",
+        PluginVersion = "0.8",
         Ports = "",
         IsActive = true
       };

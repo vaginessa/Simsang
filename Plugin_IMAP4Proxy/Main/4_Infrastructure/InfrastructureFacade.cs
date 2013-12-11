@@ -60,34 +60,6 @@ namespace Plugin.Main.IMAP4Proxy
     #endregion
 
 
-    #region PRIVATE
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    private String GetSessionDir()
-    {
-      String lRetVal = String.Empty;
-
-      lRetVal = String.Format("{0}{1}", cPlugin.Config.BaseDir, cPlugin.Config.SessionDir);
-
-      try
-      {
-        if (!Directory.Exists(lRetVal))
-          Directory.CreateDirectory(lRetVal);
-      }
-      catch (Exception lEx)
-      {
-        cPlugin.Host.LogMessage(lEx.StackTrace);
-      }
-
-      return (lRetVal);
-    }
-
-    #endregion
-
-
     #region EVENTS
 
     /// <summary>
@@ -120,8 +92,8 @@ namespace Plugin.Main.IMAP4Proxy
     public void onStart(ProxyConfig pProxyConfig)
     {
       String lFuncRetVal = String.Empty;
-      String lIMAP4RevProxyPath = String.Format(@"{0}\{1}", pProxyConfig.BasisDirectory, cIMAP4RevProxyBin);
-      String lIMAP4SRevProxyPath = String.Format(@"{0}\{1}", pProxyConfig.BasisDirectory, cIMAP4SRevProxyBin);
+      String lIMAP4RevProxyPath = String.Format(@"{0}\{1}", cProxyConfig.BasisDirectory, cIMAP4RevProxyBin);
+      String lIMAP4SRevProxyPath = String.Format(@"{0}\{1}", cProxyConfig.BasisDirectory, cIMAP4SRevProxyBin);
 
       /*
        * 1. Check if proxy binaries are at the right place.
@@ -286,7 +258,7 @@ namespace Plugin.Main.IMAP4Proxy
       List<T> lRetVal = null;
       FileStream lFS = null;
       XmlSerializer lXMLSerial;
-      String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
+      String lSessionFilePath = String.Format(@"{0}\{1}.xml", cProxyConfig.SessionDirectory, pSessionName);
 
       try
       {
@@ -313,7 +285,7 @@ namespace Plugin.Main.IMAP4Proxy
     /// <param name="pSessionFileName"></param>
     public void deleteSession(String pSessionName)
     {
-      String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
+      String lSessionFilePath = String.Format(@"{0}\{1}.xml", cProxyConfig.SessionDirectory, pSessionName);
 
       if (File.Exists(lSessionFilePath))
         File.Delete(lSessionFilePath);
@@ -328,7 +300,7 @@ namespace Plugin.Main.IMAP4Proxy
     public String getSessionData(String pSessionName)
     {
       String lRetVal = String.Empty;
-      String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
+      String lSessionFilePath = String.Format(@"{0}\{1}.xml", cProxyConfig.SessionDirectory, pSessionName);
 
       try
       {
@@ -353,7 +325,7 @@ namespace Plugin.Main.IMAP4Proxy
       {
         XmlSerializer lSerializer;
         FileStream lFS = null;
-        String lSessionFilePath = String.Format(@"{0}\{1}.xml", GetSessionDir(), pSessionName);
+        String lSessionFilePath = String.Format(@"{0}\{1}.xml", cProxyConfig.SessionDirectory, pSessionName);
 
         try
         {

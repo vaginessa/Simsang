@@ -38,7 +38,7 @@ namespace Plugin.Main
 
     #region PUBLIC
 
-    public PluginHTTPRequestsUC()
+    public PluginHTTPRequestsUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -128,17 +128,19 @@ namespace Plugin.Main
 
       #endregion
 
-
       /*
        * Plugin configuration
        */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
+
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "HTTP requests",
         PluginDescription = "Listing client systems HTTP requests.",
-        PluginVersion = "0.6",
+        PluginVersion = "0.7",
         Ports = "TCP:80;TCP:443;",
         IsActive = true
       };

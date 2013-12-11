@@ -173,7 +173,6 @@ namespace Simsang
           lPluginFiles[i].LastIndexOf("\\") + 1,
           lPluginFiles[i].IndexOf(".dll") - lPluginFiles[i].LastIndexOf("\\") - 1);
 
-
           /*
            * Load plugin.
            */
@@ -203,9 +202,15 @@ namespace Simsang
           {
             if (lObjType != null)
             {
-              mPluginList[lPlugCnt] = (IPlugin)Activator.CreateInstance(lObjType);
+              PluginParameters lPluginParams = new PluginParameters() 
+              { 
+                PluginDirectoryFullPath = lTempPluginPath,
+                SessionDirectoryFullPath = String.Format(@"{0}{1}", lTempPluginPath, Config.SessionDir) 
+              };
+
+              mPluginList[lPlugCnt] = (IPlugin) Activator.CreateInstance(lObjType, lPluginParams);
               mPluginList[lPlugCnt].Host = this;
-              mPluginList[lPlugCnt].Config.BaseDir = lTempPluginPath + @"\";
+//              mPluginList[lPlugCnt].Config.BaseDir = lTempPluginPath + @"\";
 
               mACMain.DGVUsedPlugins.Add(new UsedPlugins(mPluginList[lPlugCnt].Config.PluginName, mPluginList[lPlugCnt].Config.PluginDescription, mPluginList[lPlugCnt].Config.PluginVersion, "1"));
               mPluginPosition.Add(mPluginList[lPlugCnt].Config.PluginName, lPlugCnt);

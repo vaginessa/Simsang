@@ -45,7 +45,7 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    public PluginIMAP4ProxyUC()
+    public PluginIMAP4ProxyUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -125,29 +125,32 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams!=null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams!=null) ? pPluginParams.SessionDirectoryFullPath :  String.Format("{0}sessions", lBaseDir);
+
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "IMAP4(S) proxy",
         PluginDescription = "IMAP4(S) reverse proxy server to intercept account data.",
-        PluginVersion = "0.3",
+        PluginVersion = "0.4",
         Ports = "TCP:993;TCP:143;",
         IsActive = true
       };
 
-
       /*
        * Proxy server configuration
        */
-      ProxyConfig lConfig = new ProxyConfig()
+      ProxyConfig lProxyConfig = new ProxyConfig()
                   {
-                    BasisDirectory = (cHost != null) ? cHost.GetWorkingDirectory() : String.Empty,
+                    BasisDirectory = Config.BaseDir,
+                    SessionDirectory = Config.SessionDir,
                     //RemoteHostName = String.Empty,
                     isDebuggingOn = (cHost != null) ? cHost.IsDebuggingOn() : false,
                     onProxyExit = null
                   };
-      cTask = TaskFacade.getInstance(lConfig, this);
+      cTask = TaskFacade.getInstance(lProxyConfig, this);
     }
 
     #endregion
@@ -235,6 +238,22 @@ namespace Plugin.Main
       cHost.PluginSetStatus(this, "red");
       cHost.LogMessage(String.Format("{0}: Stopped for unknown reason", Config.PluginName));
       SetIMAP4ProxyOnStopped();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private String getPluginPath()
+    {
+      String lRetVal = String.Empty;
+
+
+      lRetVal = String.Format("{0}", Directory.GetCurrentDirectory(), Config.SessionDir);
+//      lRetVal = String.Format("{0}", Directory.GetCurrentDirectory(), Config.SessionDir);
+
+      return (lRetVal);
     }
 
     #endregion

@@ -43,7 +43,7 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    public PluginPOP3ProxyUC()
+    public PluginPOP3ProxyUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -121,15 +121,18 @@ namespace Plugin.Main
 
 
       /*
-       * Plugin configuration 
+       * Plugin configuration
        */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
+
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "POP3(S) proxy",
         PluginDescription = "POP3(S) reverse proxy server to intercept account data",
-        PluginVersion = "0.4",
+        PluginVersion = "0.5",
         Ports = "TCP:995;TCP:110;",
         IsActive = true
       };
@@ -140,7 +143,7 @@ namespace Plugin.Main
        */
       ProxyConfig lConfig = new ProxyConfig()
                   {
-                    BasisDirectory = (cHost != null) ? cHost.GetWorkingDirectory() : String.Empty,
+                    BasisDirectory = Config.BaseDir,
                     //RemoteHostName = String.Empty,
                     isDebuggingOn = (cHost != null) ? cHost.IsDebuggingOn() : false,
                     onProxyExit = null //onPOP3ProxyExited

@@ -22,6 +22,7 @@ namespace Plugin.Main.IMAP4Proxy.Config
     public bool isDebuggingOn;
     public OnProxyExitDelegate onProxyExit;
     public String BasisDirectory;
+    public String SessionDirectory;
     public String RemoteHostName;
   }
 

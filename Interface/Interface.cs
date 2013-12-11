@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace Simsang.Plugin
 {
+  /// <summary>
+  /// Properties that have to be defined in a 
+  /// plugin.
+  /// </summary>
   public class PluginProperties
   {
     public String PluginName { get; set; }
@@ -15,12 +19,26 @@ namespace Simsang.Plugin
     public bool IsActive { get; set; }
   }
 
+  /// <summary>
+  /// Parameter object passed to a plugin when instanciating
+  /// it.
+  /// </summary>
+  public class PluginParameters
+  {
+    public String PluginDirectoryFullPath { get; set; }
+    public String SessionDirectoryFullPath { get; set; }
+
+  }
+
+  /// <summary>
+  /// Interface that has to be implemented by a plugin
+  /// to offer full functionality to the host application.
+  /// </summary>
   public interface IPlugin
   {
     Control PluginControl { get; }
     PluginProperties Config { set; get; }
     IPluginHost Host { get; set; }
-
 
     String getData();
     String onGetSessionData(String pSessionID);
@@ -39,7 +57,8 @@ namespace Simsang.Plugin
 
 
   /// <summary>
-  /// The host
+  /// The interface a host application hast to implement to
+  /// offer the required functionality to the loaded plugins.
   /// </summary>
   public interface IPluginHost
   {

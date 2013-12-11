@@ -34,7 +34,7 @@ namespace Plugin.Main
 
     #region PUBLIC
 
-    public PluginHTTPInjectUC()
+    public PluginHTTPInjectUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -99,17 +99,19 @@ namespace Plugin.Main
       RB_Redirect.Checked = true;
       RB_Redirect_CheckedChanged(null, null);
 
-
       /*
        * Plugin configuration
        */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
+
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "HTTP inject",
         PluginDescription = "Injecting data packets in an established HTTP data connection.",
-        PluginVersion = "0.4",
+        PluginVersion = "0.5",
         Ports = "TCP:80;",
         IsActive = true
       };
@@ -118,12 +120,10 @@ namespace Plugin.Main
       /*
        * Proxy server configuration
        */
-      String lSessionDir = String.Format("{0}{1}", Config.BaseDir, Config.SessionDir);
       cConfigParams = new InjectionConfig
       {
         isDebuggingOn = (cHost != null) ? cHost.IsDebuggingOn() : false,
-//        BasisDirectory = lSessionDir,  // WHUT!!! no sir!! no, no, no!!!
-        BasisDirectory = String.Format(@"{0}\", Directory.GetCurrentDirectory()), 
+        BasisDirectory = Config.BaseDir,
         onWebServerExit = onMicroWebExited,
         InjectionRulesPath = (cHost != null) ? cHost.GetAPEInjectionRulesFile() : String.Empty
       };

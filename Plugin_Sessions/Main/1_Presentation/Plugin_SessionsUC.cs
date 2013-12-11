@@ -32,7 +32,7 @@ namespace Plugin.Main
     private BindingList<Session.Config.Session> cSessions;
     public BindingList<MngSessionsConfig.SessionPattern> cSessionPatterns;
     private TaskFacade cTask;
-    private String cPatternFilePath = @"plugins\Sessions\Plugin_Session_Patterns.xml";
+//    private String cPatternFilePath = @"plugins\Sessions\Plugin_Session_Patterns.xml";
     private TreeNode mFilterNode;
 
     #endregion
@@ -43,7 +43,7 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    public PluginSessionsUC()
+    public PluginSessionsUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -121,17 +121,19 @@ namespace Plugin.Main
       DGV_Sessions.DataSource = cSessions;
       #endregion
 
-
       /*
-             * Plugin configuration 
-             */
+       * Plugin configuration
+       */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
+
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "Sessions",
         PluginDescription = "Listing and taking over session where valid session cookies where found within HTTP requests.",
-        PluginVersion = "0.7",
+        PluginVersion = "0.8",
         Ports = "TCP:80;TCP:443;",
         IsActive = true
       };

@@ -56,7 +56,7 @@ namespace Plugin.Main
     /// Constructor.
     /// Instantiate the UserControl.
     /// </summary>
-    public PluginSystemsUC()
+    public PluginSystemsUC(PluginParameters pPluginParams)
     {
       InitializeComponent();
 
@@ -118,17 +118,19 @@ namespace Plugin.Main
       #endregion
 
 
-
       /*
-       * Plugin configuration 
+       * Plugin configuration
        */
+      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
+
       Config = new PluginProperties()
       {
-        BaseDir = String.Format(@"{0}\", Directory.GetCurrentDirectory()),
-        SessionDir = ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\",
+        BaseDir = lBaseDir,
+        SessionDir = lSessionDir,
         PluginName = "Systems",
         PluginDescription = "Listing detected client systems, their OS type and the timestamp when it was last seen.",
-        PluginVersion = "0.7",
+        PluginVersion = "0.8",
         Ports = "TCP:80;TCP:443;",
         IsActive = true
       };
