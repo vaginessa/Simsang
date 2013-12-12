@@ -214,7 +214,7 @@ namespace Plugin.Main
         cTask.onStop();
 
         String lMsg = String.Format("{0}: {1}", Config.PluginName, lEx.Message);
-        cHost.LogMessage(lMsg);
+        cHost.LogMessage(lMsg);     
         MessageBox.Show(lMsg, "Can't start proxy server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
 

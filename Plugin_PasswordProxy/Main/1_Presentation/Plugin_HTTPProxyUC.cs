@@ -819,7 +819,10 @@ namespace Plugin.Main
           if (hti.RowIndex >= 0)
             CMS_PasswordProxy.Show(DGV_Accounts, e.Location);
         }
-        catch (Exception) { }
+        catch (Exception lEx)
+        {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        }
       } // if (e.Button ...
     }
 
@@ -859,7 +862,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 

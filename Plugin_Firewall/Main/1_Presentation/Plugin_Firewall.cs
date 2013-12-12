@@ -511,6 +511,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         MessageBox.Show(String.Format(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning));
       }
     }
@@ -547,12 +548,12 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
           MessageBox.Show(String.Format("Error occurred : {0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
           return;
         }
 
         MessageBox.Show(String.Format("FW rule ID : {0}", lFWRuleID));
-
       }
     }
 

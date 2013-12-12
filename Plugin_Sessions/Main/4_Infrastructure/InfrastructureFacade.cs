@@ -157,10 +157,17 @@ namespace Plugin.Main.Session
       BindingList<T> lRecords = new BindingList<T>();
       var lSerializer = new XmlSerializer(typeof(BindingList<T>));
 
-      using (TextReader lTextReader = new StringReader(pSessionData))
+      try
       {
-        lRecords = (BindingList<T>)lSerializer.Deserialize(lTextReader);
-      } // using (TextRe...
+        using (TextReader lTextReader = new StringReader(pSessionData))
+        {
+          lRecords = (BindingList<T>)lSerializer.Deserialize(lTextReader);
+        } // using (TextRe...
+      }
+      catch (Exception lEx)
+      {
+        String a = lEx.Message;
+      }
 
       return (lRecords);
     }

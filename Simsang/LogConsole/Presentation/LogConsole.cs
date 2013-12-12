@@ -85,11 +85,19 @@ namespace Simsang.LogConsole.Main
     public delegate void pushMsgDelegate(String pMsg);
     public static void pushMsg(String pMsg)
     {
-      //if (mLogConsole != null && mLogConsole.InvokeRequired)
-      //{
-      //  mLogConsole.BeginInvoke(new pushMsgDelegate(pushMsg), new object[] { pMsg });
-      //  return;
-      //} // if (InvokeRequired)
+
+      /*
+       * Create log console instance if not done yet.
+       */
+      if (mLogConsole == null)
+        getInstance();
+
+      if (mLogConsole != null && mLogConsole.InvokeRequired)
+      {
+        mLogConsole.BeginInvoke(new pushMsgDelegate(pushMsg), new object[] { pMsg });
+        return;
+      } // if (InvokeRequired)
+
 
 
       String lTimeStamp = String.Empty;
@@ -111,7 +119,10 @@ namespace Simsang.LogConsole.Main
           mLogConsole.TB_LogContent.SelectionStart = mLogConsole.TB_LogContent.Text.Length;
           mLogConsole.TB_LogContent.ScrollToCaret();
         }
-        catch { }
+        catch (Exception lEx)
+        {
+          String lMsg = lEx.Message;
+        }
       } // if (!Stri
     }
 
@@ -152,8 +163,10 @@ namespace Simsang.LogConsole.Main
     {
       if (keyData == Keys.Escape)
       {
-        this.Close();
-        return true;
+        this.Hide();
+        return false;
+        //this.Close();
+        //return true;
       }
       else
         return base.ProcessDialogKey(keyData);

@@ -317,12 +317,15 @@ namespace Plugin.Main
               else
                 DGV_HTTPRequests.Rows[lCounter].Visible = true;
             }
-            catch (Exception) { }
+            catch (Exception lEx)
+            {
+              cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+            }
           }
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(lEx.StackTrace);
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         }
       }
 
@@ -649,7 +652,10 @@ namespace Plugin.Main
           if (hti.RowIndex >= 0)
             CMS_HTTPRequests.Show(DGV_HTTPRequests, e.Location);
         }
-        catch (Exception) { }
+        catch (Exception lEx)
+        {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        }
 
       }
     }
@@ -703,7 +709,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
     }
 
@@ -731,13 +737,13 @@ namespace Plugin.Main
       {
         BindingList<HTTPRequests> lTmpHosts = new BindingList<HTTPRequests>();
         int lCurIndex = DGV_HTTPRequests.CurrentCell.RowIndex;
-        //        String lHostName = DGV_HTTPRequests.Rows[lCurIndex].Cells["RemoteHost"].Value.ToString();
+        //String lHostName = DGV_HTTPRequests.Rows[lCurIndex].Cells["RemoteHost"].Value.ToString();
 
         cTask.removeElementAt(lCurIndex);
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
     }
 
@@ -760,8 +766,9 @@ namespace Plugin.Main
           DGV_HTTPRequests.CurrentCell = DGV_HTTPRequests.Rows[hti.RowIndex].Cells[0];
         }
       }
-      catch (Exception)
+      catch (Exception lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         DGV_HTTPRequests.ClearSelection();
       }
     }
@@ -787,12 +794,14 @@ namespace Plugin.Main
         lSrcIP = DGV_HTTPRequests.SelectedRows[0].Cells["SrcIP"].Value.ToString();
         lUserAgent = String.Empty; //DGV_HTTPRequests.SelectedRows[0].Cells[1].Value.ToString();
       }
-      catch (ArgumentOutOfRangeException)
+      catch (ArgumentOutOfRangeException lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         return;
       }
-      catch (Exception)
+      catch (Exception lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
 
 
@@ -801,9 +810,10 @@ namespace Plugin.Main
         Browser lMiniBrowser = new Browser(lURL, lCookie, lSrcIP, lUserAgent);
         lMiniBrowser.Show(); // Dialog();
       }
-      catch (Exception except)
+      catch (Exception lEx)
       {
-        MessageBox.Show("MiniBrowser unexpectedly crashed : " + except.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        MessageBox.Show("MiniBrowser unexpectedly crashed : " + lEx.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
     }
 

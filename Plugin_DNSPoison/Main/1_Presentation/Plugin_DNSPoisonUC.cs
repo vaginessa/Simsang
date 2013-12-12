@@ -498,7 +498,8 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        MessageBox.Show(String.Format("{0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        MessageBox.Show(String.Format("An error occurred while adding a record.\r\n{0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
     }
 
@@ -519,7 +520,10 @@ namespace Plugin.Main
           if (hti.RowIndex >= 0)
             CMS_DNSPoison.Show(DGV_Spoofing, e.Location);
         }
-        catch (Exception) { }
+        catch (Exception lEx) 
+        {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        }
       }
     }
 
@@ -539,7 +543,10 @@ namespace Plugin.Main
 
         cTask.removeRecordAt(lHostName);
       }
-      catch (Exception) { }
+      catch (Exception lEx) 
+      {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+      }
     }
 
 
@@ -602,6 +609,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
           MessageBox.Show(String.Format("{0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
       }
@@ -628,6 +636,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
           MessageBox.Show(String.Format("{0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
       }

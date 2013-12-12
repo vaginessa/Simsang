@@ -377,50 +377,50 @@ namespace Plugin.Main
     /// <param name="pData"></param>
     public delegate void onNewDataDelegate(String pData);
     public void onNewData(String pData)
+    {
+      if (Config.IsActive)
+      {
+        if (InvokeRequired)
         {
-          if (Config.IsActive)
+          BeginInvoke(new onNewDataDelegate(onNewData), new object[] { pData });
+          return;
+        } // if (InvokeRequired)
+
+
+
+        try
+        {
+          if (pData != null && pData.Length > 0)
           {
-            if (InvokeRequired)
+            String[] lSplitter = Regex.Split(pData, @"\|\|");
+            if (lSplitter.Length == 7)
             {
-              BeginInvoke(new onNewDataDelegate(onNewData), new object[] { pData });
-              return;
-            } // if (InvokeRequired)
+              String lProto = lSplitter[0];
+              String lSMAC = lSplitter[1];
+              String lSIP = lSplitter[2];
+              String lSrcPort = lSplitter[3];
+              String lDstIP = lSplitter[4];
+              String lDstPort = lSplitter[5];
+              String lHostName = lSplitter[6];
 
 
-
-            try
-            {
-              if (pData != null && pData.Length > 0)
+              if (lDstPort != null && lDstPort == "53")
               {
-                String[] lSplitter = Regex.Split(pData, @"\|\|");
-                if (lSplitter.Length == 7)
+                lock (this)
                 {
-                  String lProto = lSplitter[0];
-                  String lSMAC = lSplitter[1];
-                  String lSIP = lSplitter[2];
-                  String lSrcPort = lSplitter[3];
-                  String lDstIP = lSplitter[4];
-                  String lDstPort = lSplitter[5];
-                  String lHostName = lSplitter[6];
-
-                 
-                  if (lDstPort != null && lDstPort == "53")
-                  {
-                    lock (this)
-                    {
-                      cTask.addRecord(new DNSRequestRecord(lSMAC, lSIP, lHostName, lProto));
-                    } // lock (this)
-                  } // if (lDstPort != null ...
-                }
-              } // if (pData.Le... 
+                  cTask.addRecord(new DNSRequestRecord(lSMAC, lSIP, lHostName, lProto));
+                } // lock (this)
+              } // if (lDstPort != null ...
             }
-            catch (Exception lEx)
-            {
-              if (cHost != null)
-                cHost.LogMessage(String.Format("Input data : {0}\r\nStackTrace : {1}", pData, lEx.StackTrace));
-            }
-          } // if (cIsActive)
+          } // if (pData.Le... 
         }
+        catch (Exception lEx)
+        {
+          if (cHost != null)
+            cHost.LogMessage(String.Format("Input data : {0}\r\nStackTrace : {1}", pData, lEx.StackTrace));
+        }
+      } // if (cIsActive)
+    }
 
 
 
@@ -478,7 +478,10 @@ namespace Plugin.Main
             else
               DGV_DNSRequests.Rows[lCounter].Visible = true;
           }
-          catch (Exception) { }
+          catch (Exception lEx)
+          {
+            cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          }
         }
       }
 
@@ -531,7 +534,10 @@ namespace Plugin.Main
           if (hti.RowIndex >= 0)
             CMS_DNSRequests.Show(DGV_DNSRequests, e.Location);
         }
-        catch (Exception) { }
+        catch (Exception lEx)
+        {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        }
       }
     }
 
@@ -563,7 +569,10 @@ namespace Plugin.Main
         int lCurIndex = DGV_DNSRequests.CurrentCell.RowIndex;
         cTask.removeRecordAt(lCurIndex);
       }
-      catch (Exception) { }
+      catch (Exception lEx)
+      {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+      }
     }
 
 
@@ -583,7 +592,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -604,11 +613,9 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
-
-
 
 
     /// <summary>
@@ -629,11 +636,13 @@ namespace Plugin.Main
           DGV_DNSRequests.CurrentCell = DGV_DNSRequests.Rows[hti.RowIndex].Cells[0];
         }
       }
-      catch (Exception)
+      catch (Exception lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         DGV_DNSRequests.ClearSelection();
       }
     }
+
     #endregion
 
 

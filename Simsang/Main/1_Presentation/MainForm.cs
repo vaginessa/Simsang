@@ -186,6 +186,10 @@ namespace Simsang
       mCurrentSession = new AttackSession();
       mCurrentSession.StartTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
       
+
+      // Initialize log console
+      LogConsole.Main.LogConsole.getInstance();
+
       // Check Pcap version
       try
       {

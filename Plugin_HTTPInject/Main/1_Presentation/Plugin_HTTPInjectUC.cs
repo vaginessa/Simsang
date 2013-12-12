@@ -561,7 +561,11 @@ namespace Plugin.Main
         OFD_InjectedFile.ShowDialog();
         lIconPath = String.Format("{0}\\{1}", Path.GetDirectoryName(OFD_InjectedFile.FileName), Path.GetFileName(OFD_InjectedFile.FileName));
       }
-      catch (Exception) { }
+      catch (Exception lEx)
+      {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+      }
+
 
       if (!String.IsNullOrEmpty(lIconPath))
       {
@@ -572,8 +576,9 @@ namespace Plugin.Main
           else
             TB_ReplacementURL.Text = String.Empty;
         }
-        catch (Exception)
+        catch (Exception lEx)
         {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
           TB_ReplacementURL.Text = String.Empty;
         }
       }
@@ -641,6 +646,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
     }
@@ -689,8 +695,9 @@ namespace Plugin.Main
 
         cTask.removeItemFromList(lRequestedHost, lRequestedURL);
       }
-      catch (Exception)
+      catch (Exception lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         return;
       }
     }

@@ -322,7 +322,7 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-        cTask.loadSessionDataFromString(pSessionName);
+        cTask.saveSession(pSessionName);
       } // if (cIsActiv...
     }
 
@@ -839,6 +839,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
     }
 
@@ -892,8 +893,9 @@ namespace Plugin.Main
           Browser lMiniBrowser = new Browser(lURL, lCookies, lSrcIP, lUserAgent);
           lMiniBrowser.Show();
         }
-        catch (Exception)
+        catch (Exception lEx)
         {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         }
       } // if (DG...
     }
@@ -927,7 +929,10 @@ namespace Plugin.Main
               if (lSubNode != null && lSubNode.Nodes.Count > 0)
                 lSubNode.Nodes.Clear();
       }
-      catch (Exception) { }
+      catch (Exception lEx)
+      {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+      }
 
       /*
        * Select Main TV-Node.
@@ -935,7 +940,7 @@ namespace Plugin.Main
       mFilterNode = TV_Sessions.Nodes[0];
       TV_Sessions.SelectedNode = TV_Sessions.Nodes[0];
       TV_Sessions.Select();
-      //            myTreeView.SelectedNode = myTreeNode
+      //myTreeView.SelectedNode = myTreeNode
     }
 
 
@@ -955,7 +960,10 @@ namespace Plugin.Main
           if (hti.RowIndex >= 0)
             CMS_Sessions.Show(DGV_Sessions, e.Location);
         }
-        catch (Exception) { }
+        catch (Exception lEx)
+        {
+          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        }
       }
     }
 
@@ -1003,7 +1011,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
     }
 
@@ -1026,8 +1034,9 @@ namespace Plugin.Main
           DGV_Sessions.CurrentCell = DGV_Sessions.Rows[hti.RowIndex].Cells[0];
         }
       }
-      catch (Exception)
+      catch (Exception lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         DGV_Sessions.ClearSelection();
       }
     }

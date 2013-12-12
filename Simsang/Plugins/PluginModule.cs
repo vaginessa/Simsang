@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
@@ -63,82 +62,7 @@ namespace Simsang
         } // foreach (IPlugi...
       } // if (mPlugi...
 
-
       return (lRetVal);
-    }
-
-    #endregion
-
-
-    #region PROPERTIES
-
-    public IPlugin[] PluginList { get { return (mPluginList); } }
-    public Hashtable GetPluginPosition { get { return (mPluginPosition); } }
-    public String GetInterface() { return (mACMain.GetInterface()); }
-    public String GetStartIP() { return (mACMain.GetStartIP()); }
-    public String GetStopIP() { return (mACMain.GetStopIP()); }
-    public String GetCurrentIP() { return (mACMain.GetCurrentIP()); }
-
-    public List<Tuple<String, String, String>> GetAllReachableSystems()
-    {
-      List<Tuple<String, String, String>> lRetVal = new List<Tuple<String, String, String>>();
-      foreach (ARPScan.Main.TargetRecord lTmp in ARPScan.Main.ARPScan.GetInstance().TargetList())
-        lRetVal.Add(new Tuple<String, String, String>(lTmp.MAC, lTmp.IP, lTmp.Vendor));
-
-      return (lRetVal);
-    }
-
-    public bool IsDebuggingOn() { return (Config.DebugOn()); }
-    public String GetSessionName() { return (mACMain.GetSessionName()); }
-    public String GetWorkingDirectory() { return (Directory.GetCurrentDirectory()); }
-    public String GetAPEWorkingDirectory() { return (Config.LocalBinariesPath); }
-    public String GetAPEFWRulesFile() { return (Config.APEFWRulesPath); }
-    public String GetAPEInjectionRulesFile() { return (Config.APEInjectionRulesPath); }
-    public String GetDNSPoisoningHostsFile() { return (Config.DNSPoisoningHostsPath); }
-    public void LogMessage(String pMsg) { LogConsole.Main.LogConsole.pushMsg(pMsg); }
-
-    public void PluginSetStatus(Object pPluginObj, String pStatus)
-    {
-      try
-      {
-        if (pPluginObj != null)
-        {
-          IPlugin lPlugin = (IPlugin)pPluginObj;
-          if (lPlugin != null)
-          {
-            TabPage lTabPage = this.mACMain.GetTabPageHandler.FindTabPage(lPlugin.Config.PluginName);
-
-            if (lTabPage != null)
-              lTabPage.ImageKey = pStatus;
-
-          } // if (lPlugin...
-        } // if (pPlugin...
-      }
-      catch (Exception lEx)
-      {
-        LogConsole.Main.LogConsole.pushMsg(String.Format("PluginSetStatus() : {0}", lEx.ToString()));
-      }
-    }
-
-    #endregion
-
-
-    #region IPluginHost Member
-
-    /// <summary>
-    /// Plugin is connecting back to register itself actively. Create ControlTab!
-    /// </summary>
-    /// <param name="pPlugin"></param>
-    /// <returns></returns>
-    public bool Register(IPlugin pPlugin)
-    {
-      TabPage lTP_Plugin = new TabPage(pPlugin.Config.PluginName);
-      lTP_Plugin.Controls.Add(pPlugin.PluginControl);
-      lTP_Plugin.BackColor = mACMain.TPDefault.BackColor;
-
-      mACMain.TCPlugins.TabPages.Add(lTP_Plugin);
-
-      return (true);
     }
 
 
@@ -202,15 +126,15 @@ namespace Simsang
           {
             if (lObjType != null)
             {
-              PluginParameters lPluginParams = new PluginParameters() 
-              { 
+              PluginParameters lPluginParams = new PluginParameters()
+              {
                 PluginDirectoryFullPath = lTempPluginPath,
-                SessionDirectoryFullPath = String.Format(@"{0}{1}", lTempPluginPath, Config.SessionDir) 
+                SessionDirectoryFullPath = String.Format(@"{0}{1}", lTempPluginPath, Config.SessionDir)
               };
 
-              mPluginList[lPlugCnt] = (IPlugin) Activator.CreateInstance(lObjType, lPluginParams);
+              mPluginList[lPlugCnt] = (IPlugin)Activator.CreateInstance(lObjType, lPluginParams);
               mPluginList[lPlugCnt].Host = this;
-//              mPluginList[lPlugCnt].Config.BaseDir = lTempPluginPath + @"\";
+              //              mPluginList[lPlugCnt].Config.BaseDir = lTempPluginPath + @"\";
 
               mACMain.DGVUsedPlugins.Add(new UsedPlugins(mPluginList[lPlugCnt].Config.PluginName, mPluginList[lPlugCnt].Config.PluginDescription, mPluginList[lPlugCnt].Config.PluginVersion, "1"));
               mPluginPosition.Add(mPluginList[lPlugCnt].Config.PluginName, lPlugCnt);
@@ -336,6 +260,78 @@ namespace Simsang
         } // foreach (IPlug...
       } // if (mPlugin...
     }
+
+    #endregion
+
+
+    #region INTERFACE IPluginHost
+
+    public IPlugin[] PluginList { get { return (mPluginList); } }
+    public Hashtable GetPluginPosition { get { return (mPluginPosition); } }
+    public String GetInterface() { return (mACMain.GetInterface()); }
+    public String GetStartIP() { return (mACMain.GetStartIP()); }
+    public String GetStopIP() { return (mACMain.GetStopIP()); }
+    public String GetCurrentIP() { return (mACMain.GetCurrentIP()); }
+
+    public List<Tuple<String, String, String>> GetAllReachableSystems()
+    {
+      List<Tuple<String, String, String>> lRetVal = new List<Tuple<String, String, String>>();
+      foreach (ARPScan.Main.TargetRecord lTmp in ARPScan.Main.ARPScan.GetInstance().TargetList())
+        lRetVal.Add(new Tuple<String, String, String>(lTmp.MAC, lTmp.IP, lTmp.Vendor));
+
+      return (lRetVal);
+    }
+
+    public bool IsDebuggingOn() { return (Config.DebugOn()); }
+    public String GetSessionName() { return (mACMain.GetSessionName()); }
+    public String GetWorkingDirectory() { return (Directory.GetCurrentDirectory()); }
+    public String GetAPEWorkingDirectory() { return (Config.LocalBinariesPath); }
+    public String GetAPEFWRulesFile() { return (Config.APEFWRulesPath); }
+    public String GetAPEInjectionRulesFile() { return (Config.APEInjectionRulesPath); }
+    public String GetDNSPoisoningHostsFile() { return (Config.DNSPoisoningHostsPath); }
+    public void LogMessage(String pMsg) { LogConsole.Main.LogConsole.pushMsg(pMsg); }
+
+    public void PluginSetStatus(Object pPluginObj, String pStatus)
+    {
+      try
+      {
+        if (pPluginObj != null)
+        {
+          IPlugin lPlugin = (IPlugin)pPluginObj;
+          if (lPlugin != null)
+          {
+            TabPage lTabPage = this.mACMain.GetTabPageHandler.FindTabPage(lPlugin.Config.PluginName);
+
+            if (lTabPage != null)
+              lTabPage.ImageKey = pStatus;
+
+          } // if (lPlugin...
+        } // if (pPlugin...
+      }
+      catch (Exception lEx)
+      {
+        LogConsole.Main.LogConsole.pushMsg(String.Format("PluginSetStatus() : {0}", lEx.ToString()));
+      }
+    }
+
+
+
+    /// <summary>
+    /// Plugin is connecting back to register itself actively. Create ControlTab!
+    /// </summary>
+    /// <param name="pPlugin"></param>
+    /// <returns></returns>
+    public bool Register(IPlugin pPlugin)
+    {
+      TabPage lTP_Plugin = new TabPage(pPlugin.Config.PluginName);
+      lTP_Plugin.Controls.Add(pPlugin.PluginControl);
+      lTP_Plugin.BackColor = mACMain.TPDefault.BackColor;
+
+      mACMain.TCPlugins.TabPages.Add(lTP_Plugin);
+
+      return (true);
+    }
+
 
     #endregion
 

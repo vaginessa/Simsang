@@ -506,7 +506,7 @@ namespace Plugin.Main
         // If cell selection is valid
         if (hitTestInfo.ColumnIndex >= 0 && hitTestInfo.RowIndex >= 0)
         {
-          //          DGV_TrafficData.Rows[hitTestInfo.RowIndex].Selected = true;
+          //DGV_TrafficData.Rows[hitTestInfo.RowIndex].Selected = true;
           CMS_DataGrid_RightMouseButton.Show(DGV_TrafficData, new Point(e.X, e.Y));
         }
       }
@@ -565,8 +565,9 @@ namespace Plugin.Main
           DGV_TrafficData.CurrentCell = DGV_TrafficData.Rows[hti.RowIndex].Cells[0];
         }
       }
-      catch (Exception)
+      catch (Exception lEx)
       {
+        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         DGV_TrafficData.ClearSelection();
       }
     }
