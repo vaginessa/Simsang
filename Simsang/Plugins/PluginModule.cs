@@ -18,7 +18,7 @@ namespace Simsang
 
     #region MEMBERS
 
-    private SimsangMain mACMain;
+    private SimsangMain mSimsangMain;
     private IPlugin[] mPluginList;
     private Hashtable mPluginPosition = new Hashtable();
 
@@ -33,7 +33,7 @@ namespace Simsang
     /// <param name="pACMain"></param>
     public PluginModule(SimsangMain pACMain)
     {
-      mACMain = pACMain;
+      mSimsangMain = pACMain;
     }
 
 
@@ -129,14 +129,12 @@ namespace Simsang
               PluginParameters lPluginParams = new PluginParameters()
               {
                 PluginDirectoryFullPath = lTempPluginPath,
-                SessionDirectoryFullPath = String.Format(@"{0}{1}", lTempPluginPath, Config.SessionDir)
+                SessionDirectoryFullPath = String.Format(@"{0}{1}", lTempPluginPath, Config.SessionDir),
+                HostApplication = (IPluginHost) this
               };
 
-              mPluginList[lPlugCnt] = (IPlugin)Activator.CreateInstance(lObjType, lPluginParams);
-              mPluginList[lPlugCnt].Host = this;
-              //              mPluginList[lPlugCnt].Config.BaseDir = lTempPluginPath + @"\";
-
-              mACMain.DGVUsedPlugins.Add(new UsedPlugins(mPluginList[lPlugCnt].Config.PluginName, mPluginList[lPlugCnt].Config.PluginDescription, mPluginList[lPlugCnt].Config.PluginVersion, "1"));
+              mPluginList[lPlugCnt] = (IPlugin) Activator.CreateInstance(lObjType, lPluginParams);
+              mSimsangMain.DGVUsedPlugins.Add(new UsedPlugins(mPluginList[lPlugCnt].Config.PluginName, mPluginList[lPlugCnt].Config.PluginDescription, mPluginList[lPlugCnt].Config.PluginVersion, "1"));
               mPluginPosition.Add(mPluginList[lPlugCnt].Config.PluginName, lPlugCnt);
             } // if (lObjType...
           }
@@ -149,25 +147,25 @@ namespace Simsang
 
 
 
-      /*
-       * Bring plugins in the right order.
-       * Or mainly : move the Simsang tab page to the end.
-       */
-      TabPage lTabPageDefault = null;
-      foreach (TabPage lPage in mACMain.TCPlugins.TabPages)
-      {
-        if (lPage.Text.ToLower() == "simsang")
-        {
-          lTabPageDefault = lPage;
-          mACMain.TCPlugins.TabPages.Remove(lPage);
-        }
-        else
-        {
-        } // if (lPag...
-      } // foreach (TabPag...
+      ///*
+      // * Bring plugins in the right order.
+      // * Or mainly : move the Simsang tab page to the end.
+      // */
+      //TabPage lTabPageDefault = null;
+      //foreach (TabPage lPage in mSimsangMain.TCPlugins.TabPages)
+      //{
+      //  if (lPage.Text.ToLower() == "simsang")
+      //  {
+      //    lTabPageDefault = lPage;
+      //    mSimsangMain.TCPlugins.TabPages.Remove(lPage);
+      //  }
+      //  else
+      //  {
+      //  } // if (lPag...
+      //} // foreach (TabPag...
 
-      if (lTabPageDefault != null)
-        mACMain.TCPlugins.TabPages.Add(lTabPageDefault);
+      //if (lTabPageDefault != null)
+      //  mSimsangMain.TCPlugins.TabPages.Add(lTabPageDefault);
     }
 
 
@@ -180,6 +178,27 @@ namespace Simsang
       for (int i = 0; i < mPluginList.Length; i++)
         if (mPluginList[i] != null)
           mPluginList[i].onInit();
+
+
+      /*
+       * Bring plugins in the right order.
+       * Or mainly : move the Simsang tab page to the end.
+       */
+      TabPage lTabPageDefault = null;
+      foreach (TabPage lPage in mSimsangMain.TCPlugins.TabPages)
+      {
+        if (lPage.Text.ToLower() == "simsang")
+        {
+          lTabPageDefault = lPage;
+          mSimsangMain.TCPlugins.TabPages.Remove(lPage);
+        }
+        else
+        {
+        } // if (lPag...
+      } // foreach (TabPag...
+
+      if (lTabPageDefault != null)
+        mSimsangMain.TCPlugins.TabPages.Add(lTabPageDefault);
     }
 
 
@@ -199,7 +218,7 @@ namespace Simsang
     /// </summary>
     public void CloseInactivePlugins()
     {
-      foreach (TabPage lTabPage in mACMain.TCPlugins.TabPages)
+      foreach (TabPage lTabPage in mSimsangMain.TCPlugins.TabPages)
       {
         String lTabTitle = lTabPage.Text;
         String lPlugState = Config.GetRegistryValue(lTabTitle, "state");
@@ -210,9 +229,9 @@ namespace Simsang
 
           try
           {
-            for (int lCounter = 0; lCounter < mACMain.UsedPlugins.Count; lCounter++)
+            for (int lCounter = 0; lCounter < mSimsangMain.UsedPlugins.Count; lCounter++)
             {
-              if (mACMain.UsedPlugins[lCounter].PluginName == lTabPage.Text)
+              if (mSimsangMain.UsedPlugins[lCounter].PluginName == lTabPage.Text)
               {
                 lTabIndex = lCounter;
                 break;
@@ -220,13 +239,13 @@ namespace Simsang
             } // for (int ...
 
 
-            //lTabIndex = (int) mACMain.GetTabPageHandler.PluginPosition[lTabTitle];
+            //lTabIndex = (int) mSimsangMain.GetTabPageHandler.PluginPosition[lTabTitle];
             if (lTabIndex >= 0)
             {
-              mACMain.UsedPlugins[lTabIndex].Active = "0";
-              mACMain.GetTabPageHandler.HideTabPage(lTabPage);
+              mSimsangMain.UsedPlugins[lTabIndex].Active = "0";
+              mSimsangMain.GetTabPageHandler.HideTabPage(lTabPage);
               try
-              { mACMain.GetPluginByName(lTabPage.Text).Config.IsActive = false; }
+              { mSimsangMain.GetPluginByName(lTabPage.Text).Config.IsActive = false; }
               catch (Exception) { }
             }
           }
@@ -268,10 +287,10 @@ namespace Simsang
 
     public IPlugin[] PluginList { get { return (mPluginList); } }
     public Hashtable GetPluginPosition { get { return (mPluginPosition); } }
-    public String GetInterface() { return (mACMain.GetInterface()); }
-    public String GetStartIP() { return (mACMain.GetStartIP()); }
-    public String GetStopIP() { return (mACMain.GetStopIP()); }
-    public String GetCurrentIP() { return (mACMain.GetCurrentIP()); }
+    public String GetInterface() { return (mSimsangMain.GetInterface()); }
+    public String GetStartIP() { return (mSimsangMain.GetStartIP()); }
+    public String GetStopIP() { return (mSimsangMain.GetStopIP()); }
+    public String GetCurrentIP() { return (mSimsangMain.GetCurrentIP()); }
 
     public List<Tuple<String, String, String>> GetAllReachableSystems()
     {
@@ -283,7 +302,7 @@ namespace Simsang
     }
 
     public bool IsDebuggingOn() { return (Config.DebugOn()); }
-    public String GetSessionName() { return (mACMain.GetSessionName()); }
+    public String GetSessionName() { return (mSimsangMain.GetSessionName()); }
     public String GetWorkingDirectory() { return (Directory.GetCurrentDirectory()); }
     public String GetAPEWorkingDirectory() { return (Config.LocalBinariesPath); }
     public String GetAPEFWRulesFile() { return (Config.APEFWRulesPath); }
@@ -300,7 +319,7 @@ namespace Simsang
           IPlugin lPlugin = (IPlugin)pPluginObj;
           if (lPlugin != null)
           {
-            TabPage lTabPage = this.mACMain.GetTabPageHandler.FindTabPage(lPlugin.Config.PluginName);
+            TabPage lTabPage = this.mSimsangMain.GetTabPageHandler.FindTabPage(lPlugin.Config.PluginName);
 
             if (lTabPage != null)
               lTabPage.ImageKey = pStatus;
@@ -325,9 +344,9 @@ namespace Simsang
     {
       TabPage lTP_Plugin = new TabPage(pPlugin.Config.PluginName);
       lTP_Plugin.Controls.Add(pPlugin.PluginControl);
-      lTP_Plugin.BackColor = mACMain.TPDefault.BackColor;
+      lTP_Plugin.BackColor = mSimsangMain.TPDefault.BackColor;
 
-      mACMain.TCPlugins.TabPages.Add(lTP_Plugin);
+      mSimsangMain.TCPlugins.TabPages.Add(lTP_Plugin);
 
       return (true);
     }

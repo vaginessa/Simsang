@@ -55,13 +55,13 @@ namespace Plugin.Main
 
     #region MEMBERS
 
-    private IPluginHost cHost;
     private List<String> cTargetList;
     private List<PeerSystems> cPeersDataSource;
     private BindingList<Account> cAccounts;
     public BindingList<ManageAuthentications.AccountPattern> cAccountPatterns;
     private String cPatternFilePath = @"plugins\HTTPProxy\Plugin_AccountsHTMLAuth_Patterns.txt";
     private TaskFacade cTask;
+    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -139,6 +139,7 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
+      cPluginParams = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -168,7 +169,6 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
 
     #endregion
 
@@ -193,9 +193,8 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-
-
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.Register(this);
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
 
       WebServerConfig lWebServerConfig = new WebServerConfig();
       lWebServerConfig.BasisDirectory = Config.BaseDir;
@@ -224,7 +223,7 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-        cHost.PluginSetStatus(this, "green");
+        cPluginParams.HostApplication.PluginSetStatus(this, "green");
         setPWProxyBTOnStarted();
       } // if (cIsActiv...
     }
@@ -247,7 +246,7 @@ namespace Plugin.Main
       cTask.stopProxies();
 
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
       setPWProxyBTOnStopped();
     }
 
@@ -298,7 +297,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
 
       return (lRetVal);
@@ -342,7 +341,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
     }
 
@@ -379,7 +378,7 @@ namespace Plugin.Main
       cTask.clearRecordList();
       TB_RemoteHost.Text = String.Empty;
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -404,7 +403,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
     }
 
@@ -436,7 +435,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(lEx.StackTrace);
+          cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
         }
       } // if (cIsActiv...
     }
@@ -488,7 +487,7 @@ namespace Plugin.Main
                 }
                 catch (Exception lEx)
                 {
-                  cHost.LogMessage(String.Format("PasswordProxy::NewData() : {0}\r\n{1}", lEx.Message, lEx.StackTrace));
+                  cPluginParams.HostApplication.LogMessage(String.Format("PasswordProxy::NewData() : {0}\r\n{1}", lEx.Message, lEx.StackTrace));
                   return;
                 }
 
@@ -504,7 +503,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
+          cPluginParams.HostApplication.LogMessage(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActiv...
     }
@@ -556,7 +555,7 @@ namespace Plugin.Main
         WebServerConfig pConfig = new WebServerConfig
         {
           BasisDirectory = Config.BaseDir,
-          isDebuggingOn = cHost.IsDebuggingOn(),
+          isDebuggingOn = cPluginParams.HostApplication.IsDebuggingOn(),
           isRedirect = CB_RedirectTo.Checked,
           RedirectToURL = TB_RedirectURL.Text,
           RemoteHostName = TB_RemoteHost.Text,
@@ -571,17 +570,17 @@ namespace Plugin.Main
         catch (Exception lEx)
         {
           String lLogMsg = String.Format("{0}: {1}", Config.PluginName, lMsg);
-          cHost.LogMessage(lLogMsg);
+          cPluginParams.HostApplication.LogMessage(lLogMsg);
           setPWProxyBTOnStopped();
-          cHost.PluginSetStatus(this, "red");
+          cPluginParams.HostApplication.PluginSetStatus(this, "red");
 
           MessageBox.Show(lLogMsg, "Can't start proxy server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
       }
       else
       {
-        cHost.LogMessage(String.Format("{0}: No forwarding host/URL defined. Stopping the pluggin.", Config.PluginName));
-        cHost.PluginSetStatus(this, "grey");
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: No forwarding host/URL defined. Stopping the pluggin.", Config.PluginName));
+        cPluginParams.HostApplication.PluginSetStatus(this, "grey");
       }  // if (lRemoteHost ...
 
     }
@@ -630,8 +629,8 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cHost.PluginSetStatus(this, "red");
-      cHost.LogMessage(String.Format("{0}: Stopped for unknown reason", Config.PluginName));
+      cPluginParams.HostApplication.PluginSetStatus(this, "red");
+      cPluginParams.HostApplication.LogMessage(String.Format("{0}: Stopped for unknown reason", Config.PluginName));
       setPWProxyBTOnStopped();
     }
 
@@ -821,7 +820,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       } // if (e.Button ...
     }
@@ -862,7 +861,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -875,7 +874,7 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void DGV_Accounts_DoubleClick(object sender, EventArgs e)
     {
-      ManageAuthentications.Form_ManageAuthentications lManageSystems = new ManageAuthentications.Form_ManageAuthentications(cHost);
+      ManageAuthentications.Form_ManageAuthentications lManageSystems = new ManageAuthentications.Form_ManageAuthentications(cPluginParams.HostApplication);
       lManageSystems.ShowDialog();
       readSystemPatterns();
     }

@@ -40,12 +40,12 @@ namespace Plugin.Main
 
     #region MEMBERS
 
-    private IPluginHost cHost;
     private List<String> cTargetList;
     private BindingList<SystemRecord> cSystems;
     public BindingList<ManageSystems.SystemPattern> cSystemPatterns;
     private String cPatternFilePath = @"plugins\Systems\Plugin_SystemsOS_Patterns.xml";
     private TaskFacade cTask;
+    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -121,6 +121,7 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
+      cPluginParams = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -329,7 +330,6 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
 
     #endregion
 
@@ -354,7 +354,8 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.Register(this);
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
       readSystemPatterns();
     }
 
@@ -376,10 +377,17 @@ namespace Plugin.Main
         // Add all system from ARP scan to the list
         cTask.removeAllRecords();
 
-        foreach (Tuple<String, String, String> lTmp in cHost.GetAllReachableSystems())
-          cTask.addRecord(new SystemRecord(lTmp.Item1, lTmp.Item2, String.Empty, lTmp.Item3, String.Empty, String.Empty));
-
-        cHost.PluginSetStatus(this, "green");
+        foreach (Tuple<String, String, String> lTmp in cPluginParams.HostApplication.GetAllReachableSystems())
+        {
+          try
+          {
+            cTask.addRecord(new SystemRecord(lTmp.Item1, lTmp.Item2, String.Empty, lTmp.Item3, String.Empty, String.Empty));
+          }
+          catch (RecordException) 
+          {
+          }
+        }
+        cPluginParams.HostApplication.PluginSetStatus(this, "green");
       } // if (cIsActiv...
     }
 
@@ -397,7 +405,7 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -603,7 +611,7 @@ namespace Plugin.Main
                 }
                 catch (Exception lEx)
                 {
-                  cHost.LogMessage(String.Format("PluginSystemsMainUC::NewData(0) : {0} - {1}", lEx.Message, lEx.StackTrace));
+                  cPluginParams.HostApplication.LogMessage(String.Format("PluginSystemsMainUC::NewData(0) : {0} - {1}", lEx.Message, lEx.StackTrace));
                 }
 
                 try
@@ -634,9 +642,12 @@ namespace Plugin.Main
                       DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
                   }
                 }
+                catch (RecordException)
+                {
+                }
                 catch (Exception lEx)
                 {
-                  cHost.LogMessage(String.Format("PluginSystemsMainUC::NewData(1) : {0} - {1}", lEx.Message, lEx.StackTrace));
+                  cPluginParams.HostApplication.LogMessage(String.Format("PluginSystemsMainUC::NewData(1) : {0} - {1}", lEx.Message, lEx.StackTrace));
                 }
 
                 /*
@@ -646,8 +657,14 @@ namespace Plugin.Main
               else if (lEntryType == EntryType.Empty && lSIP.Length > 0 && lSMAC.Length > 0)
               {
                 lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
-                cTask.addRecord(new SystemRecord(lSMAC, lSIP, String.Empty, lUserAgent, String.Empty, String.Empty));
-                DGV_Systems.Refresh();
+                try
+                {
+                  cTask.addRecord(new SystemRecord(lSMAC, lSIP, String.Empty, lUserAgent, String.Empty, String.Empty));
+                  DGV_Systems.Refresh();
+                }
+                catch (RecordException)
+                {
+                }
 
                 if (lLastPosition >= 0)
                   DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
@@ -752,7 +769,7 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void DGV_Systems_DoubleClick(object sender, EventArgs e)
     {
-      ManageSystems.Form_ManageSystems lManageSystems = new ManageSystems.Form_ManageSystems(cHost);
+      ManageSystems.Form_ManageSystems lManageSystems = new ManageSystems.Form_ManageSystems(cPluginParams.HostApplication);
       lManageSystems.ShowDialog();
       readSystemPatterns();
     }

@@ -24,10 +24,10 @@ namespace Plugin.Main
 
     #region MEMBERS
 
-    private IPluginHost cHost;
     private BindingList<InjectedURLRecord> cInjectedURLs;
     private TaskFacade cTask;
     private InjectionConfig cConfigParams;
+    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -102,8 +102,9 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
-      String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
-      String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
+      cPluginParams = pPluginParams;
+      String lBaseDir = String.Format(@"{0}\", (cPluginParams != null) ? cPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (cPluginParams != null) ? cPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
       Config = new PluginProperties()
       {
@@ -122,13 +123,14 @@ namespace Plugin.Main
        */
       cConfigParams = new InjectionConfig
       {
-        isDebuggingOn = (cHost != null) ? cHost.IsDebuggingOn() : false,
+        isDebuggingOn = (cPluginParams != null) ? cPluginParams.HostApplication.IsDebuggingOn() : false,
         BasisDirectory = Config.BaseDir,
         onWebServerExit = onMicroWebExited,
-        InjectionRulesPath = (cHost != null) ? cHost.GetAPEInjectionRulesFile() : String.Empty
+        InjectionRulesPath = (cPluginParams != null) ? cPluginParams.HostApplication.GetAPEInjectionRulesFile() : String.Empty
       };
 
       cTask = TaskFacade.getInstance(cConfigParams, this);
+      DomainFacade.getInstance(cConfigParams, this).addObserver(this);
     }
 
     #endregion
@@ -148,8 +150,8 @@ namespace Plugin.Main
         return;
       }
 
-      SetHTTPInjectionOnStopped();
-      cHost.PluginSetStatus(this, "red");
+      HTTPInjectionIsStopped();
+      cPluginParams.HostApplication.PluginSetStatus(this, "red");
     }
 
 
@@ -158,47 +160,16 @@ namespace Plugin.Main
     /// 
     /// </summary>
     /// <returns></returns>
-    private delegate bool SetHTTPInjectionOnStartedDelegate();
-    private bool SetHTTPInjectionOnStarted()
+//    private delegate void HTTPInjectionIsStartedDelegate();
+    private void HTTPInjectionIsStarted()
     {
-      if (InvokeRequired)
-      {
-        BeginInvoke(new SetHTTPInjectionOnStartedDelegate(SetHTTPInjectionOnStarted), new object[] { });
-        return (false);
-      }
-
-      bool lRetVal = false;
-
-      try
-      {
-        // Disable relevant GUI elements
-        TB_ReplacementURL.Enabled = false;
-        TB_RequestedHost.Enabled = false;
-        TB_RequestedURL.Enabled = false;
-        BT_Add.Enabled = false;
-        BT_InjectFile.Enabled = false;
-        RB_Inject.Enabled = false;
-
-
-        // Start MicroWeb process
-        cTask.onStart();
-
-        lRetVal = true;
-      }
-      catch (InjWarningException lEx)
-      {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
-        cHost.PluginSetStatus(this, "grey");
-      }
-      catch (Exception lEx)
-      {
-        SetHTTPInjectionOnStopped();
-        cHost.PluginSetStatus(this, "red");
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
-      }
-
-
-      return (lRetVal);
+      // Disable relevant GUI elements
+      TB_ReplacementURL.Enabled = false;
+      TB_RequestedHost.Enabled = false;
+      TB_RequestedURL.Enabled = false;
+      BT_Add.Enabled = false;
+      BT_InjectFile.Enabled = false;
+      RB_Inject.Enabled = false;
     }
 
 
@@ -206,17 +177,14 @@ namespace Plugin.Main
     /// 
     /// </summary>
     /// <returns></returns>
-    private delegate bool SetHTTPInjectionOnStoppedDelegate();
-    private bool SetHTTPInjectionOnStopped()
+    private delegate void HTTPInjectionIsStoppedDelegate();
+    private void HTTPInjectionIsStopped()
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new SetHTTPInjectionOnStoppedDelegate(SetHTTPInjectionOnStopped), new object[] { });
-        return (false);
+        BeginInvoke(new HTTPInjectionIsStoppedDelegate(HTTPInjectionIsStopped), new object[] { });
+        return;
       }
-
-      bool lRetVal = false;
-      String lInjectionRulesPath = cHost.GetAPEInjectionRulesFile();
 
       /*
        * Block GUI elements
@@ -227,10 +195,6 @@ namespace Plugin.Main
       BT_Add.Enabled = true;
       BT_InjectFile.Enabled = true;
       RB_Inject.Enabled = true;
-
-      cTask.onStop();
-
-      return (lRetVal);
     }
 
     #endregion
@@ -239,7 +203,7 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
+//    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
 
     #endregion
 
@@ -266,8 +230,8 @@ namespace Plugin.Main
 
       // Kill previousliy started HTTP injection instance 
       cTask.onInit();
-
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.Register(this);
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -288,8 +252,23 @@ namespace Plugin.Main
         } // if (InvokeRequired)
 
 
-        cHost.PluginSetStatus(this, "green");
-
+        try
+        {
+          HTTPInjectionIsStarted();
+          cTask.onStart();
+          cPluginParams.HostApplication.PluginSetStatus(this, "green");
+        }
+        catch (InjWarningException lEx)
+        {
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+        }
+        catch (Exception lEx)
+        {
+          HTTPInjectionIsStopped();
+          cPluginParams.HostApplication.PluginSetStatus(this, "red");
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        }
 
       } // if (cIsActiv...
     }
@@ -309,9 +288,8 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
 
-      SetHTTPInjectionOnStopped();
-
-      cHost.PluginSetStatus(this, "grey");
+      HTTPInjectionIsStopped();
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -359,7 +337,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
 
       return (lRetVal);
@@ -377,6 +355,9 @@ namespace Plugin.Main
         BeginInvoke(new onShutDownDelegate(onShutDown), new object[] { });
         return;
       } // if (Invoke
+
+      cTask.onStop();
+      HTTPInjectionIsStopped();
     }
 
 
@@ -399,7 +380,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.Message);
+        cPluginParams.HostApplication.LogMessage(lEx.Message);
       }
     }
 
@@ -423,7 +404,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
     }
 
@@ -446,7 +427,7 @@ namespace Plugin.Main
 
       cTask.emptyInjectionList();
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -469,7 +450,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
     }
 
@@ -496,7 +477,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(lEx.Message);
+          cPluginParams.HostApplication.LogMessage(lEx.Message);
         }
 
       } // if (cIsActiv...
@@ -563,7 +544,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
 
 
@@ -578,7 +559,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
           TB_ReplacementURL.Text = String.Empty;
         }
       }
@@ -635,9 +616,9 @@ namespace Plugin.Main
       try
       {
         if (RB_Inject.Checked)
-          cTask.addRecord(lType, lRequestedHost, lRequestedURL, cHost.GetCurrentIP().ToString(), Path.GetFileName(lReplacementURL), lReplacementURL);
+          cTask.addRecord(lType, lRequestedHost, lRequestedURL, cPluginParams.HostApplication.GetCurrentIP().ToString(), Path.GetFileName(lReplacementURL), lReplacementURL);
         else
-          cTask.addRecord(lType, lRequestedHost, lRequestedURL, lReplacementHost, lReplacementHost, String.Empty);
+          cTask.addRecord(lType, lRequestedHost, lRequestedURL, lReplacementHost, lReplacementURL, String.Empty);
 
         TB_RequestedHost.Text = String.Empty;
         TB_RequestedURL.Text = String.Empty;
@@ -646,7 +627,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
     }
@@ -660,18 +641,36 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void DGV_Inject_MouseUp(object sender, MouseEventArgs e)
     {
-      DataGridView.HitTestInfo hitTestInfo;
+      DataGridView.HitTestInfo hti;
       if (e.Button == MouseButtons.Right)
       {
-        hitTestInfo = DGV_Inject.HitTest(e.X, e.Y);
-
-        // If cell selection is valid
-        if (hitTestInfo.ColumnIndex >= 0 && hitTestInfo.RowIndex >= 0)
+        try
         {
-          DGV_Inject.Rows[hitTestInfo.RowIndex].Selected = true;
-          CMS_DataGrid_RightMouseButton.Show(DGV_Inject, new Point(e.X, e.Y));
+          hti = DGV_Inject.HitTest(e.X, e.Y);
+
+          // If cell selection is valid
+          if (hti.ColumnIndex >= 0 && hti.RowIndex >= 0)
+          {
+            DGV_Inject.CurrentRow.Selected = false;
+            DGV_Inject.CurrentCell = DGV_Inject.Rows[hti.RowIndex].Cells[hti.ColumnIndex];
+            DGV_Inject.Rows[hti.RowIndex].Selected = true;
+            CMS_DataGrid_RightMouseButton.Show(DGV_Inject, new Point(e.X, e.Y));
+            //CMS_SessionMgmt.Show(DGV_Inject, new Point(e.X, e.Y));
+          }
         }
+        catch (Exception) { }
       }
+      //if (e.Button == MouseButtons.Right)
+      //{
+      //  hitTestInfo = DGV_Inject.HitTest(e.X, e.Y);
+
+      //  // If cell selection is valid
+      //  if (hitTestInfo.ColumnIndex >= 0 && hitTestInfo.RowIndex >= 0)
+      //  {
+      //    DGV_Inject.Rows[hitTestInfo.RowIndex].Cells[hitTestInfo.ColumnIndex].Selected = true;
+      //    CMS_DataGrid_RightMouseButton.Show(DGV_Inject, new Point(e.X, e.Y));
+      //  }
+      //}
     }
 
 
@@ -697,7 +696,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         return;
       }
     }

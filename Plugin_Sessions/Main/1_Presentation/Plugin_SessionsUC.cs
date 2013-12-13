@@ -26,12 +26,12 @@ namespace Plugin.Main
 
     #region MEMBERS
 
-    private IPluginHost cHost;
     private String cIconsDir = @"\Icons";
     private List<String> cTargetList;
     private BindingList<Session.Config.Session> cSessions;
     public BindingList<MngSessionsConfig.SessionPattern> cSessionPatterns;
     private TaskFacade cTask;
+    private PluginParameters cPluginParams;
 //    private String cPatternFilePath = @"plugins\Sessions\Plugin_Session_Patterns.xml";
     private TreeNode mFilterNode;
 
@@ -121,9 +121,11 @@ namespace Plugin.Main
       DGV_Sessions.DataSource = cSessions;
       #endregion
 
+
       /*
        * Plugin configuration
        */
+      cPluginParams = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -152,7 +154,6 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
 
     #endregion
 
@@ -178,7 +179,8 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.Register(this);
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
 
       try
       {
@@ -186,7 +188,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0} : Error ocurred while initialising pattern file : {1}", Config.PluginName, lEx.Message));
+        cPluginParams.HostApplication.LogMessage(String.Format("{0} : Error ocurred while initialising pattern file : {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -206,7 +208,7 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-        cHost.PluginSetStatus(this, "green");
+        cPluginParams.HostApplication.PluginSetStatus(this, "green");
       } // if (cIsActi...
     }
 
@@ -223,7 +225,7 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -266,7 +268,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
 
       return (lRetVal);
@@ -374,7 +376,7 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
       /*
        * Clear DataGridView
        */
@@ -495,7 +497,7 @@ namespace Plugin.Main
       //}
       //catch (Exception lEx) 
       //{
-      //  cHost.LogMessage(String.Format("{0} : Error ocurred while reading pattern file : {1}", Config.PluginName, lEx.Message));          
+      //  cPluginParams.HostApplication.LogMessage(String.Format("{0} : Error ocurred while reading pattern file : {1}", Config.PluginName, lEx.Message));          
       //}
       //finally
       //{
@@ -668,7 +670,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("PluginSessionUC::AddNode() : {0} - {1}", lEx.Message, lEx.StackTrace));
+        cPluginParams.HostApplication.LogMessage(String.Format("PluginSessionUC::AddNode() : {0} - {1}", lEx.Message, lEx.StackTrace));
       }
 
       return (lRetVal);
@@ -832,14 +834,14 @@ namespace Plugin.Main
       {
         if (TV_Sessions.SelectedNode.Text.ToLower().Contains("sessions"))
         {
-          MngSessions.ManageSessions lManageSessions = new MngSessions.ManageSessions(cHost);
+          MngSessions.ManageSessions lManageSessions = new MngSessions.ManageSessions(cPluginParams.HostApplication);
           lManageSessions.ShowDialog();
           initSessionPatterns();
         }
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
     }
 
@@ -895,7 +897,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         }
       } // if (DG...
     }
@@ -931,7 +933,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
 
       /*
@@ -962,7 +964,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         }
       }
     }
@@ -1011,7 +1013,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
     }
 
@@ -1036,7 +1038,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         DGV_Sessions.ClearSelection();
       }
     }

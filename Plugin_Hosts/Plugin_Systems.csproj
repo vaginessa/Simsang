@@ -84,6 +84,7 @@
     <Compile Include="Main\3_Domain\DomainFacade.cs" />
     <Compile Include="Main\4_Infrastructure\InfrastructureFacade.cs" />
     <Compile Include="Main\4_Infrastructure\MACVendor.cs" />
+    <Compile Include="Main\Config\Config.cs" />
     <Compile Include="Main\Config\IObservable.cs" />
     <Compile Include="Main\Config\IObserver.cs" />
     <Compile Include="Main\1_Presentation\ManageSystems\1_Presentation\ManageSystems.cs">

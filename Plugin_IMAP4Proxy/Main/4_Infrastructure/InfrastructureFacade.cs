@@ -26,6 +26,8 @@ namespace Plugin.Main.IMAP4Proxy
     private int cIMAP4SPort = 993;
     private String cIMAP4RevProxyBin = "IMAP4ReverseProxyServer.exe";
     private String cIMAP4SRevProxyBin = "IMAP4SReverseProxyServer.exe";
+    private String cIMAP4RevProxyPath;
+    private String cIMAP4SRevProxyPath;
     private String cIMAP4RevProxyName = "IMAP4ReverseProxyServer";
     private String cIMAP4SRevProxyName = "IMAP4SReverseProxyServer";
     private Process cIMAP4RevProxyProc;
@@ -42,7 +44,11 @@ namespace Plugin.Main.IMAP4Proxy
     {
       cPlugin = pPlugin;
       cProxyConfig = pProxyConfig;
+
+      cIMAP4RevProxyPath = String.Format(@"{0}{1}", cProxyConfig.BasisDirectory, cIMAP4RevProxyBin);
+      cIMAP4SRevProxyPath = String.Format(@"{0}{1}", cProxyConfig.BasisDirectory, cIMAP4SRevProxyBin);
     }
+
 
     /// <summary>    
     /// Create single instance
@@ -92,16 +98,14 @@ namespace Plugin.Main.IMAP4Proxy
     public void onStart(ProxyConfig pProxyConfig)
     {
       String lFuncRetVal = String.Empty;
-      String lIMAP4RevProxyPath = String.Format(@"{0}\{1}", cProxyConfig.BasisDirectory, cIMAP4RevProxyBin);
-      String lIMAP4SRevProxyPath = String.Format(@"{0}\{1}", cProxyConfig.BasisDirectory, cIMAP4SRevProxyBin);
 
       /*
        * 1. Check if proxy binaries are at the right place.
        */
-      if (!File.Exists(lIMAP4RevProxyPath))
+      if (!File.Exists(cIMAP4RevProxyPath))
         throw new Exception("The IMAP4 proxy binary was not found.");
 
-      if (!File.Exists(lIMAP4SRevProxyPath))
+      if (!File.Exists(cIMAP4SRevProxyPath))
         throw new Exception("The IMAP4S proxy binary was not found.");
 
       /*
@@ -138,7 +142,7 @@ namespace Plugin.Main.IMAP4Proxy
       cIMAP4RevProxyProc = new Process();
       cIMAP4RevProxyProc.StartInfo.WorkingDirectory = pProxyConfig.BasisDirectory;
       cIMAP4RevProxyProc.StartInfo = lProcStartInfoIMAP4RevProxy;
-      cIMAP4RevProxyProc.StartInfo.FileName = lIMAP4RevProxyPath;
+      cIMAP4RevProxyProc.StartInfo.FileName = cIMAP4RevProxyPath;
       cIMAP4RevProxyProc.StartInfo.Arguments = String.Format("{0} /rhp:{1};{0} /d", cIMAP4Port, cProxyConfig.RemoteHostName);
 
       cIMAP4RevProxyProc.StartInfo.WindowStyle = cProxyConfig.isDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
@@ -151,7 +155,7 @@ namespace Plugin.Main.IMAP4Proxy
       cIMAP4SRevProxyProc = new Process();
       cIMAP4SRevProxyProc.StartInfo.WorkingDirectory = pProxyConfig.BasisDirectory;
       cIMAP4SRevProxyProc.StartInfo = lProcStartInfoIMAP4SRevProxy;
-      cIMAP4SRevProxyProc.StartInfo.FileName = lIMAP4SRevProxyPath;
+      cIMAP4SRevProxyProc.StartInfo.FileName = cIMAP4SRevProxyPath;
       cIMAP4SRevProxyProc.StartInfo.Arguments = String.Format("{0} /rhp:{1};{0} /d", cIMAP4SPort, cProxyConfig.RemoteHostName);
 
       cIMAP4SRevProxyProc.StartInfo.WindowStyle = pProxyConfig.isDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;

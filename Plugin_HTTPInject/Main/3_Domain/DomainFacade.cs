@@ -16,7 +16,7 @@ namespace Plugin.Main.HTTPInject
 
     private static DomainFacade cInstance;
     private InfrastructureFacade cInfrastructure;
-    private BindingList<InjectedURLRecord> cRecordList;
+    private List<InjectedURLRecord> cRecordList;
     private List<IObserver> cObservers;
     private IPlugin cPlugin;
 
@@ -25,7 +25,7 @@ namespace Plugin.Main.HTTPInject
 
     #region PROPERTIES
 
-    public BindingList<InjectedURLRecord> InjectedURLList { get { return cRecordList; } private set { } }
+    public List<InjectedURLRecord> InjectedURLList { get { return cRecordList; } private set { } }
 
     #endregion
 
@@ -36,7 +36,7 @@ namespace Plugin.Main.HTTPInject
     {
       cPlugin = pPlugin;
       cInfrastructure = InfrastructureFacade.getInstance(pProxyConfig, pPlugin);
-      cRecordList = new BindingList<InjectedURLRecord>();
+      cRecordList = new List<InjectedURLRecord>();
       cObservers = new List<IObserver>();
     }
 
@@ -66,6 +66,7 @@ namespace Plugin.Main.HTTPInject
     public void addRecord(InjectedURLRecord pRecord)
     {
       cRecordList.Add(pRecord);
+      notify();
     }
 
 
@@ -87,9 +88,14 @@ namespace Plugin.Main.HTTPInject
     public void removeRecordAt(String pRequestedHost, String pRequestedURL)
     {
       if (cRecordList != null && cRecordList.Count > 0)
-        foreach (InjectedURLRecord lTmp in cRecordList)
-          if (lTmp.RequestedHost == pRequestedHost && lTmp.RequestedURL == pRequestedURL)
-            cRecordList.Remove(lTmp);
+      {
+        for (int i = 0; i < cRecordList.Count; i++)
+          if (cRecordList.ElementAt(i).RequestedHost == pRequestedHost && cRecordList.ElementAt(i).RequestedURL == pRequestedURL)
+            cRecordList.RemoveAt(i);
+      }
+        //foreach (InjectedURLRecord lTmp in cRecordList)
+        //  if (lTmp.RequestedHost == pRequestedHost && lTmp.RequestedURL == pRequestedURL)
+        //    cRecordList.Remove(lTmp);
 
       notify();
     }
@@ -116,7 +122,7 @@ namespace Plugin.Main.HTTPInject
     /// <param name="pSessionFilePath"></param>
     public void loadSessionData(String pSessionName)
     {
-      BindingList<InjectedURLRecord> lSessionData = null;
+      List<InjectedURLRecord> lSessionData = null;
 
       lSessionData = cInfrastructure.loadSessionData<InjectedURLRecord>(pSessionName);
 
@@ -136,7 +142,7 @@ namespace Plugin.Main.HTTPInject
     /// <param name="pSessionData"></param>
     public void loadSessionDataFromString(String pSessionData)
     {
-      BindingList<InjectedURLRecord> lRecords = cInfrastructure.loadSessionDataFromString<InjectedURLRecord>(pSessionData);
+      List<InjectedURLRecord> lRecords = cInfrastructure.loadSessionDataFromString<InjectedURLRecord>(pSessionData);
 
       if (lRecords != null && lRecords.Count > 0)
       {

@@ -194,6 +194,7 @@ namespace Plugin.Main.IPAccounting
     /// </summary>
     public void onStop()
     {
+      cInfrastructure.onStop();
     }
 
     #endregion

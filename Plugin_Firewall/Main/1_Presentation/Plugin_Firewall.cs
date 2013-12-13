@@ -21,12 +21,12 @@ namespace Plugin.Main
 
     #region MEMBERS
 
-    private IPluginHost cHost;
     private List<String> cSrcTargetList;
     private List<String> cDstTargetList;
     private BindingList<FWRule> cFWRules;
     private TaskFacade cTask;
     private DomainFacade cDomain;
+    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -118,9 +118,11 @@ namespace Plugin.Main
 
       #endregion
 
+
       /*
        * Plugin configuration
        */
+      cPluginParams = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -154,7 +156,6 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
 
     #endregion
 
@@ -178,7 +179,8 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.Register(this);
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -198,10 +200,10 @@ namespace Plugin.Main
         } // if (InvokeRequired)
 
 
-        String lFWRulesPath = cHost.GetAPEFWRulesFile();
+        String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
         cTask.onStart(lFWRulesPath);
 
-        cHost.PluginSetStatus(this, "green");
+        cPluginParams.HostApplication.PluginSetStatus(this, "green");
 
         /*
          * Block GUI elements
@@ -232,10 +234,10 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
 
       // Delete firewall rules file
-      String lFWRulesPath = cHost.GetAPEFWRulesFile();
+      String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
       cTask.onStop(lFWRulesPath);
 
       /*
@@ -293,7 +295,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
 
       return (lRetVal);
@@ -332,7 +334,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
     }
 
@@ -360,7 +362,7 @@ namespace Plugin.Main
 
       cTask.emptyRuleList();
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -385,7 +387,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.Message);
+        cPluginParams.HostApplication.LogMessage(lEx.Message);
       }
     }
 
@@ -412,7 +414,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
     }
 
@@ -439,7 +441,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(lEx.Message);
+          cPluginParams.HostApplication.LogMessage(lEx.Message);
         }
       } // if (cIsActiv...
     }
@@ -511,7 +513,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         MessageBox.Show(String.Format(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning));
       }
     }
@@ -548,7 +550,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
           MessageBox.Show(String.Format("Error occurred : {0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
           return;
         }

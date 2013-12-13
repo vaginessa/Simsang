@@ -27,7 +27,7 @@ namespace Simsang.Plugin
   {
     public String PluginDirectoryFullPath { get; set; }
     public String SessionDirectoryFullPath { get; set; }
-
+    public IPluginHost HostApplication { get; set;  }
   }
 
   /// <summary>
@@ -38,7 +38,6 @@ namespace Simsang.Plugin
   {
     Control PluginControl { get; }
     PluginProperties Config { set; get; }
-    IPluginHost Host { get; set; }
 
     String getData();
     String onGetSessionData(String pSessionID);

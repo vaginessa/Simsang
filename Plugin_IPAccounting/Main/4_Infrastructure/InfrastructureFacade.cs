@@ -39,7 +39,7 @@ namespace Plugin.Main.IPAccounting
     private Process cIPAccountingProc;
     private String cIPAccountingPath;
     private IPAccountingConfig cAccountingConfig;
-    private String cData = String.Empty;
+    private String cData;
     private List<AccountingItem> cAccountingRecords;
     private IPlugin cPlugin;
 
@@ -52,11 +52,14 @@ namespace Plugin.Main.IPAccounting
     /// 
     /// </summary>
     /// <param name="pConfig"></param>
-    private InfrastructureFacade(IPAccountingConfig pConfig, IPlugin pPlugin)
+    private InfrastructureFacade(IPAccountingConfig pAccountingConfig, IPlugin pPlugin)
     {
+      cAccountingConfig = pAccountingConfig;
       cPlugin = pPlugin;
-      init(pConfig);
+
       cAccountingRecords = new List<AccountingItem>();
+      cIPAccountingPath = String.Format(@"{0}{1}", cAccountingConfig.BasisDirectory, cIPAccountingBin);
+      init(pAccountingConfig);
     }
 
 
@@ -94,8 +97,6 @@ namespace Plugin.Main.IPAccounting
         cAccountingConfig.onIPAccountingExit = pConfig.onIPAccountingExit != null ? pConfig.onIPAccountingExit : cAccountingConfig.onIPAccountingExit;
         cAccountingConfig.onUpdateList = pConfig.onUpdateList != null ? pConfig.onUpdateList : cAccountingConfig.onUpdateList;
         cAccountingConfig.StructureParameter = pConfig.StructureParameter != null ? pConfig.StructureParameter : cAccountingConfig.StructureParameter;
-
-        cIPAccountingPath = String.Format(@"{0}\{1}", pConfig.BasisDirectory, cIPAccountingBin);
       }
     }
 
@@ -327,21 +328,15 @@ namespace Plugin.Main.IPAccounting
         {
           try
           {
-            Process.GetProcessById(cIPAccountingProc.Id).Kill();
-          }
-          catch (Exception lEx)
-          {
-          }
-
-          try
-          {
             cIPAccountingProc.Kill();
           }
-          catch (Exception lEx)
+          catch (Exception)
           {
           }
 
-        }
+          cIPAccountingProc.Close();
+          cIPAccountingProc = null;
+        } // if (cIPAc...
       }
       catch (Exception)
       { }
@@ -385,9 +380,6 @@ namespace Plugin.Main.IPAccounting
     /// </summary>
     private void killAllInstances()
     {
-      /*
-       * Kill previousliy started IPAccounting instance 
-       */
       Process[] lProcInstances;
 
       if ((lProcInstances = Process.GetProcessesByName(cIPAccountingProcName)) != null && lProcInstances.Length > 0)
@@ -512,9 +504,7 @@ namespace Plugin.Main.IPAccounting
     /// <param name="e"></param>
     private void onIPAccountingExited(object sender, System.EventArgs e)
     {
-      // KillAllInstances() is questionable. Maybe we can remove it. figure it out when you read this!
       killAllInstances();
-      onStop();
 
       if (cAccountingConfig.onIPAccountingExit != null)
         cAccountingConfig.onIPAccountingExit();

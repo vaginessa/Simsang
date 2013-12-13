@@ -65,7 +65,7 @@ namespace Plugin.Main.HTTPProxy
     }
 
     #endregion
-    
+
 
     #region SESSION
 
@@ -90,8 +90,8 @@ namespace Plugin.Main.HTTPProxy
       }
       catch (Exception lEx)
       {
-        String lMessage = String.Format("HTTPProxy::loadSessionData() : {0}", lEx.Message);
-        cPlugin.Host.LogMessage(lMessage);
+        //String lMessage = String.Format("HTTPProxy::loadSessionData() : {0}", lEx.Message);
+        //cPlugin.Host.LogMessage(lMessage);
       }
       finally
       {

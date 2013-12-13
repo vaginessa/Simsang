@@ -29,6 +29,8 @@ namespace Plugin.Main.POP3Proxy
     private String cPOP3SRevProxyBin = "POP3SReverseProxyServer.exe";
     private String cPOP3RevProxyName = "POP3ReverseProxyServer";
     private String cPOP3SRevProxyName = "POP3SReverseProxyServer";
+    private String cPOP3RevProxyPath;
+    private String cPOP3SRevProxyPath;
     private Process cPOP3RevProxyProc;
     private Process cPOP3SRevProxyProc;
     private static InfrastructureFacade cInstance;
@@ -43,6 +45,9 @@ namespace Plugin.Main.POP3Proxy
     private InfrastructureFacade(ProxyConfig pProxyConfig, IPlugin pPlugin)
     {
       cPlugin = pPlugin;
+
+      cPOP3RevProxyPath = String.Format(@"{0}{1}", cPlugin.Config.BaseDir, cPOP3RevProxyBin);
+      cPOP3SRevProxyPath = String.Format(@"{0}{1}", cPlugin.Config.BaseDir, cPOP3SRevProxyBin);
     }
 
 
@@ -96,15 +101,14 @@ namespace Plugin.Main.POP3Proxy
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="pProxyConfig"></param>
     public void onStart(ProxyConfig pProxyConfig)
     {
       String lFuncRetVal = String.Empty;
-      String lPOP3RevProxyPath;
-      String lPOP3SRevProxyPath;
 
       init(pProxyConfig);
-      lPOP3RevProxyPath = String.Format(@"{0}\{1}", cProxyConfig.BasisDirectory, cPOP3RevProxyBin);
-      lPOP3SRevProxyPath = String.Format(@"{0}\{1}", cProxyConfig.BasisDirectory, cPOP3SRevProxyBin);
+
+
 
 
       /*
@@ -129,10 +133,10 @@ namespace Plugin.Main.POP3Proxy
       /*
        * 3. Proxy server binaries at the right place?
        */
-      if (!File.Exists(lPOP3RevProxyPath))
+      if (!File.Exists(cPOP3RevProxyPath))
         throw new Exception("The POP3 proxy binary was not found.");
 
-      if (!File.Exists(lPOP3SRevProxyPath))
+      if (!File.Exists(cPOP3SRevProxyPath))
         throw new Exception("The POP3S proxy binary was not found.");
 
 
@@ -149,7 +153,7 @@ namespace Plugin.Main.POP3Proxy
       cPOP3RevProxyProc = new Process();
       cPOP3RevProxyProc.StartInfo.WorkingDirectory = cProxyConfig.BasisDirectory;
       cPOP3RevProxyProc.StartInfo = lProcStartInfoPOP3RevProxy;
-      cPOP3RevProxyProc.StartInfo.FileName = lPOP3RevProxyPath;
+      cPOP3RevProxyProc.StartInfo.FileName = cPOP3RevProxyPath;
       cPOP3RevProxyProc.StartInfo.Arguments = String.Format("{0} /rhp:{1};{0} /d", cPOP3Port, cProxyConfig.RemoteHostName);
 
       cPOP3RevProxyProc.StartInfo.WindowStyle = cProxyConfig.isDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
@@ -159,7 +163,7 @@ namespace Plugin.Main.POP3Proxy
       cPOP3SRevProxyProc = new Process();
       cPOP3SRevProxyProc.StartInfo.WorkingDirectory = cProxyConfig.BasisDirectory;
       cPOP3SRevProxyProc.StartInfo = lProcStartInfoPOP3SRevProxy;
-      cPOP3SRevProxyProc.StartInfo.FileName = lPOP3SRevProxyPath;
+      cPOP3SRevProxyProc.StartInfo.FileName = cPOP3SRevProxyPath;
       cPOP3SRevProxyProc.StartInfo.Arguments = String.Format("{0} /rhp:{1};{0} /d", cPOP3SPort, cProxyConfig.RemoteHostName);
 
       cPOP3SRevProxyProc.StartInfo.WindowStyle = cProxyConfig.isDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;

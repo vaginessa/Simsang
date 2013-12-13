@@ -28,11 +28,11 @@ namespace Plugin.Main
 
     #region MEMBERS
 
-    private IPluginHost cHost;
     private List<String> cTargetList;
     private BindingList<AccountingItem> cAccountingRecords;
     private TaskFacade cTask;
     private String cAccountingBasis = "-p";
+    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -54,9 +54,11 @@ namespace Plugin.Main
       PropertyInfo pi = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
       pi.SetValue(DGV_TrafficData, true, null);
 
+
       /*
        * Plugin configuration
        */
+      cPluginParams = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -83,12 +85,13 @@ namespace Plugin.Main
       IPAccountingConfig lConfig = new IPAccountingConfig()
                                        {
                                          BasisDirectory = Config.BaseDir,
-                                         isDebuggingOn = false, //cHost.IsDebuggingOn(),
-                                         Interface = null, //cHost.GetInterface(),
+                                         isDebuggingOn = false, //cPluginParams.HostApplication.IsDebuggingOn(),
+                                         Interface = null, //cPluginParams.HostApplication.GetInterface(),
                                          onUpdateList = update,
                                          onIPAccountingExit = null
                                        };
       cTask = TaskFacade.getInstance(lConfig, this);
+      DomainFacade.getInstance(lConfig, this).addObserver(this);
     }
 
     #endregion
@@ -101,17 +104,17 @@ namespace Plugin.Main
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private delegate void onIPAccountingExitedDelegate(object sender, System.EventArgs e);
-    private void onIPAccountingExited(object sender, System.EventArgs e)
+    private delegate void onIPAccountingExitedDelegate(); 
+    private void onIPAccountingExited()
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new onIPAccountingExitedDelegate(onIPAccountingExited), new object[] { sender, e });
+        BeginInvoke(new onIPAccountingExitedDelegate(onIPAccountingExited), new object[] { });
         return;
       }
 
-      SetIPAccountingBTOnStopped();
-      cHost.PluginSetStatus(this, "red");
+      IPAccountingIsStopped();
+      cPluginParams.HostApplication.PluginSetStatus(this, "red");
     }
 
 
@@ -119,12 +122,12 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    private delegate void SetIPAccountingBTOnStoppedDelegate();
-    private void SetIPAccountingBTOnStopped()
+    private delegate void IPAccountingIsStoppedDelegate();
+    private void IPAccountingIsStopped()
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new SetIPAccountingBTOnStoppedDelegate(SetIPAccountingBTOnStopped), new object[] { });
+        BeginInvoke(new IPAccountingIsStoppedDelegate(IPAccountingIsStopped), new object[] { });
         return;
       }
 
@@ -134,8 +137,6 @@ namespace Plugin.Main
       RB_Service.Enabled = true;
       RB_RemoteIP.Enabled = true;
       RB_LocalIP.Enabled = true;
-
-      cTask.onStop();
     }
 
 
@@ -144,17 +145,15 @@ namespace Plugin.Main
     /// 
     /// </summary>
     /// <returns></returns>
-    private delegate bool SetIPAccountingBTOnStartedDelegate();
-    private bool SetIPAccountingBTOnStarted()
+    private delegate void IPAccountingIsStartedDelegate();
+    private void IPAccountingIsStarted()
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new SetIPAccountingBTOnStartedDelegate(SetIPAccountingBTOnStarted), new object[] { });
-        return (false);
+        BeginInvoke(new IPAccountingIsStartedDelegate(IPAccountingIsStarted), new object[] { });
+        return;
       }
 
-      bool lRetVal = false;
-      IPAccountingConfig lConfig;
 
       /*
        * Set GUI parameters
@@ -162,32 +161,6 @@ namespace Plugin.Main
       RB_Service.Enabled = false;
       RB_RemoteIP.Enabled = false;
       RB_LocalIP.Enabled = false;
-
-
-      try
-      {
-        /*
-         * Start accounting application.
-         */
-        cTask.onInit();
-
-        lConfig = new IPAccountingConfig
-        {
-          BasisDirectory = Config.BaseDir,
-          isDebuggingOn = cHost.IsDebuggingOn(),
-          onUpdateList = update,
-          onIPAccountingExit = null,
-          Interface = cHost.GetInterface()
-        };
-        cTask.onStart(lConfig);
-        lRetVal = true;
-      }
-      catch (Exception lEx)
-      {
-        lRetVal = false;
-      }
-
-      return (lRetVal);
     }
 
     #endregion
@@ -196,7 +169,6 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
 
     #endregion
 
@@ -222,7 +194,8 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.Register(this);
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
       cTask.onInit();
     }
 
@@ -242,11 +215,32 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
+        /*
+         * Start accounting application.
+         */
+        IPAccountingIsStarted();
 
-        if (SetIPAccountingBTOnStarted())
-          cHost.PluginSetStatus(this, "green");
-        else
-          cHost.PluginSetStatus(this, "red");
+        try
+        {
+          cTask.onInit();
+
+          IPAccountingConfig lConfig = new IPAccountingConfig
+          {
+            BasisDirectory = Config.BaseDir,
+            isDebuggingOn = cPluginParams.HostApplication.IsDebuggingOn(),
+            onUpdateList = update,
+            onIPAccountingExit = onIPAccountingExited,
+            Interface = cPluginParams.HostApplication.GetInterface(),
+            StructureParameter = cAccountingBasis
+          };
+
+          cTask.onStart(lConfig);
+        }
+        catch (Exception)
+        {
+        }
+        cPluginParams.HostApplication.PluginSetStatus(this, "green");
+
       } // if (cIsActi...
     }
 
@@ -264,8 +258,9 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      SetIPAccountingBTOnStopped();
-      cHost.PluginSetStatus(this, "grey");
+      cTask.onStop();
+      IPAccountingIsStopped();
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -345,8 +340,8 @@ namespace Plugin.Main
         return;
       } // if (Invoke
 
-
-      SetIPAccountingBTOnStopped();
+      cTask.onStop();
+      IPAccountingIsStopped();
     }
 
 
@@ -393,7 +388,7 @@ namespace Plugin.Main
 
 
       cTask.emptyRecordList();
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -521,13 +516,7 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void clearToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      SetIPAccountingBTOnStopped();
-      //      cDataArray.Clear();
-      //      cData = String.Empty;
-      //      UpdateTextBox("");
-
-      Thread.Sleep(500);
-      SetIPAccountingBTOnStarted();
+      cTask.emptyRecordList();
     }
 
 
@@ -541,7 +530,7 @@ namespace Plugin.Main
     {
       ManageServices.Form_ManageServices lManageServices;
 
-      lManageServices = new ManageServices.Form_ManageServices(cHost);
+      lManageServices = new ManageServices.Form_ManageServices(cPluginParams.HostApplication);
       lManageServices.ShowDialog();
     }
 
@@ -567,7 +556,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         DGV_TrafficData.ClearSelection();
       }
     }
@@ -757,15 +746,21 @@ namespace Plugin.Main
 
     }
 
-
     #endregion
 
 
     #region OBSERVER INTERFACE METHODS
 
+    private delegate void updateDelegate(List<AccountingItem> pRecordList);
     public void update(List<AccountingItem> pRecordList)
     {
-      pRecordList.Clear();
+      if (InvokeRequired)
+      {
+        BeginInvoke(new updateDelegate(update), new object[] { pRecordList });
+        return;
+      }
+      
+      cAccountingRecords.Clear();
       foreach (AccountingItem lTmp in pRecordList)
         cAccountingRecords.Add(lTmp);
 

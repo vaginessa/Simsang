@@ -26,10 +26,10 @@ namespace Plugin.Main
 
     #region MEMBERS
 
-    private IPluginHost cHost;
     private List<String> cTargetList;
     private BindingList<DNSPoisonRecord> cDNSPoisonRecords;
     private TaskFacade cTask;
+    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -69,6 +69,7 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
+      cPluginParams = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
       Config = new PluginProperties()
@@ -150,7 +151,6 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
 
     #endregion
 
@@ -175,7 +175,8 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.Register(this);
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -229,11 +230,11 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
 
-      TB_Address.Text = cHost.GetCurrentIP();
+      TB_Address.Text = cPluginParams.HostApplication.GetCurrentIP();
       TB_Host.Text = String.Empty;
 
       cTask.clearRecordList();
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -255,8 +256,8 @@ namespace Plugin.Main
 
         if (cDNSPoisonRecords != null && cDNSPoisonRecords.Count > 0)
         {
-          cHost.PluginSetStatus(this, "green");
-          String lPoisoningHostsPath = cHost.GetDNSPoisoningHostsFile();
+          cPluginParams.HostApplication.PluginSetStatus(this, "green");
+          String lPoisoningHostsPath = cPluginParams.HostApplication.GetDNSPoisoningHostsFile();
           String lDNSPoisoningHosts = String.Empty;
 
 
@@ -281,8 +282,8 @@ namespace Plugin.Main
         }
         else
         {
-          cHost.LogMessage(String.Format("{0}: No rule defined. Stopping the pluggin.", Config.PluginName));
-          cHost.PluginSetStatus(this, "grey");
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: No rule defined. Stopping the pluggin.", Config.PluginName));
+          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
         } // if (lFWRulesPath...
       } // if (cIsAct...
     }
@@ -302,13 +303,13 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
 
-      String lFWRulesPath = cHost.GetDNSPoisoningHostsFile();
+      String lFWRulesPath = cPluginParams.HostApplication.GetDNSPoisoningHostsFile();
 
       if (File.Exists(lFWRulesPath))
         File.Delete(lFWRulesPath);
 
       SetDNSHijackBTOnStopped();
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -357,7 +358,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
 
       return (lRetVal);
@@ -385,7 +386,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.Message);
+        cPluginParams.HostApplication.LogMessage(lEx.Message);
       }
     }
 
@@ -409,7 +410,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
     }
 
@@ -436,7 +437,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(lEx.Message);
+          cPluginParams.HostApplication.LogMessage(lEx.Message);
         }
       } // if (cIsActi...
     }
@@ -462,7 +463,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
     }
 
@@ -498,7 +499,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         MessageBox.Show(String.Format("An error occurred while adding a record.\r\n{0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
     }
@@ -522,7 +523,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx) 
         {
-          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       }
     }
@@ -545,7 +546,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx) 
       {
-        cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -584,7 +585,7 @@ namespace Plugin.Main
     private void PluginDNSPoisonUC_Load(object sender, EventArgs e)
     {
       if (TB_Address.Text.Length == 0)
-        TB_Address.Text = cHost.GetCurrentIP();
+        TB_Address.Text = cPluginParams.HostApplication.GetCurrentIP();
     }
 
 
@@ -609,7 +610,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
           MessageBox.Show(String.Format("{0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
       }
@@ -636,7 +637,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cHost.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
           MessageBox.Show(String.Format("{0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
       }

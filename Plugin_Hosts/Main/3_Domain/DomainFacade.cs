@@ -97,13 +97,13 @@ namespace Plugin.Main.Systems
         // Check if record already exists
         foreach (SystemRecord lTmp in cRecordList)
           if (lTmp.ID == pRecord.ID)
-            throw new Exception("System alrady exists.");
+            throw new RecordException("System alrady exists.");
 
         if (!Regex.Match(pRecord.SrcMAC.Trim(), @"^[\da-f]{1,2}[\-:][\da-f]{1,2}[\-:][\da-f]{1,2}[\-:][\da-f]{1,2}[\-:][\da-f]{1,2}[\-:][\da-f]{1,2}$", RegexOptions.IgnoreCase).Success)
-          throw new Exception("Something is wrong with the MAC address");
+          throw new RecordException("Something is wrong with the MAC address");
 
         if (!Regex.Match(pRecord.SrcIP.Trim(), @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", RegexOptions.IgnoreCase).Success)
-          throw new Exception("Something is wrong with the IP address");
+          throw new RecordException("Something is wrong with the IP address");
 
         cRecordList.Add(pRecord);
         notify();

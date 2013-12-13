@@ -33,6 +33,7 @@ namespace Plugin.Main.HTTPInject
     private static InfrastructureFacade cInstance;
     private String cMicroWebBin = "MicroWeb.exe";
     private String cMicroWebProcName = "MicroWeb";
+    private String cMicroWebPath;
     private Process cMicroWebProc;
     private InjectionConfig cProxyConfig;
     private IPlugin cPlugin;
@@ -46,6 +47,8 @@ namespace Plugin.Main.HTTPInject
     {
       cProxyConfig = pProxyConfig;
       cPlugin = pPlugin;
+
+      cMicroWebPath = String.Format(@"{0}{1}", cProxyConfig.BasisDirectory, cMicroWebBin);
     }
 
 
@@ -73,9 +76,9 @@ namespace Plugin.Main.HTTPInject
     /// <typeparam name="T"></typeparam>
     /// <param name="pSessionName"></param>
     /// <returns></returns>
-    public BindingList<T> loadSessionData<T>(String pSessionName)
+    public List<T> loadSessionData<T>(String pSessionName)
     {
-      BindingList<T> lRecords = null;
+      List<T> lRecords = null;
       FileStream lFS = null;
       XmlSerializer lXMLSerial;
       String lSessionFilePath = String.Format(@"{0}\{1}.xml", cPlugin.Config.SessionDir, pSessionName);
@@ -83,8 +86,8 @@ namespace Plugin.Main.HTTPInject
       try
       {
         lFS = new FileStream(lSessionFilePath, FileMode.Open);
-        lXMLSerial = new XmlSerializer(typeof(BindingList<T>));
-        lRecords = (BindingList<T>)lXMLSerial.Deserialize(lFS);
+        lXMLSerial = new XmlSerializer(typeof(List<T>));
+        lRecords = (List<T>)lXMLSerial.Deserialize(lFS);
       }
       finally
       {
@@ -138,7 +141,7 @@ namespace Plugin.Main.HTTPInject
     /// <typeparam name="T"></typeparam>
     /// <param name="pSessionName"></param>
     /// <param name="pRecords"></param>
-    public void saveSessionData<T>(String pSessionName, BindingList<T> pRecords)
+    public void saveSessionData<T>(String pSessionName, List<T> pRecords)
     {
       if (pSessionName.Length > 0)
       {
@@ -168,14 +171,14 @@ namespace Plugin.Main.HTTPInject
     /// <typeparam name="T"></typeparam>
     /// <param name="pSessionData"></param>
     /// <returns></returns>
-    public BindingList<T> loadSessionDataFromString<T>(String pSessionData)
+    public List<T> loadSessionDataFromString<T>(String pSessionData)
     {
-      BindingList<T> lRecords = new BindingList<T>();
-      var lSerializer = new XmlSerializer(typeof(BindingList<T>));
+      List<T> lRecords = new List<T>();
+      var lSerializer = new XmlSerializer(typeof(List<T>));
 
       using (TextReader lTextReader = new StringReader(pSessionData))
       {
-        lRecords = (BindingList<T>)lSerializer.Deserialize(lTextReader);
+        lRecords = (List<T>)lSerializer.Deserialize(lTextReader);
       } // using (TextRe...
 
       return (lRecords);
@@ -192,24 +195,21 @@ namespace Plugin.Main.HTTPInject
     /// <param name="pURLList"></param>
     public void onStart(List<InjectedURLRecord> pURLList)
     {
-      String lMicroWebPath = String.Format("{0}{1}", cProxyConfig.BasisDirectory, cMicroWebBin);
+
       String lInjectionRules = String.Empty;
       var lProcStartInfo = new ProcessStartInfo();
       cMicroWebProc = new Process();
 
 
-      if (File.Exists(lMicroWebPath))
+      if (File.Exists(cMicroWebPath))
       {
         lProcStartInfo.WorkingDirectory = cProxyConfig.BasisDirectory;
         cMicroWebProc.StartInfo = lProcStartInfo;
-        cMicroWebProc.StartInfo.FileName = lMicroWebPath;
-        //      cMicroWebProc.StartInfo.Arguments = String.Format("-i {0} {1} -x -f", cHost.GetInterface(), cAccountingBasis);
+        cMicroWebProc.StartInfo.FileName = cMicroWebPath;
+        //cMicroWebProc.StartInfo.Arguments = String.Format("-i {0} {1} -x -f", cHost.GetInterface(), cAccountingBasis);
         cMicroWebProc.StartInfo.UseShellExecute = false;
         cMicroWebProc.StartInfo.CreateNoWindow = cProxyConfig.isDebuggingOn ? false : true;
         cMicroWebProc.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
-
-        // Configure the process exited event and start
-        // MicroWeb process
         cMicroWebProc.Exited += new EventHandler(onMicroWebExited);
 
         try
@@ -233,7 +233,7 @@ namespace Plugin.Main.HTTPInject
         if (pURLList != null && pURLList.Count > 0)
         {
           // Write APE HTTPInjection rules file
-          if (cProxyConfig.InjectionRulesPath != null)
+          if (!String.IsNullOrEmpty(cProxyConfig.InjectionRulesPath))
           {
             if (File.Exists(cProxyConfig.InjectionRulesPath))
               File.Delete(cProxyConfig.InjectionRulesPath);
@@ -308,7 +308,7 @@ namespace Plugin.Main.HTTPInject
       }
       else
       {
-        throw new InjErrorException(String.Format("{0} doesn't exist", lMicroWebPath));
+        throw new InjErrorException(String.Format("{0} doesn't exist", cMicroWebPath));
       } // if (File.Exists...
     }
 
@@ -365,13 +365,7 @@ namespace Plugin.Main.HTTPInject
     /// </summary>
     public void onInit()
     {
-      Process[] lProcInstances;
-
-      if ((lProcInstances = Process.GetProcessesByName(cMicroWebProcName)) != null && lProcInstances.Length > 0)
-        foreach (Process lProc in lProcInstances)
-          try { lProc.Kill(); }
-          catch (Exception) { }
-
+      killAllInstances();
     }
 
 
@@ -383,7 +377,25 @@ namespace Plugin.Main.HTTPInject
     /// <param name="e"></param>
     private void onMicroWebExited(object sender, System.EventArgs e)
     {
+      killAllInstances();
 
+      if (cProxyConfig.onWebServerExit != null)
+        cProxyConfig.onWebServerExit();
+    }
+
+    #endregion
+
+
+    #region PRIVATE
+
+    private void killAllInstances()
+    {
+      Process[] lProcInstances;
+
+      if ((lProcInstances = Process.GetProcessesByName(cMicroWebProcName)) != null && lProcInstances.Length > 0)
+        foreach (Process lProc in lProcInstances)
+          try { lProc.Kill(); }
+          catch (Exception) { }
     }
 
     #endregion

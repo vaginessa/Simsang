@@ -24,12 +24,12 @@ namespace Plugin.Main
 
     #region MEMBERS
 
-    private IPluginHost cHost;
     private List<String> cTargetList;
     private BindingList<ApplicationRecord> cApplications;
     public BindingList<MngApplication.ApplicationPattern> cApplicationPatterns;
     private String cPatternFilePath = @"plugins\UsedApps\Plugin_UsedApps_Patterns.xml";
     private TaskFacade cTask;
+    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -37,7 +37,6 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
 
     #endregion
 
@@ -97,9 +96,11 @@ namespace Plugin.Main
 
       #endregion
 
+
       /*
        * Plugin configuration
        */
+      cPluginParams = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -191,7 +192,8 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.Register(this);
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
       readApplicationPatterns();
     }
 
@@ -211,7 +213,7 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-        cHost.PluginSetStatus(this, "green");
+        cPluginParams.HostApplication.PluginSetStatus(this, "green");
       } // if (cIsActiv...
     }
 
@@ -229,7 +231,7 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cHost.PluginSetStatus(this, "grey");
+      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -530,7 +532,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cHost.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
       }
     }
 
@@ -542,7 +544,7 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void DGV_Applications_DoubleClick(object sender, EventArgs e)
     {
-      MngApplication.Form_ManageApps lManageApps = new MngApplication.Form_ManageApps(cHost);
+      MngApplication.Form_ManageApps lManageApps = new MngApplication.Form_ManageApps(cPluginParams.HostApplication);
       lManageApps.ShowDialog();
       readApplicationPatterns();
     }
