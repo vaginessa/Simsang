@@ -19,7 +19,8 @@ namespace Simsang
     #region MEMBERS
 
     private TabControl mTB_Control;
-    private TabPage[] mTabPages;
+//    private TabPage[] mTabPages;
+    private List<TabPage> mTabPages;
     private Hashtable mPluginPosition;
 
     #endregion
@@ -28,7 +29,8 @@ namespace Simsang
     #region PROPERTIES
 
     public Hashtable PluginPosition { get { return (mPluginPosition); } }
-    public TabPage[] TabPages { get { return (mTabPages); } }
+//    public TabPage[] TabPages { get { return (mTabPages); } set { mTabPages = value} }
+    public List<TabPage> TabPages { get { return (mTabPages); } }
 
     #endregion
 
@@ -42,19 +44,15 @@ namespace Simsang
     /// <param name="pPluginPosition"></param>
     public TabPageHandler(TabControl pTBControl, Hashtable pPluginPosition)
     {
-      int lCount = 0;
       mTB_Control = pTBControl;
       mPluginPosition = pPluginPosition;
 
       if (pTBControl.TabPages.Count > 0)
       {
-        mTabPages = new TabPage[pTBControl.TabPages.Count];
+        mTabPages = new List<TabPage>();
 
-        foreach (TabPage lTabPage in pTBControl.TabPages)
-        {
-          mTabPages[lCount] = lTabPage;
-          lCount++;
-        } // foreach (TabPage...
+        for (int i = 0; i < pTBControl.TabCount; i++)
+          mTabPages.Add(pTBControl.TabPages[i]);
       } // if (pTBControl.Ta...
     }
 
@@ -70,7 +68,7 @@ namespace Simsang
 
       if (mTabPages != null)
       {
-        for (int lCount = 0; lCount < mTabPages.Length; lCount++)
+        for (int lCount = 0; lCount < mTabPages.Count; lCount++)
         {
           if (mTabPages[lCount].Text.ToLower() == pTabName.ToLower())
           {
@@ -119,7 +117,6 @@ namespace Simsang
               mTB_Control.TabPages.Insert(i, pNewTabPage);
               break;
             } // if (lChe...
-
 
 
             if (lNewTPText.CompareTo(lCheckText) < 0)

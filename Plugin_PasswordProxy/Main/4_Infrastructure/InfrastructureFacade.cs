@@ -324,7 +324,7 @@ namespace Plugin.Main.HTTPProxy
     /// <summary>
     /// 
     /// </summary>
-    public void stopProxies()
+    public void onStop()
     {
       /*
        * Deactivate Exit events
@@ -344,19 +344,8 @@ namespace Plugin.Main.HTTPProxy
       /*
        * Killing the proxy processes 
        */
-      try
-      {
-        if (cHTTPRevProxyProc != null && cHTTPRevProxyProc.Responding)
-          cHTTPRevProxyProc.Kill();
-      }
-      catch (Exception) { }
-
-      try
-      {
-        if (cHTTPSRevProxyProc != null && cHTTPSRevProxyProc.Responding)
-          cHTTPSRevProxyProc.Kill();
-      }
-      catch (Exception) { }
+      killProcessByName(cHTTPRevProxyName);
+      killProcessByName(cHTTPSRevProxyName);
     }
 
 
@@ -389,6 +378,30 @@ namespace Plugin.Main.HTTPProxy
        */
       if (cWebServerConfig != null && cWebServerConfig.onWebServerExit != null)
         cWebServerConfig.onWebServerExit();
+    }
+
+    #endregion
+
+
+    #region PRIVATE
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pProcName"></param>
+    private void killProcessByName(String pProcName)
+    {
+      if (!String.IsNullOrEmpty(pProcName))
+      {
+        foreach (Process lProc in Process.GetProcessesByName(pProcName))
+        {
+          try
+          {
+            Process.GetProcessById(lProc.Id).Kill();
+          }
+          catch (Exception) { }
+        } // foreach (Process...
+      } // if (!String.IsN...
     }
 
     #endregion

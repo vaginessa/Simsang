@@ -100,6 +100,27 @@ namespace Plugin.Main.IPAccounting
       }
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pProcName"></param>
+    private void killProcessByName(String pProcName)
+    {
+      if (!String.IsNullOrEmpty(pProcName))
+      {
+        foreach (Process lProc in Process.GetProcessesByName(pProcName))
+        {
+          try
+          {
+            Process.GetProcessById(lProc.Id).Kill();
+          }
+          catch (Exception) { }
+        } // foreach (Process...
+      } // if (!String.IsN...
+    }
+
+
     #endregion
 
 
@@ -345,28 +366,8 @@ namespace Plugin.Main.IPAccounting
       /*
        * Just to be safe, kill all other IP Accounting instances.
        */
-      Process[] lACInstances;
-      if ((lACInstances = Process.GetProcessesByName(cIPAccountingProcName)) != null && lACInstances.Length > 0)
-      {
-        foreach (Process lProc in lACInstances)
-        {
-          try
-          {
-            Process.GetProcessById(cIPAccountingProc.Id).Kill();
-          }
-          catch (Exception)
-          {
-          }
-
-          try
-          {
-            lProc.Kill();
-          }
-          catch (Exception)
-          {
-          }
-        } // foreach (Process...
-      } // if ((lACInstan...
+      killProcessByName(cIPAccountingProcName);
+      
     }
 
     #endregion

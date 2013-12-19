@@ -304,7 +304,23 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cTask.loadSessionData(pSessionName);
+      try
+      {
+        onResetPlugin();
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+      }
+
+      try
+      {
+        cTask.loadSessionData(pSessionName);
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message)); 
+      }
     }
 
 
@@ -532,7 +548,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 

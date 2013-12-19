@@ -148,7 +148,6 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-
       cPluginParams.HostApplication.Register(this);
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
@@ -205,6 +204,15 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
+      try
+      {
+        onResetPlugin();
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+      }
+
 
       try
       {
@@ -212,7 +220,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.Message);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -237,7 +245,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -264,7 +272,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -291,7 +299,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(lEx.Message);
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActive)
     }
@@ -335,7 +343,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       return (lRetVal);
@@ -368,6 +376,7 @@ namespace Plugin.Main
     /// </summary>
     public void onShutDown()
     {
+      
     }
 
 
@@ -417,8 +426,8 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          if (cPluginParams.HostApplication != null)
-            cPluginParams.HostApplication.LogMessage(String.Format("Input data : {0}\r\nStackTrace : {1}", pData, lEx.StackTrace));
+          if (cPluginParams.HostApplication != null) 
+            cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActive)
     }

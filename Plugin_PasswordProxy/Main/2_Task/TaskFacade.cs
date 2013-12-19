@@ -173,8 +173,9 @@ namespace Plugin.Main.HTTPProxy
     /// <summary>
     /// 
     /// </summary>
-    public void stopProxies()
+    public void onStop()
     {
+      cDomain.onStop();
     }
 
     #endregion

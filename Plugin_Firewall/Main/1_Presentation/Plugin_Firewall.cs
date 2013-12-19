@@ -180,6 +180,7 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
       cPluginParams.HostApplication.Register(this);
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
@@ -203,19 +204,8 @@ namespace Plugin.Main
         String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
         cTask.onStart(lFWRulesPath);
 
+        setGUIInactive();
         cPluginParams.HostApplication.PluginSetStatus(this, "green");
-
-        /*
-         * Block GUI elements
-         */
-        CB_Protocol.Enabled = false;
-        CB_SrcIP.Enabled = false;
-        TB_SrcPortLower.Enabled = false;
-        TB_SrcPortUpper.Enabled = false;
-        CB_DstIP.Enabled = false;
-        TB_DstPortLower.Enabled = false;
-        TB_DstPortUpper.Enabled = false;
-        BT_Add.Enabled = false;
       } // if (cIsActiv...
     }
 
@@ -233,24 +223,12 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
 
       // Delete firewall rules file
       String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
       cTask.onStop(lFWRulesPath);
-
-      /*
-       * Unblock GUI elements
-       */
-      CB_Protocol.Enabled = true;
-      CB_SrcIP.Enabled = true;
-      TB_SrcPortLower.Enabled = true;
-      TB_SrcPortUpper.Enabled = true;
-      CB_DstIP.Enabled = true;
-      TB_DstPortLower.Enabled = true;
-      TB_DstPortUpper.Enabled = true;
-      BT_Add.Enabled = true;
     }
 
 
@@ -295,7 +273,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       return (lRetVal);
@@ -309,6 +287,8 @@ namespace Plugin.Main
     /// </summary>
     public void onShutDown()
     {
+      String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
+      cTask.onStop(lFWRulesPath);
     }
 
 
@@ -334,7 +314,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -361,7 +341,7 @@ namespace Plugin.Main
       CB_SrcIP.Text = String.Empty;
 
       cTask.emptyRuleList();
-
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
@@ -380,6 +360,14 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
+      try
+      {
+        onResetPlugin();
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+      }
 
       try
       {
@@ -387,7 +375,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.Message);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -414,7 +402,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -441,7 +429,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(lEx.Message);
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActiv...
     }
@@ -624,6 +612,59 @@ namespace Plugin.Main
     private void CB_DstIP_SelectedIndexChanged(object sender, EventArgs e)
     {
     }
+
+    #endregion
+
+
+    #region PRIVATE
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private delegate void setGUIActiveDelegate();
+    private void setGUIActive()
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new setGUIActiveDelegate(setGUIActive), new object[] { });
+        return;
+      }
+
+      CB_Protocol.Enabled = true;
+      CB_SrcIP.Enabled = true;
+      TB_SrcPortLower.Enabled = true;
+      TB_SrcPortUpper.Enabled = true;
+      CB_DstIP.Enabled = true;
+      TB_DstPortLower.Enabled = true;
+      TB_DstPortUpper.Enabled = true;
+      BT_Add.Enabled = true;
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    private delegate void setGUIInactiveDelegate();
+    private void setGUIInactive()
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new setGUIInactiveDelegate(setGUIInactive), new object[] { });
+        return;
+      }
+
+      CB_Protocol.Enabled = false;
+      CB_SrcIP.Enabled = false;
+      TB_SrcPortLower.Enabled = false;
+      TB_SrcPortUpper.Enabled = false;
+      CB_DstIP.Enabled = false;
+      TB_DstPortLower.Enabled = false;
+      TB_DstPortUpper.Enabled = false;
+      BT_Add.Enabled = false;
+    }
+
 
     #endregion
 

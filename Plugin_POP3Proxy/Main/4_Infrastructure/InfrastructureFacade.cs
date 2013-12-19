@@ -236,6 +236,14 @@ namespace Plugin.Main.POP3Proxy
           cPOP3SRevProxyProc.Kill();
       }
       catch (Exception) { }
+
+
+      /*
+       * Killing the proxy processes 
+       */
+      killProcessByName(cPOP3RevProxyName);
+      killProcessByName(cPOP3SRevProxyName);
+
     }
 
 
@@ -260,6 +268,25 @@ namespace Plugin.Main.POP3Proxy
       // Call back to the GUI.
       if (cProxyConfig.onProxyExit != null)
         cProxyConfig.onProxyExit();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pProcName"></param>
+    private void killProcessByName(String pProcName)
+    {
+      if (!String.IsNullOrEmpty(pProcName))
+      {
+        foreach (Process lProc in Process.GetProcessesByName(pProcName))
+        {
+          try
+          {
+            Process.GetProcessById(lProc.Id).Kill();
+          }
+          catch (Exception) { }
+        } // foreach (Process...
+      } // if (!String.IsN...
     }
 
     #endregion

@@ -226,9 +226,9 @@ namespace Plugin.Main.HTTPProxy
     /// <summary>
     /// 
     /// </summary>
-    public void stopProxies()
+    public void onStop()
     {
-      cInfrastructure.stopProxies();
+      cInfrastructure.onStop();
     }
 
     #endregion

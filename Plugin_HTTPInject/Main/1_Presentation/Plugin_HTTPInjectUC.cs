@@ -150,7 +150,7 @@ namespace Plugin.Main
         return;
       }
 
-      HTTPInjectionIsStopped();
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "red");
     }
 
@@ -160,8 +160,7 @@ namespace Plugin.Main
     /// 
     /// </summary>
     /// <returns></returns>
-//    private delegate void HTTPInjectionIsStartedDelegate();
-    private void HTTPInjectionIsStarted()
+    private void setGUIInactive()
     {
       // Disable relevant GUI elements
       TB_ReplacementURL.Enabled = false;
@@ -177,18 +176,15 @@ namespace Plugin.Main
     /// 
     /// </summary>
     /// <returns></returns>
-    private delegate void HTTPInjectionIsStoppedDelegate();
-    private void HTTPInjectionIsStopped()
+    private delegate void setGUIActiveDelegate();
+    private void setGUIActive()
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new HTTPInjectionIsStoppedDelegate(HTTPInjectionIsStopped), new object[] { });
+        BeginInvoke(new setGUIActiveDelegate(setGUIActive), new object[] { });
         return;
       }
 
-      /*
-       * Block GUI elements
-       */
       TB_ReplacementURL.Enabled = true;
       TB_RequestedHost.Enabled = true;
       TB_RequestedURL.Enabled = true;
@@ -203,7 +199,6 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-//    public IPluginHost Host { get { return cHost; } set { cHost = value; cHost.Register(this); } }
 
     #endregion
 
@@ -228,9 +223,9 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      // Kill previousliy started HTTP injection instance 
       cTask.onInit();
       cPluginParams.HostApplication.Register(this);
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
@@ -254,7 +249,7 @@ namespace Plugin.Main
 
         try
         {
-          HTTPInjectionIsStarted();
+          setGUIInactive();
           cTask.onStart();
           cPluginParams.HostApplication.PluginSetStatus(this, "green");
         }
@@ -265,7 +260,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          HTTPInjectionIsStopped();
+          setGUIActive();
           cPluginParams.HostApplication.PluginSetStatus(this, "red");
           cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
@@ -287,8 +282,7 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-
-      HTTPInjectionIsStopped();
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
@@ -337,7 +331,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       return (lRetVal);
@@ -357,7 +351,7 @@ namespace Plugin.Main
       } // if (Invoke
 
       cTask.onStop();
-      HTTPInjectionIsStopped();
+      setGUIActive();
     }
 
 
@@ -376,11 +370,20 @@ namespace Plugin.Main
 
       try
       {
+        onResetPlugin();
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+      }
+
+      try
+      {
         cTask.loadSessionData(pSessionName);
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.Message);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -404,7 +407,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -426,7 +429,7 @@ namespace Plugin.Main
       TB_ReplacementURL.Text = String.Empty;
 
       cTask.emptyInjectionList();
-
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
@@ -450,7 +453,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -477,7 +480,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(lEx.Message);
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
 
       } // if (cIsActiv...

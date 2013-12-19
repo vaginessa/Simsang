@@ -113,7 +113,8 @@ namespace Plugin.Main
         return;
       }
 
-      IPAccountingIsStopped();
+      setGUIActive();
+      cTask.onStop();
       cPluginParams.HostApplication.PluginSetStatus(this, "red");
     }
 
@@ -122,18 +123,15 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    private delegate void IPAccountingIsStoppedDelegate();
-    private void IPAccountingIsStopped()
+    private delegate void setGUIActiveDelegate();
+    private void setGUIActive()
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new IPAccountingIsStoppedDelegate(IPAccountingIsStopped), new object[] { });
+        BeginInvoke(new setGUIActiveDelegate(setGUIActive), new object[] { });
         return;
       }
 
-      /*
-       * Set GUI parameters
-       */
       RB_Service.Enabled = true;
       RB_RemoteIP.Enabled = true;
       RB_LocalIP.Enabled = true;
@@ -145,19 +143,15 @@ namespace Plugin.Main
     /// 
     /// </summary>
     /// <returns></returns>
-    private delegate void IPAccountingIsStartedDelegate();
-    private void IPAccountingIsStarted()
+    private delegate void setGUIInactiveDelegate();
+    private void setGUIInactive()
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new IPAccountingIsStartedDelegate(IPAccountingIsStarted), new object[] { });
+        BeginInvoke(new setGUIInactiveDelegate(setGUIInactive), new object[] { });
         return;
       }
 
-
-      /*
-       * Set GUI parameters
-       */
       RB_Service.Enabled = false;
       RB_RemoteIP.Enabled = false;
       RB_LocalIP.Enabled = false;
@@ -195,6 +189,7 @@ namespace Plugin.Main
 
 
       cPluginParams.HostApplication.Register(this);
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
       cTask.onInit();
     }
@@ -218,11 +213,11 @@ namespace Plugin.Main
         /*
          * Start accounting application.
          */
-        IPAccountingIsStarted();
 
         try
         {
           cTask.onInit();
+          setGUIInactive();
 
           IPAccountingConfig lConfig = new IPAccountingConfig
           {
@@ -235,11 +230,13 @@ namespace Plugin.Main
           };
 
           cTask.onStart(lConfig);
+          cPluginParams.HostApplication.PluginSetStatus(this, "green");
         }
         catch (Exception)
         {
+          cTask.onStop();
+          cPluginParams.HostApplication.PluginSetStatus(this, "red");
         }
-        cPluginParams.HostApplication.PluginSetStatus(this, "green");
 
       } // if (cIsActi...
     }
@@ -258,8 +255,8 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
+      setGUIActive();
       cTask.onStop();
-      IPAccountingIsStopped();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
@@ -341,7 +338,6 @@ namespace Plugin.Main
       } // if (Invoke
 
       cTask.onStop();
-      IPAccountingIsStopped();
     }
 
 
@@ -388,6 +384,7 @@ namespace Plugin.Main
 
 
       cTask.emptyRecordList();
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
@@ -406,7 +403,24 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cTask.loadSessionData(pSessionName);
+
+      try
+      {
+        onResetPlugin();
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+      }
+
+      try
+      {
+        cTask.loadSessionData(pSessionName);
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message)); 
+      }
     }
 
 

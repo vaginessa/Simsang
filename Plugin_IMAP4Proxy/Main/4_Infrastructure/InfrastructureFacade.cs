@@ -218,32 +218,8 @@ namespace Plugin.Main.IMAP4Proxy
       /*       
        * Kill running proxy processes 
        */
-      try
-      {
-        if (cIMAP4RevProxyProc != null && cIMAP4RevProxyProc.Responding)
-          cIMAP4RevProxyProc.Kill();
-      }
-      catch (Exception) { }
-
-
-      try
-      {
-        if (cIMAP4SRevProxyProc != null && cIMAP4SRevProxyProc.Responding)
-          cIMAP4SRevProxyProc.Kill();
-      }
-      catch (Exception) { }
-
-
-      //Process[] lRevProxProcesses;
-      //if ((lRevProxProcesses = Process.GetProcessesByName(cIMAP4SRevProxyName)) != null && lRevProxProcesses.Length > 0)
-      //{
-      //  foreach (Process lProc in lRevProxProcesses)
-      //  {
-      //    try { lProc.Kill(); }
-      //    catch (Exception) { }
-      //  }
-      //} // if ((lR...
-
+      killProcessByName(cIMAP4RevProxyName);
+      killProcessByName(cIMAP4SRevProxyName);
     }
 
     #endregion
@@ -364,6 +340,30 @@ namespace Plugin.Main.IMAP4Proxy
       } // using (TextRe...
 
       return (lRecords);
+    }
+
+    #endregion
+
+
+    #region PRIVATE
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pProcName"></param>
+    private void killProcessByName(String pProcName)
+    {
+      if (!String.IsNullOrEmpty(pProcName))
+      {
+        foreach (Process lProc in Process.GetProcessesByName(pProcName))
+        {
+          try
+          {
+            Process.GetProcessById(lProc.Id).Kill();
+          }
+          catch (Exception) { }
+        } // foreach (Process...
+      } // if (!String.IsN...
     }
 
     #endregion

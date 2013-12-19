@@ -99,12 +99,12 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    private delegate void SetDNSHijackBTOnStartedDelegate();
-    private void SetDNSHijackBTOnStarted()
+    private delegate void setGUIInactiveDelegate();
+    private void setGUIInactive()
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new SetDNSHijackBTOnStartedDelegate(SetDNSHijackBTOnStarted), new object[] { });
+        BeginInvoke(new setGUIInactiveDelegate(setGUIInactive), new object[] { });
         return;
       }
 
@@ -118,12 +118,12 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    private delegate void SetDNSHijackBTOnStoppedDelegate();
-    private void SetDNSHijackBTOnStopped()
+    private delegate void setGUIActiveDelegate();
+    private void setGUIActive()
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new SetDNSHijackBTOnStoppedDelegate(SetDNSHijackBTOnStopped), new object[] { });
+        BeginInvoke(new setGUIActiveDelegate(setGUIActive), new object[] { });
         return;
       }
 
@@ -142,7 +142,7 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void OnDNSHijackExited(object sender, System.EventArgs e)
     {
-      SetDNSHijackBTOnStopped();
+      setGUIActive();
     }
 
     #endregion
@@ -175,6 +175,7 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
+      setGUIActive();
       cPluginParams.HostApplication.Register(this);
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
@@ -193,7 +194,7 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      SetDNSHijackBTOnStopped();
+      setGUIActive();
     }
 
 
@@ -233,6 +234,7 @@ namespace Plugin.Main
       TB_Address.Text = cPluginParams.HostApplication.GetCurrentIP();
       TB_Host.Text = String.Empty;
 
+      setGUIActive();
       cTask.clearRecordList();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
@@ -256,10 +258,9 @@ namespace Plugin.Main
 
         if (cDNSPoisonRecords != null && cDNSPoisonRecords.Count > 0)
         {
-          cPluginParams.HostApplication.PluginSetStatus(this, "green");
+          
           String lPoisoningHostsPath = cPluginParams.HostApplication.GetDNSPoisoningHostsFile();
           String lDNSPoisoningHosts = String.Empty;
-
 
           /*
            * Write DNS poisoning host list to file
@@ -278,7 +279,9 @@ namespace Plugin.Main
               outfile.Write(lDNSPoisoningHosts);
             } // using (Strea...
           } // if (mFWRules...
-          SetDNSHijackBTOnStarted();
+
+          setGUIInactive();
+          cPluginParams.HostApplication.PluginSetStatus(this, "green");
         }
         else
         {
@@ -308,7 +311,7 @@ namespace Plugin.Main
       if (File.Exists(lFWRulesPath))
         File.Delete(lFWRulesPath);
 
-      SetDNSHijackBTOnStopped();
+      setGUIActive();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 
@@ -358,7 +361,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       return (lRetVal);
@@ -379,6 +382,15 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
+      
+      try
+      {
+        onResetPlugin();
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+      }
 
       try
       {
@@ -386,7 +398,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.Message);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -410,7 +422,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -437,7 +449,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(lEx.Message);
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActi...
     }
@@ -463,7 +475,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 

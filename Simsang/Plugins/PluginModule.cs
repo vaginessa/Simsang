@@ -133,6 +133,12 @@ namespace Simsang
                 HostApplication = (IPluginHost) this
               };
 
+              /*
+               * Add loaded plugin to ...
+               * - the global plugin list (IPlugin)
+               * - the DGV list of used plugins 
+               * - the plugin position list (name + position)
+               */
               mPluginList[lPlugCnt] = (IPlugin) Activator.CreateInstance(lObjType, lPluginParams);
               mSimsangMain.DGVUsedPlugins.Add(new UsedPlugins(mPluginList[lPlugCnt].Config.PluginName, mPluginList[lPlugCnt].Config.PluginDescription, mPluginList[lPlugCnt].Config.PluginVersion, "1"));
               mPluginPosition.Add(mPluginList[lPlugCnt].Config.PluginName, lPlugCnt);
@@ -175,15 +181,15 @@ namespace Simsang
     /// </summary>
     public void initAllPlugins()
     {
+
+      // 1. Call init event in the plugins, let them register via callback
       for (int i = 0; i < mPluginList.Length; i++)
         if (mPluginList[i] != null)
           mPluginList[i].onInit();
 
 
-      /*
-       * Bring plugins in the right order.
-       * Or mainly : move the Simsang tab page to the end.
-       */
+
+      // 2. Move the Simsang tab page to the end.
       TabPage lTabPageDefault = null;
       foreach (TabPage lPage in mSimsangMain.TCPlugins.TabPages)
       {
@@ -319,7 +325,7 @@ namespace Simsang
           IPlugin lPlugin = (IPlugin)pPluginObj;
           if (lPlugin != null)
           {
-            TabPage lTabPage = this.mSimsangMain.GetTabPageHandler.FindTabPage(lPlugin.Config.PluginName);
+            TabPage lTabPage = mSimsangMain.GetTabPageHandler.FindTabPage(lPlugin.Config.PluginName);
 
             if (lTabPage != null)
               lTabPage.ImageKey = pStatus;
@@ -336,7 +342,8 @@ namespace Simsang
 
 
     /// <summary>
-    /// Plugin is connecting back to register itself actively. Create ControlTab!
+    /// Plugin is connecting back to register itself actively. 
+    /// Create ControlTab and customize the plugin/tab appearance.
     /// </summary>
     /// <param name="pPlugin"></param>
     /// <returns></returns>
@@ -347,6 +354,8 @@ namespace Simsang
       lTP_Plugin.BackColor = mSimsangMain.TPDefault.BackColor;
 
       mSimsangMain.TCPlugins.TabPages.Add(lTP_Plugin);
+      // Add lTP_Plugin to plugin list
+      mSimsangMain.GetTabPageHandler.TabPages.Add(lTP_Plugin);
 
       return (true);
     }

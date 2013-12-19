@@ -497,7 +497,24 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cTask.loadSessionData(pSessionName);
+
+      try
+      {
+        onResetPlugin();
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+      }
+
+      try
+      {
+        cTask.loadSessionData(pSessionName);
+      }
+      catch (Exception lEx)
+      {
+        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message)); 
+      }
     }
 
 
@@ -611,7 +628,7 @@ namespace Plugin.Main
                 }
                 catch (Exception lEx)
                 {
-                  cPluginParams.HostApplication.LogMessage(String.Format("PluginSystemsMainUC::NewData(0) : {0} - {1}", lEx.Message, lEx.StackTrace));
+                  cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
                 }
 
                 try
@@ -642,12 +659,13 @@ namespace Plugin.Main
                       DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
                   }
                 }
-                catch (RecordException)
+                catch (RecordException lEx)
                 {
+                  cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
                 }
                 catch (Exception lEx)
                 {
-                  cPluginParams.HostApplication.LogMessage(String.Format("PluginSystemsMainUC::NewData(1) : {0} - {1}", lEx.Message, lEx.StackTrace));
+                  cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
                 }
 
                 /*
