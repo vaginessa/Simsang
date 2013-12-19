@@ -115,29 +115,29 @@ namespace Plugin.Main.POP3Proxy
        * 1. Check hostname
        */
       if (String.IsNullOrEmpty(cProxyConfig.RemoteHostName))
-        throw new Exception("You have to define a remote host name.");
+        throw new ExceptionWarning("You have to define a remote host name.");
 
       else if (!Regex.Match(cProxyConfig.RemoteHostName, @"^[a-z0-9_\-\.]+$", RegexOptions.IgnoreCase).Success)
-        throw new Exception("Something is wrong with the remote host.");
+        throw new ExceptionWarning("Something is wrong with the remote host.");
 
 
       /*
        * 2. Check if proxy ports (80 and 443) are ready to use.
        */
       if ((lFuncRetVal = GeneralMethods.FindProc(cPOP3Port)).Length > 0)
-        throw new Exception("POP3 port is used by an other process.");
+        throw new ExceptionWarning("POP3 port is used by an other process.");
 
       else if ((lFuncRetVal = GeneralMethods.FindProc(cPOP3SPort)).Length > 0)
-        throw new Exception("POP3S port is used by an other process.");
+        throw new ExceptionWarning("POP3S port is used by an other process.");
 
       /*
        * 3. Proxy server binaries at the right place?
        */
       if (!File.Exists(cPOP3RevProxyPath))
-        throw new Exception("The POP3 proxy binary was not found.");
+        throw new ExceptionWarning("The POP3 proxy binary was not found.");
 
       if (!File.Exists(cPOP3SRevProxyPath))
-        throw new Exception("The POP3S proxy binary was not found.");
+        throw new ExceptionWarning("The POP3S proxy binary was not found.");
 
 
       /*
@@ -182,7 +182,7 @@ namespace Plugin.Main.POP3Proxy
       catch (Exception lEx)
       {
         stopPOP3ProxyServers();
-        throw new Exception("Error occurred while starting proxy servers.");
+        throw new ExceptionError(String.Format("Error occurred while starting proxy servers.\r\nMessage: {0}", lEx.Message));
       }
     }
 

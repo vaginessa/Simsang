@@ -280,6 +280,14 @@ namespace Plugin.Main
           cTask.onStart(lConfig);
           cPluginParams.HostApplication.PluginSetStatus(this, "green");
         }
+        catch (ExceptionWarning lEx)
+        {
+          setGUIActive();
+          cTask.onStop();
+
+          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        }
         catch (Exception lEx)
         {
           setGUIActive();
