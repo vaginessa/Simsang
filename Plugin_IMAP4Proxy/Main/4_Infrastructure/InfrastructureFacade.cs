@@ -103,29 +103,29 @@ namespace Plugin.Main.IMAP4Proxy
        * 1. Check if proxy binaries are at the right place.
        */
       if (!File.Exists(cIMAP4RevProxyPath))
-        throw new Exception("The IMAP4 proxy binary was not found.");
+        throw new ExceptionWarning("The IMAP4 proxy binary was not found.");
 
       if (!File.Exists(cIMAP4SRevProxyPath))
-        throw new Exception("The IMAP4S proxy binary was not found.");
+        throw new ExceptionWarning("The IMAP4S proxy binary was not found.");
 
       /*
        * 2. Check hostname
        */
       if (String.IsNullOrEmpty(pProxyConfig.RemoteHostName))
-        throw new Exception("You have to define a remote host name.");
+        throw new ExceptionWarning("You have to define a remote host name.");
 
       if (!Regex.Match(pProxyConfig.RemoteHostName, @"^[a-z0-9_\-\.]+$", RegexOptions.IgnoreCase).Success)
-        throw new Exception("Something is wrong with the remote host.");
+        throw new ExceptionWarning("Something is wrong with the remote host.");
 
 
       /*
        * 3. Check if proxy ports (143 and 943) are ready to use.
        */
       if ((lFuncRetVal = GeneralMethods.FindProc(cIMAP4Port)).Length > 0)
-        throw new Exception("Port 143 is used by an other process. You have to stop that process to start this module.");
+        throw new ExceptionWarning("Port 143 is used by an other process. You have to stop that process to start this module.");
 
       if ((lFuncRetVal = GeneralMethods.FindProc(cIMAP4SPort)).Length > 0)
-        throw new Exception("Port 993 is used by an other process. You have to stop that process to start this module.");
+        throw new ExceptionWarning("Port 993 is used by an other process. You have to stop that process to start this module.");
 
 
 
@@ -174,7 +174,7 @@ namespace Plugin.Main.IMAP4Proxy
       }
       catch (Exception lEx)
       {
-        throw new Exception("Can't start the proxy servers.");
+        throw new ExceptionError(String.Format("Can't start the proxy servers.\r\nMessage: {0}", lEx.Message));
       }
     }
 

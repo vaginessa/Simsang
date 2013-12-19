@@ -293,6 +293,14 @@ namespace Plugin.Main
           cTask.onStart(lProxyConfig);
           cPluginParams.HostApplication.PluginSetStatus(this, "green");
         }
+        catch (ExceptionWarning lEx)
+        {
+          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+          setGUIActive();
+          cTask.onStop();
+
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        }
         catch (Exception lEx)
         {
           cPluginParams.HostApplication.PluginSetStatus(this, "red");
