@@ -109,8 +109,6 @@ namespace Plugin.Main.POP3Proxy
       init(pProxyConfig);
 
 
-
-
       /*
        * 1. Check hostname
        */

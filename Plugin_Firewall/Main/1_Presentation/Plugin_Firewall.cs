@@ -12,6 +12,7 @@ using System.Configuration;
 
 using Simsang.Plugin;
 using Plugin.Main.Firewall;
+using Plugin.Main.Firewall.Config;
 
 
 namespace Plugin.Main
@@ -200,12 +201,20 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
+        try
+        {
+          String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
+          cTask.onStart(lFWRulesPath);
 
-        String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
-        cTask.onStart(lFWRulesPath);
+          setGUIInactive();
+          cPluginParams.HostApplication.PluginSetStatus(this, "green");
+        }
+        catch (ExceptionWarning lEx)
+        {
+          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        }
 
-        setGUIInactive();
-        cPluginParams.HostApplication.PluginSetStatus(this, "green");
       } // if (cIsActiv...
     }
 
@@ -393,8 +402,6 @@ namespace Plugin.Main
         BeginInvoke(new onLoadSessionDataFromStringDelegate(onLoadSessionDataFromString), new object[] { pSessionData });
         return;
       } // if (InvokeRequired)
-
-
 
       try
       {

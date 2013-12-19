@@ -9,6 +9,8 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 
 using Simsang.Plugin;
+using Plugin.Main.Firewall.Config;
+
 
 namespace Plugin.Main.Firewall
 {
@@ -173,9 +175,14 @@ namespace Plugin.Main.Firewall
     /// </summary>
     /// <param name="pFWrules"></param>
     /// <param name="pFWRulesPath"></param>
-    public void onStart(List<FWRule> pFWrules, String pFWRulesPath)
+    public void onStart(List<FWRule> pFWRules, String pFWRulesPath)
     {
       String lFWRules = String.Empty;
+
+
+      if (pFWRules == null || pFWRules.Count <= 0)
+        throw new ExceptionWarning("No firewall rules defined");
+
 
       /*
        * Write APE firewall rules file
@@ -186,7 +193,7 @@ namespace Plugin.Main.Firewall
           File.Delete(pFWRulesPath);
 
 
-        foreach (FWRule lTmp in pFWrules)
+        foreach (FWRule lTmp in pFWRules)
           lFWRules += String.Format("{0}:{1}:{2}:{3}:{4}:{5}:{6}\r\n", lTmp.Protocol, lTmp.SrcIP, lTmp.SrcPortLower, lTmp.SrcPortUpper, lTmp.DstIP, lTmp.DstPortLower, lTmp.DstPortUpper);
 
         using (StreamWriter outfile = new StreamWriter(pFWRulesPath))
