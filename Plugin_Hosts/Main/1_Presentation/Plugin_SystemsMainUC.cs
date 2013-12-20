@@ -137,6 +137,7 @@ namespace Plugin.Main
       };
 
       cTask = TaskFacade.getInstance(this);
+      DomainFacade.getInstance(this).addObserver(this);
       cSystemPatterns = new BindingList<ManageSystems.SystemPattern>();
     }
 
@@ -376,8 +377,8 @@ namespace Plugin.Main
 
         // Add all system from ARP scan to the list
         cTask.removeAllRecords();
-
-        foreach (Tuple<String, String, String> lTmp in cPluginParams.HostApplication.GetAllReachableSystems())
+        List<Tuple<String, String, String>> lReachableSystems = cPluginParams.HostApplication.GetAllReachableSystems();
+        foreach (Tuple<String, String, String> lTmp in lReachableSystems)
         {
           try
           {
@@ -824,7 +825,7 @@ namespace Plugin.Main
 
     public void update(List<SystemRecord> pRecordList)
     {
-      pRecordList.Clear();
+      cSystems.Clear();
       foreach (SystemRecord lTmp in pRecordList)
         cSystems.Add(new SystemRecord(lTmp.SrcMAC, lTmp.SrcIP, lTmp.UserAgent, lTmp.HWVendor, lTmp.OperatingSystem, lTmp.LastSeen));
 
