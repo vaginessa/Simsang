@@ -226,38 +226,40 @@ namespace Plugin.Main
 
                   lNewRecords.Add(new HTTPRequests(lMAC, lSrcIP, lMethod, lRemoteHost, lReqString, lCookies, lData));
 
-                  //try
-                  //{
-                  //  cHTTPRequests.Add(new HTTPRequests(lMAC, lSrcIP, lMethod, lRemoteHost, lReqString, lCookies, lData));
-                  //  if (cHTTPRequests.Count > cMaxTableRows)
-                  //    cHTTPRequests.RemoveAt(0);
-                  //}
-                  //catch (Exception lEx)
-                  //{
-                  //  cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
-                  //}
+                  try
+                  {
+                    cHTTPRequests.Add(new HTTPRequests(lMAC, lSrcIP, lMethod, lRemoteHost, lReqString, lCookies, lData));
+                    if (cHTTPRequests.Count > cMaxTableRows)
+                      cHTTPRequests.RemoveAt(0);
+                  }
+                  catch (Exception lEx)
+                  {
+                    cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+                  }
 
                   //UseFilter();
 
                   /*
                    * Filter
                    */
-                  //try
-                  //{
-                  //  if (!CompareToFilter(DGV_HTTPRequests.Rows[lLastRowIndex + 1].Cells["URL"].Value.ToString()))
-                  //    DGV_HTTPRequests.Rows[lLastRowIndex + 1].Visible = false;
-                  //}
-                  //catch { }
+                  try
+                  {
+                    if (!CompareToFilter(DGV_HTTPRequests.Rows[lLastRowIndex + 1].Cells["URL"].Value.ToString()))
+                      DGV_HTTPRequests.Rows[lLastRowIndex + 1].Visible = false;
+                  }
+                  catch { }
 
-
-                  //if (lIsLastLine)
-                  //{
-                  //    DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1].Selected = true;
-                  //    DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition + 1;
-                  //}
-                  //else
-                  //    DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition;
-
+                  try
+                  {
+                    if (lIsLastLine)
+                    {
+                      DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1].Selected = true;
+                      DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition + 1;
+                    }
+                    else
+                      DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition;
+                  }
+                  catch { }
 
                   //DGV_HTTPRequests.Refresh();
                 } // if (lDstPort == "80" ...
