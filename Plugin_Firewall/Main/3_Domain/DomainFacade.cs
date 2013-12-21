@@ -89,6 +89,8 @@ namespace Plugin.Main.Firewall
           foreach (FWRule lTmp in cRecordList.ToList())
             if (lTmp.ID == pFWRuleID)
               cRecordList.Remove(lTmp);
+
+        notify();
       }
       catch (Exception)
       {
@@ -103,6 +105,7 @@ namespace Plugin.Main.Firewall
     public void clearRecordList()
     {
       cRecordList.Clear();
+      notify();
     }
 
     #endregion
