@@ -4,11 +4,18 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 
+using ManageSystems = Plugin.Main.Systems.ManageSystems;
+
 
 namespace Plugin.Main.Systems.Config
 {
-  public interface IObserver
+  public interface IRecordObserver
   {
-    void update(List<SystemRecord> oDict);
+    void updateRecordList(List<SystemRecord> oDict);
+  }
+
+  public interface ISystemPatternObserver
+  {
+    void updateSystemPatternList(List<ManageSystems.SystemPattern> oDict);
   }
 }

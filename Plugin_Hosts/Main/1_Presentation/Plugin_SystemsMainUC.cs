@@ -19,11 +19,10 @@ using Plugin.Main.Systems;
 using Plugin.Main.Systems.Config;
 using ManageSystems = Plugin.Main.Systems.ManageSystems;
 
-
 namespace Plugin.Main
 {
 
-  public partial class PluginSystemsUC : UserControl, IPlugin, IObserver
+  public partial class PluginSystemsUC : UserControl, IPlugin, IRecordObserver, ISystemPatternObserver
   {
 
     #region DATATYPES
@@ -42,8 +41,7 @@ namespace Plugin.Main
 
     private List<String> cTargetList;
     private BindingList<SystemRecord> cSystems;
-    public BindingList<ManageSystems.SystemPattern> cSystemPatterns;
-    private String cPatternFilePath = @"plugins\Systems\Plugin_SystemsOS_Patterns.xml";
+    public List<ManageSystems.SystemPattern> cSystemPatterns;
     private TaskFacade cTask;
     private PluginParameters cPluginParams;
 
@@ -112,9 +110,9 @@ namespace Plugin.Main
       cLastSeenCol.Resizable = System.Windows.Forms.DataGridViewTriState.False;
       DGV_Systems.Columns.Add(cLastSeenCol);
 
-
       cSystems = new BindingList<SystemRecord>();
       DGV_Systems.DataSource = cSystems;
+
       #endregion
 
 
@@ -137,8 +135,9 @@ namespace Plugin.Main
       };
 
       cTask = TaskFacade.getInstance(this);
-      DomainFacade.getInstance(this).addObserver(this);
-      cSystemPatterns = new BindingList<ManageSystems.SystemPattern>();
+      DomainFacade.getInstance(this).addRecordObserver(this);
+      DomainFacade.getInstance(this).addSystemPatternObserver(this);
+      cSystemPatterns = new List<ManageSystems.SystemPattern>();
     }
 
     #endregion
@@ -290,39 +289,7 @@ namespace Plugin.Main
     /// </summary>
     private void readSystemPatterns()
     {
-      //BindingList<SystemPattern> lSystemPatterns = null;
-      //FileStream lFS = null;
-      //XmlSerializer lXMLSerial;
-
-      //try
-      //{
-      //  lFS = new FileStream(cPatternFilePath, FileMode.Open);
-      //  lXMLSerial = new XmlSerializer(cSystemPatterns.GetType());
-      //  lSystemPatterns = (BindingList<SystemPattern>)lXMLSerial.Deserialize(lFS);
-      //}
-      //catch (FileNotFoundException)
-      //{
-      //  return;
-      //}
-      //catch (Exception lEx)
-      //{
-      //  MessageBox.Show(lEx.StackTrace);
-      //  return;
-      //}
-      //finally
-      //{
-      //  if (lFS != null)
-      //    lFS.Close();
-      //}
-      ///*
-      // * Clear and repopulate DataGridView.
-      // */
-      //if (lSystemPatterns != null && lSystemPatterns.Count > 0)
-      //{
-      //  cSystemPatterns.Clear();
-      //  foreach (SystemPattern lTmpPattern in lSystemPatterns)
-      //    cSystemPatterns.Add(lTmpPattern);
-      //}
+      cTask.readSystemPatterns();
     }
 
     #endregion
@@ -331,7 +298,7 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
-
+    public IPluginHost PluginHost { get { return cPluginParams.HostApplication;  } }
     #endregion
 
 
@@ -447,8 +414,6 @@ namespace Plugin.Main
 
       return (lRetVal);
     }
-
-
 
 
 
@@ -576,8 +541,6 @@ namespace Plugin.Main
     }
 
 
-
-
     /// <summary>
     /// New input data arrived
     /// </summary>
@@ -634,7 +597,7 @@ namespace Plugin.Main
 
                 try
                 {
-                  if (lEntryType != EntryType.Full && lOperatingSystem.Length > 0) //!ListEntryExists(lMAC))
+                  if (lEntryType != EntryType.Full && lOperatingSystem.Length > 0)
                   {
                     if (lEntryType == EntryType.Empty)
                       cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, lOperatingSystem, String.Empty));
@@ -646,15 +609,15 @@ namespace Plugin.Main
                       lTabelRow.Cells["OperatingSystem"].ToolTipText = lUserAgent;
 
 
-                    DGV_Systems.Refresh();
+//DGV_Systems.Refresh();
                     if (lLastPosition >= 0)
                       DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
                   }
                   else if (lSIP.Length > 0 && lSMAC.Length > 0)
                   {
                     lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
-                    cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));
-                    DGV_Systems.Refresh();
+cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));
+//DGV_Systems.Refresh();
 
                     if (lLastPosition >= 0)
                       DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
@@ -788,7 +751,8 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void DGV_Systems_DoubleClick(object sender, EventArgs e)
     {
-      ManageSystems.Form_ManageSystems lManageSystems = new ManageSystems.Form_ManageSystems(cPluginParams.HostApplication);
+//      ManageSystems.Form_ManageSystems lManageSystems = new ManageSystems.Form_ManageSystems(cPluginParams.HostApplication);
+      ManageSystems.Form_ManageSystems lManageSystems = new ManageSystems.Form_ManageSystems(this);
       lManageSystems.ShowDialog();
       readSystemPatterns();
     }
@@ -823,13 +787,28 @@ namespace Plugin.Main
 
     #region OBSERVER INTERFACE METHODS
 
-    public void update(List<SystemRecord> pRecordList)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pRecordList"></param>
+    public void updateRecordList(List<SystemRecord> pRecordList)
     {
       cSystems.Clear();
-      foreach (SystemRecord lTmp in pRecordList)
-        cSystems.Add(new SystemRecord(lTmp.SrcMAC, lTmp.SrcIP, lTmp.UserAgent, lTmp.HWVendor, lTmp.OperatingSystem, lTmp.LastSeen));
+      if (pRecordList != null)
+        foreach (SystemRecord lTmp in pRecordList)
+          cSystems.Add(new SystemRecord(lTmp.SrcMAC, lTmp.SrcIP, lTmp.UserAgent, lTmp.HWVendor, lTmp.OperatingSystem, lTmp.LastSeen));
+    }
 
-      DGV_Systems.Refresh();
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pPatternList"></param>
+    public void updateSystemPatternList(List<ManageSystems.SystemPattern> pPatternList)
+    {
+      cSystemPatterns.Clear();
+      if (pPatternList != null)
+        foreach (ManageSystems.SystemPattern lTmp in pPatternList)
+          cSystemPatterns.Add(new ManageSystems.SystemPattern(lTmp.SystemPatternString, lTmp.SystemName));
     }
 
     #endregion

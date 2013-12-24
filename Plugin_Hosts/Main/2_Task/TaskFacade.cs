@@ -43,6 +43,15 @@ namespace Plugin.Main.Systems
       return (cInstance);
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void readSystemPatterns()
+    {
+      cDomain.readSystemPatterns();
+    }
+
     #endregion
 
 

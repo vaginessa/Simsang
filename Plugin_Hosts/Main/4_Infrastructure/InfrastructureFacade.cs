@@ -21,6 +21,8 @@ namespace Plugin.Main.Systems
 
     private static InfrastructureFacade cInstance;
     private IPlugin cPlugin;
+    private String cPatternFilePath = @"plugins\Systems\Plugin_SystemsOS_Patterns.xml";
+    public BindingList<ManageSystems.SystemPattern> cSystemPatterns;
 
     #endregion
 
@@ -43,6 +45,48 @@ namespace Plugin.Main.Systems
         cInstance = new InfrastructureFacade(pPlugin);
 
       return (cInstance);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public List<ManageSystems.SystemPattern> readSystemPatterns()
+    {
+      List<ManageSystems.SystemPattern> lSystemPatterns = null;
+      FileStream lFS = null;
+      XmlSerializer lXMLSerial;
+
+      try
+      {
+        lFS = new FileStream(cPatternFilePath, FileMode.Open);
+        lXMLSerial = new XmlSerializer(cSystemPatterns.GetType());
+        lSystemPatterns = (List<ManageSystems.SystemPattern>)lXMLSerial.Deserialize(lFS);
+      }
+      catch (FileNotFoundException)
+      {
+return null;
+      }
+      catch (Exception lEx)
+      {
+return null;
+      }
+      finally
+      {
+        if (lFS != null)
+          lFS.Close();
+      }
+      /*
+       * Clear and repopulate DataGridView.
+       */
+      //if (lSystemPatterns != null && lSystemPatterns.Count > 0)
+      //{
+      //  cSystemPatterns.Clear();
+      //  foreach (ManageSystems.SystemPattern lTmpPattern in lSystemPatterns)
+      //    cSystemPatterns.Add(lTmpPattern);
+      //}   
+
+      return lSystemPatterns;
     }
 
     #endregion

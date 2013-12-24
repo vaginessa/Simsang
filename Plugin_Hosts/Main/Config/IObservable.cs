@@ -5,9 +5,16 @@ using System.Text;
 
 namespace Plugin.Main.Systems.Config
 {
-  public interface IObservable
+  public interface IRecordObservable
   {
-    void addObserver(IObserver o);
-    void notify();
+    void addRecordObserver(IRecordObserver o);
+    void notifyRecords();
   }
+
+  public interface ISystemPatternObservable
+  {
+    void addSystemPatternObserver(ISystemPatternObserver o);
+    void notifySystemPatterns();
+  }
+
 }

@@ -12,7 +12,7 @@ using Simsang.Plugin;
 
 namespace Plugin.Main.Systems
 {
-  public class DomainFacade : IObservable
+  public class DomainFacade : IRecordObservable
   {
 
     #region MEMBERS
@@ -20,7 +20,9 @@ namespace Plugin.Main.Systems
     private static DomainFacade cInstance;
     private InfrastructureFacade cInfrastructure;
     private List<SystemRecord> cRecordList;
-    private List<IObserver> cObserverList;
+    private List<ManageSystems.SystemPattern> cSystemPatternList;
+    private List<IRecordObserver> cRecordObserverList;
+    private List<ISystemPatternObserver> cSystemPatternObserverList;
     private IPlugin cPlugin;
 
     #endregion
@@ -40,7 +42,9 @@ namespace Plugin.Main.Systems
       cPlugin = pPlugin;
       cInfrastructure = InfrastructureFacade.getInstance(pPlugin);
       cRecordList = new List<SystemRecord>();
-      cObserverList = new List<IObserver>();
+      cSystemPatternList = new List<ManageSystems.SystemPattern>();
+      cRecordObserverList = new List<IRecordObserver>();
+      cSystemPatternObserverList = new List<ISystemPatternObserver>();
     }
 
 
@@ -56,6 +60,16 @@ namespace Plugin.Main.Systems
       return (cInstance);
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void readSystemPatterns()
+    {
+      cSystemPatternList = cInfrastructure.readSystemPatterns();
+      notifySystemPatterns();
+    }
+
     #endregion
 
 
@@ -69,7 +83,7 @@ namespace Plugin.Main.Systems
       if (cRecordList.Count > 0)
       {
         cRecordList.Clear();
-        notify();
+        notifyRecords();
       }
     }
 
@@ -82,7 +96,7 @@ namespace Plugin.Main.Systems
       if (cRecordList.Count > 0)
       {
         cRecordList.RemoveAt(pIndex);
-        notify();
+        notifyRecords();
       }
     }
 
@@ -106,7 +120,7 @@ namespace Plugin.Main.Systems
           throw new RecordException("Something is wrong with the IP address");
 
         cRecordList.Add(pRecord);
-        notify();
+        notifyRecords();
       }
     }
 
@@ -141,7 +155,7 @@ namespace Plugin.Main.Systems
           cRecordList.Add(lTmp);
 
       // Notify all observers
-      notify();
+      notifyRecords();
     }
 
 
@@ -193,19 +207,39 @@ namespace Plugin.Main.Systems
     /// 
     /// </summary>
     /// <param name="o"></param>
-    public void addObserver(IObserver o)
+    public void addRecordObserver(IRecordObserver o)
     {
-      cObserverList.Add(o);
+      cRecordObserverList.Add(o);
     }
 
 
     /// <summary>
     /// 
     /// </summary>
-    public void notify()
+    /// <param name="o"></param>
+    public void addSystemPatternObserver(ISystemPatternObserver o)
     {
-      foreach (IObserver lObs in cObserverList)
-        lObs.update(cRecordList);
+      cSystemPatternObserverList.Add(o);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void notifyRecords()
+    {
+      foreach (IRecordObserver lObs in cRecordObserverList)
+        lObs.updateRecordList(cRecordList);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void notifySystemPatterns()
+    {
+      foreach (ISystemPatternObserver lObs in cSystemPatternObserverList)
+        lObs.updateSystemPatternList(cSystemPatternList);      
     }
 
     #endregion
