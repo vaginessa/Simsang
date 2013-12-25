@@ -257,12 +257,14 @@ namespace Plugin.Main
         {
           cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
           cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+          cTask.onStop();
         }
         catch (Exception lEx)
         {
           setGUIActive();
           cPluginParams.HostApplication.PluginSetStatus(this, "red");
           cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          cTask.onStop();
         }
 
       } // if (cIsActiv...
