@@ -19,6 +19,7 @@ using Plugin.Main.Systems;
 using Plugin.Main.Systems.Config;
 using ManageSystems = Plugin.Main.Systems.ManageSystems;
 
+
 namespace Plugin.Main
 {
 
@@ -283,15 +284,6 @@ namespace Plugin.Main
       return (lRetVal);
     }
 
-
-    /// <summary>
-    /// 
-    /// </summary>
-    private void readSystemPatterns()
-    {
-      cTask.readSystemPatterns();
-    }
-
     #endregion
 
 
@@ -324,7 +316,7 @@ namespace Plugin.Main
 
       cPluginParams.HostApplication.Register(this);
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
-      readSystemPatterns();
+      cTask.readSystemPatterns();
     }
 
 
@@ -751,10 +743,9 @@ cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.E
     /// <param name="e"></param>
     private void DGV_Systems_DoubleClick(object sender, EventArgs e)
     {
-//      ManageSystems.Form_ManageSystems lManageSystems = new ManageSystems.Form_ManageSystems(cPluginParams.HostApplication);
       ManageSystems.Form_ManageSystems lManageSystems = new ManageSystems.Form_ManageSystems(this);
       lManageSystems.ShowDialog();
-      readSystemPatterns();
+      cTask.readSystemPatterns();
     }
 
 

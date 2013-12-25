@@ -59,9 +59,16 @@ namespace Plugin.Main.Systems.ManageSystems
 
         try
         {
+          String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), SystemPatternFile);
+
+//          lFS = new FileStream(lPatternFile, FileMode.Open);
           lSerializer = new XmlSerializer(pSystemPatterns.GetType());
-          lFS = new FileStream(SystemPatternFile, FileMode.Create);
+          lFS = new FileStream(lPatternFile, FileMode.Create);
           lSerializer.Serialize(lFS, pSystemPatterns);
+        }
+        catch (Exception lEx)
+        {
+          String lErrorMsg = lEx.Message;
         }
         finally
         {
@@ -83,9 +90,11 @@ namespace Plugin.Main.Systems.ManageSystems
 
       try
       {
-        lFS = new FileStream(SystemPatternFile, FileMode.Open);
+        String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), SystemPatternFile);
+
+        lFS = new FileStream(lPatternFile, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(List<SystemPattern>));
-        lSystemPatterns = (List<SystemPattern>) lXMLSerial.Deserialize(lFS);
+        lSystemPatterns = (List<SystemPattern>)lXMLSerial.Deserialize(lFS);
       }
       finally
       {

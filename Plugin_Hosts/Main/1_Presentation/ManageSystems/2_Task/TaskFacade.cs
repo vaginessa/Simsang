@@ -78,9 +78,10 @@ namespace Plugin.Main.Systems.ManageSystems
       /*
        * Throw exception if record already exists
        */
-      foreach (SystemPattern lTmp in cSystemPattern)
-        if (lTmp.Equals(pRecord))
-          throw new Exception("An entry with this pattern already exists");
+      if (cSystemPattern != null)      
+        foreach (SystemPattern lTmp in cSystemPattern)
+          if (lTmp.Equals(pRecord))
+            throw new Exception("An entry with this pattern already exists");
 
       try { Regex.Match("", pRecord.SystemPatternString); }
       catch (ArgumentException)

@@ -22,7 +22,7 @@ namespace Plugin.Main.Systems.ManageSystems
     #region MEMBERS
 
     private BindingList<SystemPattern> cSystemPatterns;
-    private IPluginHost cHost;
+    private PluginSystemsUC cPluginMain;
     private TaskFacade cTask;
 
     #endregion
@@ -30,11 +30,11 @@ namespace Plugin.Main.Systems.ManageSystems
 
     #region PUBLIC
 
-    public Form_ManageSystems(IPluginHost pHost)
+    public Form_ManageSystems(PluginSystemsUC pPluginMain)
     {
       InitializeComponent();
 
-      cHost = pHost;
+      cPluginMain = pPluginMain;
 
       #region Datagrid headers
 
@@ -70,13 +70,13 @@ namespace Plugin.Main.Systems.ManageSystems
       }
       catch (FileNotFoundException lEx)
       {
-        cHost.LogMessage(String.Format("Form_ManageSystems() : {0}", lEx.Message));
+        cPluginMain.PluginHost.LogMessage(String.Format("Form_ManageSystems() : {0}", lEx.Message));
         return;
       }
       catch (Exception lEx)
       {
         MessageBox.Show(lEx.StackTrace, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        cHost.LogMessage(String.Format("Form_ManageSystems() : {0}", lEx.Message));
+        cPluginMain.PluginHost.LogMessage(String.Format("Form_ManageSystems() : {0}", lEx.Message));
         return;
       }
     }
@@ -125,7 +125,7 @@ namespace Plugin.Main.Systems.ManageSystems
               catch (Exception lEx)
               {
                 MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                cHost.LogMessage(String.Format("Form_ManageSystems() : {0}", lEx.Message));
+                cPluginMain.PluginHost.LogMessage(String.Format("Form_ManageSystems() : {0}", lEx.Message));
               }
             }
           }
@@ -203,8 +203,10 @@ namespace Plugin.Main.Systems.ManageSystems
     public void update(List<SystemPattern> pSystemList)
     {
       cSystemPatterns.Clear();
-      foreach (SystemPattern lTmp in pSystemList)
-        cSystemPatterns.Add(lTmp);
+
+      if (pSystemList != null)
+        foreach (SystemPattern lTmp in pSystemList)
+          cSystemPatterns.Add(lTmp);
     }
 
     #endregion
