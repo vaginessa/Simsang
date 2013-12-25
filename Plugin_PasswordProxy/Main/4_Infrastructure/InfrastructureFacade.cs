@@ -275,12 +275,12 @@ namespace Plugin.Main.HTTPProxy
       cHTTPRevProxyProc.StartInfo = lProcStartInfoHTTPRevProxy;
       cHTTPRevProxyProc.StartInfo.FileName = cHTTPRevProxyBin;
 
-      if (cWebServerConfig.isRedirect)
-        cHTTPRevProxyProc.StartInfo.Arguments = String.Format("{0} /ru:{1} /d", cHTTPPort, cWebServerConfig.RedirectToURL);
+      if (pConfig.isRedirect)
+        cHTTPRevProxyProc.StartInfo.Arguments = String.Format("{0} /ru:{1} /d", cHTTPPort, pConfig.RedirectToURL);
       else
-        cHTTPRevProxyProc.StartInfo.Arguments = String.Format("{0} /rhp:{1};{0} /d", cHTTPPort, cWebServerConfig.RemoteHostName);
+        cHTTPRevProxyProc.StartInfo.Arguments = String.Format("{0} /rhp:{1};{0} /d", cHTTPPort, pConfig.RemoteHostName);
 
-      cHTTPRevProxyProc.StartInfo.WindowStyle = cWebServerConfig.isDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
+      cHTTPRevProxyProc.StartInfo.WindowStyle = pConfig.isDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
       //  //cHTTPRevProxyProc.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
       cHTTPRevProxyProc.EnableRaisingEvents = true;
       cHTTPRevProxyProc.Exited += new EventHandler(onProxyExited);
@@ -294,12 +294,12 @@ namespace Plugin.Main.HTTPProxy
       cHTTPSRevProxyProc.StartInfo = lProcStartInfoHTTPSRevProxy;
       cHTTPSRevProxyProc.StartInfo.FileName = cHTTPSRevProxyBin;
       //    cHTTPSRevProxyProc.StartInfo.Arguments = String.Format("{0} {1} {2} /d", cHTTPSPort, lRemoteHost, cHTTPSPort);
-      if (cWebServerConfig.isRedirect)
-        cHTTPSRevProxyProc.StartInfo.Arguments = String.Format("{0} /ru:{1} /d", cHTTPSPort, cWebServerConfig.RedirectToURL);
+      if (pConfig.isRedirect)
+        cHTTPSRevProxyProc.StartInfo.Arguments = String.Format("{0} /ru:{1} /d", cHTTPSPort, pConfig.RedirectToURL);
       else
-        cHTTPSRevProxyProc.StartInfo.Arguments = String.Format("{0} /rhp:{1};{0} /d", cHTTPSPort, cWebServerConfig.RemoteHostName);
+        cHTTPSRevProxyProc.StartInfo.Arguments = String.Format("{0} /rhp:{1};{0} /d", cHTTPSPort, pConfig.RemoteHostName);
 
-      cHTTPSRevProxyProc.StartInfo.WindowStyle = cWebServerConfig.isDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
+      cHTTPSRevProxyProc.StartInfo.WindowStyle = pConfig.isDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
       //  //cHTTPSRevProxyProc.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
       cHTTPSRevProxyProc.EnableRaisingEvents = true;
       cHTTPSRevProxyProc.Exited += new EventHandler(onProxyExited);

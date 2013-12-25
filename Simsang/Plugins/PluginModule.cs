@@ -150,28 +150,6 @@ namespace Simsang
           }
         } // for (int i = 0;...
       } // for (int i =...
-
-
-
-      ///*
-      // * Bring plugins in the right order.
-      // * Or mainly : move the Simsang tab page to the end.
-      // */
-      //TabPage lTabPageDefault = null;
-      //foreach (TabPage lPage in mSimsangMain.TCPlugins.TabPages)
-      //{
-      //  if (lPage.Text.ToLower() == "simsang")
-      //  {
-      //    lTabPageDefault = lPage;
-      //    mSimsangMain.TCPlugins.TabPages.Remove(lPage);
-      //  }
-      //  else
-      //  {
-      //  } // if (lPag...
-      //} // foreach (TabPag...
-
-      //if (lTabPageDefault != null)
-      //  mSimsangMain.TCPlugins.TabPages.Add(lTabPageDefault);
     }
 
 

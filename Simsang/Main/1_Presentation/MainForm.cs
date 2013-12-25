@@ -281,10 +281,6 @@ namespace Simsang
         mTPHandler = new TabPageHandler(TC_Plugins, mPluginModule.GetPluginPosition);
 
 
-      /*
-       * Hide all plugins what have the status "off"
-       */
-      mPluginModule.CloseInactivePlugins();
 
       // And at last a new session
       // TB_Session.Text = GetNewSessionName();
@@ -356,6 +352,10 @@ namespace Simsang
 
       // Initialize all plugins
       mPluginModule.initAllPlugins();
+
+
+      // Hide all plugins what have the status "off"
+      mPluginModule.CloseInactivePlugins();
 
 
       /*

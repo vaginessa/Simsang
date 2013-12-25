@@ -226,6 +226,44 @@ namespace Plugin.Main
 
         cPluginParams.HostApplication.PluginSetStatus(this, "green");
         setGUIInactive();
+
+
+        if ((!CB_RedirectTo.Checked && !String.IsNullOrEmpty(TB_RemoteHost.Text)) ||
+            (CB_RedirectTo.Checked && !String.IsNullOrEmpty(TB_RedirectURL.Text)))
+        {
+          WebServerConfig pConfig = new WebServerConfig
+          {
+            BasisDirectory = Config.BaseDir,
+            isDebuggingOn = cPluginParams.HostApplication.IsDebuggingOn(),
+            isRedirect = CB_RedirectTo.Checked,
+            RedirectToURL = TB_RedirectURL.Text,
+            RemoteHostName = TB_RemoteHost.Text,
+            onWebServerExit = onWebServerExited
+          };
+
+
+          try
+          {
+            cTask.startProxies(pConfig);
+          }
+          catch (Exception lEx)
+          {
+            String lLogMsg = String.Format("{0}: {1}", Config.PluginName, lEx.Message);
+            setGUIActive();
+            cPluginParams.HostApplication.LogMessage(lLogMsg);
+            cPluginParams.HostApplication.PluginSetStatus(this, "red");
+
+            cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+            cTask.onStop();
+          }
+        }
+        else
+        {
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: No forwarding host/URL defined. Stopping the pluggin.", Config.PluginName));
+          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+          cTask.onStop();
+        }  // if (lRemoteHost ...
+
       } // if (cIsActiv...
     }
 
@@ -540,49 +578,9 @@ namespace Plugin.Main
         return;
       }
 
-
-      /*
-       * 1. Adjust GUI parameters
-       */
       TB_RemoteHost.Enabled = false;
       CB_RedirectTo.Enabled = false;
       TB_RedirectURL.Enabled = false;
-
-
-      if ((!CB_RedirectTo.Checked && !String.IsNullOrEmpty(TB_RemoteHost.Text)) ||
-          (CB_RedirectTo.Checked && !String.IsNullOrEmpty(TB_RedirectURL.Text)))
-      {
-        WebServerConfig pConfig = new WebServerConfig
-        {
-          BasisDirectory = Config.BaseDir,
-          isDebuggingOn = cPluginParams.HostApplication.IsDebuggingOn(),
-          isRedirect = CB_RedirectTo.Checked,
-          RedirectToURL = TB_RedirectURL.Text,
-          RemoteHostName = TB_RemoteHost.Text,
-          onWebServerExit = onWebServerExited
-        };
-
-
-        try
-        {
-          cTask.startProxies(pConfig);
-        }
-        catch (Exception lEx)
-        {
-          String lLogMsg = String.Format("{0}: {1}", Config.PluginName, lEx.Message);
-          setGUIActive();
-          cPluginParams.HostApplication.LogMessage(lLogMsg);
-          cPluginParams.HostApplication.PluginSetStatus(this, "red");
-
-          MessageBox.Show(lLogMsg, "Can't start proxy server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        }
-      }
-      else
-      {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: No forwarding host/URL defined. Stopping the pluggin.", Config.PluginName));
-        cPluginParams.HostApplication.PluginSetStatus(this, "grey");
-      }  // if (lRemoteHost ...
-
     }
 
 

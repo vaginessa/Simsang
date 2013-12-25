@@ -147,7 +147,7 @@ namespace Plugin.Main
                     BasisDirectory = Config.BaseDir,
                     //RemoteHostName = String.Empty,
                     isDebuggingOn = (cPluginParams.HostApplication != null) ? cPluginParams.HostApplication.IsDebuggingOn() : false,
-                    onProxyExit = null //onPOP3ProxyExited
+                    onProxyExit = onPOP3ProxyExited
                   };
       cTask = TaskFacade.getInstance(lConfig, this);
       DomainFacade.getInstance(lConfig, this).addObserver(this);
@@ -197,12 +197,12 @@ namespace Plugin.Main
     /// <summary>
     /// 
     /// </summary>
-    public delegate void onPOP3ProxyExitedDelegate(object sender, System.EventArgs e);
-    private void onPOP3ProxyExited(object sender, System.EventArgs e)
+    public delegate void onPOP3ProxyExitedDelegate(); //object sender, System.EventArgs e);
+    private void onPOP3ProxyExited() //object sender, System.EventArgs e)
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new onPOP3ProxyExitedDelegate(onPOP3ProxyExited), new object[] { sender, e });
+        BeginInvoke(new onPOP3ProxyExitedDelegate(onPOP3ProxyExited), new object[] { /* sender, e */ });
         return;
       } // if (InvokeRequired)
 
@@ -272,13 +272,13 @@ namespace Plugin.Main
           {
             BasisDirectory = Directory.GetCurrentDirectory(),
             isDebuggingOn = cPluginParams.HostApplication.IsDebuggingOn(),
-            onProxyExit = null, // onPOP3ProxyExited,
+            onProxyExit = onPOP3ProxyExited,
             RemoteHostName = TB_POP3Server.Text
           };
 
           setGUIInactive();
-          cTask.onStart(lConfig);
           cPluginParams.HostApplication.PluginSetStatus(this, "green");
+          cTask.onStart(lConfig);
         }
         catch (ExceptionWarning lEx)
         {
@@ -566,11 +566,9 @@ namespace Plugin.Main
 
     public void update(List<POP3Account> pRecordList)
     {
-      pRecordList.Clear();
+      cAccounts.Clear();
       foreach (POP3Account lTmp in pRecordList)
         cAccounts.Add(new POP3Account(lTmp.SrcMAC, lTmp.SrcIP, lTmp.DstIP, lTmp.DstPort, lTmp.Username, lTmp.Password, lTmp.Server));
-
-      DGV_Accounts.Refresh();
     }
 
     #endregion
