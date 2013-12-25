@@ -52,7 +52,11 @@ namespace Plugin.Main.Systems.Config
       mOperatingSystem = pOperatingSystem;
       mHWVendor = pHWVendor;
       mLastSeen = !String.IsNullOrEmpty(pLastSeen) ? pLastSeen : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-      mID = String.Format("{0}{1}{2}", pSrcMAC, pSrcMAC, pUserAgentString);
+////      mID = String.Format("{0}{1}{2}", pSrcMAC, pSrcMAC, pUserAgentString);
+//      mID = String.Format("{0}{1}{2}", pSrcMAC, pSrcIP, pUserAgentString);      
+
+      mSrcMAC = Regex.Replace(mSrcMAC, @"-", ":");
+      mID = String.Format("{0}{1}", pSrcMAC.ToLower(), pSrcIP);
     }
 
 

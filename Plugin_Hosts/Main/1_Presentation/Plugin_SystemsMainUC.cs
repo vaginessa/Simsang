@@ -567,9 +567,11 @@ namespace Plugin.Main
               String lUserAgent = String.Empty;
               Match lMatchUserAgent;
               int lLastPosition = -1;
-              EntryType lEntryType = FullEntryExists(lSMAC, lSIP);
+              EntryType lEntryType;
               DataGridViewRow lTabelRow;
 
+              lSMAC = Regex.Replace(lSMAC, @"-", ":");
+              lEntryType = FullEntryExists(lSMAC, lSIP);
 
               /*
                * Determine the operating system due to the HTTP User-Agent string.
@@ -587,6 +589,10 @@ namespace Plugin.Main
                   cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
                 }
 
+
+                /*
+                 * 
+                 */
                 try
                 {
                   if (lEntryType != EntryType.Full && lOperatingSystem.Length > 0)
@@ -600,16 +606,13 @@ namespace Plugin.Main
                     if ((lTabelRow = GetRowByMAC(lSMAC)) != null)
                       lTabelRow.Cells["OperatingSystem"].ToolTipText = lUserAgent;
 
-
-//DGV_Systems.Refresh();
                     if (lLastPosition >= 0)
                       DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
                   }
                   else if (lSIP.Length > 0 && lSMAC.Length > 0)
                   {
                     lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
-cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));
-//DGV_Systems.Refresh();
+                    cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));
 
                     if (lLastPosition >= 0)
                       DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
@@ -634,7 +637,7 @@ cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.E
                 try
                 {
                   cTask.addRecord(new SystemRecord(lSMAC, lSIP, String.Empty, lUserAgent, String.Empty, String.Empty));
-                  DGV_Systems.Refresh();
+//DGV_Systems.Refresh();
                 }
                 catch (RecordException)
                 {
