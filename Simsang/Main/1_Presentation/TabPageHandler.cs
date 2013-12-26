@@ -78,7 +78,6 @@ namespace Simsang
         } // for (int lCoun...
       } // if (mTabPag...
 
-
       return (lRetVal);
     }
 

@@ -225,9 +225,7 @@ namespace Simsang
       try { Config.CommonLanguateRuntime = Environment.Version.ToString(); }
       catch (Exception) { }
 
-      /*
-       * Check if an other instance is running.
-       */
+      // Check if an other instance is running.
       Process[] lACInstances;
 
       if ((lACInstances = Process.GetProcessesByName(Config.APEName)) != null && lACInstances.Length > 0)
@@ -237,15 +235,11 @@ namespace Simsang
             catch (Exception) { }
 
 
-      /*
-       * Check if configuration is ok.
-       */
+      // Check if configuration is ok.
       this.ConfigOK(Directory.GetCurrentDirectory());
 
 
-      /*
-       * Set right Debugging modus in GUI
-       */
+      //Set right Debugging modus in GUI
       if (Config.DebugOn())
       {
         TSMI_Debugging.Text = "Turn debugging off";
@@ -257,30 +251,19 @@ namespace Simsang
         this.setAppTitle("");
       }
 
-      /*
-       * Populate network interface.
-       */
+      //Populate network interface.
       this.LoadNICSettings();
       LogConsole.Main.LogConsole.pushMsg(String.Format("Current directory : {0}", Directory.GetCurrentDirectory()));
 
-
-      /*
-       * Start data input thread.
-       */
+      // Start data input thread.
       mInputModule.startInputThread();
 
-      /*
-       * Load all plugins.
-       */
+      // Load all plugins.
       mPluginModule.LoadPlugins();
 
-      /*
-       * Tab page controler. To hide and show tab pages.
-       */
+      // Tab page controler. To hide and show tab pages.
       if (mPluginModule != null)
         mTPHandler = new TabPageHandler(TC_Plugins, mPluginModule.GetPluginPosition);
-
-
 
       // And at last a new session
       // TB_Session.Text = GetNewSessionName();
@@ -309,9 +292,7 @@ namespace Simsang
       }
 
 
-      /*
-       * Check confirmation
-       */
+      // Check confirmation
       String lRegistrationValue = Config.GetRegistryValue(Config.RegistryContributionKey, Config.RegistryContributionValue);
       if (String.IsNullOrEmpty(lRegistrationValue) || lRegistrationValue.ToLower() != "ok")
       {
@@ -704,7 +685,7 @@ namespace Simsang
               {
                 IPlugin lTmp = GetPluginByName(mUsedPlugins[e.RowIndex].PluginName); //
                 lTmp.Config.IsActive = true;
-                lTmp.onInit();
+                lTmp.onResetPlugin();
               }
               catch (Exception) { }
 
