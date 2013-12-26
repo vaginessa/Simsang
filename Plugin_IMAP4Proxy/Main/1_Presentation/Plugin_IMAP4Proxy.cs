@@ -149,7 +149,7 @@ namespace Plugin.Main
                     SessionDirectory = Config.SessionDir,
                     //RemoteHostName = String.Empty,
                     isDebuggingOn = (cPluginParams.HostApplication != null) ? cPluginParams.HostApplication.IsDebuggingOn() : false,
-                    onProxyExit = null
+                    onProxyExit = onIMAP4ProxyExited
                   };
       cTask = TaskFacade.getInstance(lProxyConfig, this);
     }
@@ -196,12 +196,12 @@ namespace Plugin.Main
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    public delegate void onIMAP4ProxyExitedDelegate(object sender, System.EventArgs e);
-    private void onIMAP4ProxyExited(object sender, System.EventArgs e)
+    public delegate void onIMAP4ProxyExitedDelegate(); //object sender, System.EventArgs e);
+    private void onIMAP4ProxyExited() //object sender, System.EventArgs e)
     {
       if (InvokeRequired)
       {
-        BeginInvoke(new onIMAP4ProxyExitedDelegate(onIMAP4ProxyExited), new object[] { sender, e });
+        BeginInvoke(new onIMAP4ProxyExitedDelegate(onIMAP4ProxyExited), new object[] { /* sender, e */ });
         return;
       } // if (InvokeRequired)
 
@@ -285,7 +285,7 @@ namespace Plugin.Main
           {
             BasisDirectory = cPluginParams.HostApplication.GetWorkingDirectory(),
             isDebuggingOn = cPluginParams.HostApplication.IsDebuggingOn(),
-            onProxyExit = null,
+            onProxyExit = onIMAP4ProxyExited,
             RemoteHostName = TB_ForwardHost.Text
           };
 
@@ -580,11 +580,9 @@ namespace Plugin.Main
 
     public void update(List<IMAP4Account> pRecordList)
     {
-      pRecordList.Clear();
+      cAccounts.Clear();
       foreach (IMAP4Account lTmp in pRecordList)
         cAccounts.Add(new IMAP4Account(lTmp.SrcMAC, lTmp.SrcIP, lTmp.DstIP, lTmp.DstPort, lTmp.Username, lTmp.Password, lTmp.Server));
-
-      DGV_Accounts.Refresh();
     }
 
     #endregion
