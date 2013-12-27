@@ -34,6 +34,7 @@ namespace Plugin.Main.HTTPProxy
     private String cHTTPRevProxyPath;
     private String cHTTPSRevProxyPath;
     private IPlugin cPlugin;
+    private String cPatternFilePath = @"plugins\HTTPProxy\Plugin_AccountsHTMLAuth_Patterns.xml";
 
     #endregion
 
@@ -50,7 +51,6 @@ namespace Plugin.Main.HTTPProxy
     }
 
 
-
     /// <summary>
     /// Create single instance
     /// </summary>
@@ -62,6 +62,37 @@ namespace Plugin.Main.HTTPProxy
         cInstance = new InfrastructureFacade(pWebServerConfig, pPlugin);
 
       return (cInstance);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public List<ManageAuthentications.AccountPattern> readAuthenticationPatterns()
+    {
+      List<ManageAuthentications.AccountPattern> lAccountPatternRecords = new List<ManageAuthentications.AccountPattern>();
+      FileStream lFS = null;
+      XmlSerializer lXMLSerial;
+
+      try
+      {
+        String lPatternFile = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), cPatternFilePath);
+
+        lFS = new FileStream(lPatternFile, FileMode.Open);
+        lXMLSerial = new XmlSerializer(typeof(List<ManageAuthentications.AccountPattern>));
+        lAccountPatternRecords = (List<ManageAuthentications.AccountPattern>)lXMLSerial.Deserialize(lFS);
+      }
+      catch (Exception lEx)
+      {
+        String lMsg = lEx.Message;
+      }
+      finally
+      {
+        if (lFS != null)
+          lFS.Close();
+      }
+
+      return lAccountPatternRecords;
     }
 
     #endregion
@@ -118,7 +149,7 @@ namespace Plugin.Main.HTTPProxy
 
       using (TextReader lTextReader = new StringReader(pSessionData))
       {
-        lRecords = (T)lSerializer.Deserialize(lTextReader);
+        lRecords = (T) lSerializer.Deserialize(lTextReader);
       } // using (TextRe...
 
       return (lRecords);

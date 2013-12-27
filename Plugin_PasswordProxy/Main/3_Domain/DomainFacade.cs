@@ -60,6 +60,16 @@ namespace Plugin.Main.HTTPProxy
       return (cInstance);
     }
 
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public List<ManageAuthentications.AccountPattern> readAuthenticationPatterns()
+    {
+      return(cInfrastructure.readAuthenticationPatterns());
+    }
+
     #endregion
 
 

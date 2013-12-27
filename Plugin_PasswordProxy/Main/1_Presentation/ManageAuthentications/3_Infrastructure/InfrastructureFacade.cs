@@ -34,7 +34,7 @@ namespace Plugin.Main.HTTPProxy.ManageAuthentications
     /// </summary>
     private InfrastructureFacade()
     {
-      PatternFile = @"\plugins\HTTPProxy\Plugin_AccountsHTMLAuth_Patterns.xml";
+      PatternFile = @"plugins\HTTPProxy\Plugin_AccountsHTMLAuth_Patterns.xml";
     }
 
 
@@ -79,15 +79,21 @@ namespace Plugin.Main.HTTPProxy.ManageAuthentications
     /// </summary>
     public List<AccountPattern> readAccountsPatterns()
     {
-      List<AccountPattern> lRetVal = null;
+      List<AccountPattern> lAccountPatternRecords = new List<AccountPattern>();
       FileStream lFS = null;
       XmlSerializer lXMLSerial;
 
       try
       {
-        lFS = new FileStream(PatternFile, FileMode.Open);
+        String lPatternFile = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), PatternFile);
+
+        lFS = new FileStream(lPatternFile, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(List<AccountPattern>));
-        lRetVal = (List<AccountPattern>)lXMLSerial.Deserialize(lFS);
+        lAccountPatternRecords = (List<AccountPattern>)lXMLSerial.Deserialize(lFS);
+      }
+      catch (Exception lEx)
+      {
+        String lMsg = lEx.Message;
       }
       finally
       {
@@ -95,7 +101,7 @@ namespace Plugin.Main.HTTPProxy.ManageAuthentications
           lFS.Close();
       }
 
-      return (lRetVal);
+      return lAccountPatternRecords;
     }
 
     #endregion

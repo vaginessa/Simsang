@@ -58,8 +58,7 @@ namespace Plugin.Main
     private List<String> cTargetList;
     private List<PeerSystems> cPeersDataSource;
     private BindingList<Account> cAccounts;
-    public BindingList<ManageAuthentications.AccountPattern> cAccountPatterns;
-    private String cPatternFilePath = @"plugins\HTTPProxy\Plugin_AccountsHTMLAuth_Patterns.txt";
+    public List<ManageAuthentications.AccountPattern> cAccountPatterns;
     private TaskFacade cTask;
     private PluginParameters cPluginParams;
 
@@ -143,6 +142,9 @@ namespace Plugin.Main
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
+      cPeersDataSource = new List<PeerSystems>();
+      cAccountPatterns = new List<ManageAuthentications.AccountPattern>();
+
       Config = new PluginProperties()
       {
         BaseDir = lBaseDir,
@@ -159,8 +161,7 @@ namespace Plugin.Main
       lWebServerConfig.BasisDirectory = Config.BaseDir;
 
       cTask = TaskFacade.getInstance(lWebServerConfig, this);
-      cPeersDataSource = new List<PeerSystems>();
-      cAccountPatterns = new BindingList<ManageAuthentications.AccountPattern>();
+      DomainFacade.getInstance(lWebServerConfig, this).addObserver(this);
     }
 
     #endregion
@@ -206,7 +207,7 @@ namespace Plugin.Main
       lWebServerConfig.onWebServerExit = onWebServerExited;
 
       cTask.onInit(lWebServerConfig);
-      readSystemPatterns();
+      cAccountPatterns = cTask.readAuthenticationPatterns();
     }
 
 
@@ -538,7 +539,7 @@ namespace Plugin.Main
                   lAuthData.Username.Length > 0 &&
                   lAuthData.Password.Length > 0)
               {
-                cTask.addRecord(new Account(lSMAC, lSIP, lAuthData.CompanyURL, lDPort, lAuthData.Username, lAuthData.Password));
+                cTask.addRecord(new Account(lSMAC, lSIP, lAuthData.CompanyURL, lDPort, lAuthData.Username, lAuthData.Password));                
               } // if (lAuthData.Co...
             } // if (lSplitter...
           } // if (pData.Lengt ...
@@ -750,53 +751,6 @@ namespace Plugin.Main
       return (lRetVal);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    private void readSystemPatterns()
-    {
-      String lLine;
-      StreamReader lSR;
-
-      if (cAccountPatterns == null)
-        cAccountPatterns = new BindingList<ManageAuthentications.AccountPattern>();
-      else
-        cAccountPatterns.Clear();
-
-
-      try
-      {
-        lSR = new StreamReader(cPatternFilePath);
-        while ((lLine = lSR.ReadLine()) != null)
-        {
-          lLine = lLine.Trim();
-          String[] lSplit = Regex.Split(lLine, @"\|\|");
-
-
-          if (lSplit.Length == 6)
-          {
-            String lMethod = lSplit[0];
-            String lHostPattern = lSplit[1];
-            String lURIPattern = lSplit[2];
-            String lCredentialsPattern = lSplit[3];
-            String lCompany = lSplit[4];
-            String lCompanyURL = lSplit[5];
-
-            cAccountPatterns.Add(new ManageAuthentications.AccountPattern(lMethod, lHostPattern, lURIPattern, lCredentialsPattern, lCompany, lCompanyURL));
-          }
-        }
-      }
-      catch (FileNotFoundException)
-      {
-        //            MessageBox.Show("HTTP Authentication Pattern file not found!");
-      }
-      catch (Exception)
-      {
-        MessageBox.Show("Error occurred while opening " + cPatternFilePath);
-      }
-    }
-
-
     #endregion
 
 
@@ -856,7 +810,6 @@ namespace Plugin.Main
       {
         int lCurIndex = DGV_Accounts.CurrentCell.RowIndex;
         cTask.removeRecordAt(lCurIndex);
-
       }
       catch (Exception lEx)
       {
@@ -875,7 +828,7 @@ namespace Plugin.Main
     {
       ManageAuthentications.Form_ManageAuthentications lManageSystems = new ManageAuthentications.Form_ManageAuthentications(cPluginParams.HostApplication);
       lManageSystems.ShowDialog();
-      readSystemPatterns();
+      cAccountPatterns = cTask.readAuthenticationPatterns();
     }
 
 
