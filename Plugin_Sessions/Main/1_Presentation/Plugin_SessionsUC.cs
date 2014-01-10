@@ -10,6 +10,9 @@ using System.Text;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Configuration;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 
 using Simsang.Plugin;
 using Simsang.MiniBrowser;
@@ -18,9 +21,6 @@ using Plugin.Main.Session.Config;
 using MngSessions = Plugin.Main.Session.ManageSessions;
 using MngSessionsConfig = Plugin.Main.Session.ManageSessions.Config;
 
-using System.Xml;
-using System.Xml.Linq;
-using System.Xml.Serialization;
 
 namespace Plugin.Main
 {
@@ -156,6 +156,7 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
+    public IPluginHost PluginHost { get { return cPluginParams.HostApplication; } }
 
     #endregion
 
@@ -835,7 +836,7 @@ namespace Plugin.Main
       {
         if (TV_Sessions.SelectedNode.Text.ToLower().Contains("sessions"))
         {
-          MngSessions.ManageSessions lManageSessions = new MngSessions.ManageSessions(cPluginParams.HostApplication);
+          MngSessions.ManageSessions lManageSessions = new MngSessions.ManageSessions(this);
           lManageSessions.ShowDialog();
           initSessionPatterns();
         }

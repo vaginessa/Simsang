@@ -26,7 +26,7 @@ namespace Plugin.Main.Session.ManageSessions
 
     private BindingList<SessionPattern> cSessionPatternRecords;
     private String cIconsPath = @"plugins\Sessions\Icons";
-    private IPluginHost cHost;
+    private PluginSessionsUC cPluginMain;
     private TaskFacade cTask;
 
     #endregion
@@ -34,11 +34,11 @@ namespace Plugin.Main.Session.ManageSessions
 
     #region PUBLIC
 
-    public ManageSessions(IPluginHost pHost)
+    public ManageSessions(PluginSessionsUC pPluginMain)
     {
       InitializeComponent();
 
-      cHost = pHost;
+      cPluginMain = pPluginMain;
 
       #region DGV Header definitions
 
@@ -96,16 +96,15 @@ namespace Plugin.Main.Session.ManageSessions
       }
       catch (FileNotFoundException lEx)
       {
-        cHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
+        cPluginMain.PluginHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
       }
       catch (Exception lEx)
       {
         MessageBox.Show("Error ocurred: " + lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        cHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
+        cPluginMain.PluginHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
       }
 
       initInputFields();
-
     }
 
     #endregion
@@ -195,7 +194,7 @@ namespace Plugin.Main.Session.ManageSessions
               catch (Exception lEx)
               {
                 MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                cHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
+                cPluginMain.PluginHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
               }
             }
       }
@@ -289,7 +288,7 @@ namespace Plugin.Main.Session.ManageSessions
       catch (Exception lEx)
       {
         MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        cHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
+        cPluginMain.PluginHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
         return;
       }
 
@@ -329,7 +328,6 @@ namespace Plugin.Main.Session.ManageSessions
     }
 
     #endregion
-
 
   }
 }

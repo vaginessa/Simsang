@@ -88,8 +88,10 @@ namespace Plugin.Main.Session.ManageSessions
 
         try
         {
+          String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), SessionPatternsFile);
+
           lSerializer = new XmlSerializer(pRecords.GetType());
-          lFS = new FileStream(SessionPatternsFile, FileMode.Create);
+          lFS = new FileStream(lPatternFile, FileMode.Create);
           lSerializer.Serialize(lFS, pRecords);
         }
         finally
