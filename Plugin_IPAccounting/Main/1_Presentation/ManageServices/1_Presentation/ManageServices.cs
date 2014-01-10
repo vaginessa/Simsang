@@ -151,10 +151,6 @@ namespace Plugin.Main.IPAccounting.ManageServices
         return base.ProcessDialogKey(keyData);
     }
 
-    #endregion
-
-
-    #region EVENTS
 
     /// <summary>
     /// 

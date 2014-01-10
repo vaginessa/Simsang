@@ -6,6 +6,7 @@ using System.ComponentModel;
 
 using Simsang.Plugin;
 using Plugin.Main.Applications.Config;
+using Plugin.Main.Applications.ManageApplications;
 
 namespace Plugin.Main.Applications
 {
@@ -40,6 +41,14 @@ namespace Plugin.Main.Applications
         cInstance = new TaskFacade(pPlugin);
 
       return (cInstance);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public List<ApplicationPattern> readApplicationPatterns()
+    {
+      return (cDomain.readApplicationPatterns());
     }
 
     #endregion

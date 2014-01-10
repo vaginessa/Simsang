@@ -139,7 +139,6 @@ namespace Plugin.Main.IPAccounting
       XmlSerializer lXMLSerial;
       String lSessionFilePath = String.Format(@"{0}\{1}.xml", cPlugin.Config.SessionDir, pSessionName);
 
-
       try
       {
         lFS = new FileStream(lSessionFilePath, FileMode.Open);
@@ -185,7 +184,8 @@ namespace Plugin.Main.IPAccounting
         lRetVal = File.ReadAllText(lSessionFilePath);
       }
       catch (Exception)
-      { }
+      { 
+      }
 
       return (lRetVal);
     }
@@ -208,7 +208,6 @@ namespace Plugin.Main.IPAccounting
 
         try
         {
-
           lSerializer = new XmlSerializer(pRecords.GetType());
           lFS = new FileStream(lSessionFilePath, FileMode.Create);
           lSerializer.Serialize(lFS, pRecords);

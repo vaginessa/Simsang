@@ -26,7 +26,7 @@ namespace Plugin.Main
 
     private List<String> cTargetList;
     private BindingList<ApplicationRecord> cApplications;
-    public BindingList<MngApplication.ApplicationPattern> cApplicationPatterns;
+    public List<MngApplication.ApplicationPattern> cApplicationPatterns;
     private String cPatternFilePath = @"plugins\UsedApps\Plugin_UsedApps_Patterns.xml";
     private TaskFacade cTask;
     private PluginParameters cPluginParams;
@@ -37,6 +37,7 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
+    public IPluginHost PluginHost { get { return cPluginParams.HostApplication; } }
 
     #endregion
 
@@ -115,7 +116,7 @@ namespace Plugin.Main
         IsActive = true
       };
 
-      cApplicationPatterns = new BindingList<MngApplication.ApplicationPattern>();
+      cApplicationPatterns = new List<MngApplication.ApplicationPattern>();
       cTask = TaskFacade.getInstance(this);
     }
 
@@ -123,26 +124,6 @@ namespace Plugin.Main
 
 
     #region PRIVATE
-
-    /// <summary>
-    /// 
-    /// </summary>
-    private void readApplicationPatterns()
-    {
-      BindingList<MngApplication.ApplicationPattern> lApplicationPatterns = null;
-
-      /*
-       * Clear and repopulate DataGridView.
-       */
-      if (lApplicationPatterns != null && lApplicationPatterns.Count > 0)
-      {
-        cApplicationPatterns.Clear();
-        foreach (MngApplication.ApplicationPattern lReq in lApplicationPatterns)
-          cApplicationPatterns.Add(lReq);
-      }
-    }
-
-
 
     /// <summary>
     /// 
@@ -194,7 +175,8 @@ namespace Plugin.Main
 
       cPluginParams.HostApplication.Register(this);
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
-      readApplicationPatterns();
+
+      cApplicationPatterns = cTask.readApplicationPatterns();
     }
 
 
@@ -343,8 +325,6 @@ namespace Plugin.Main
 
 
 
-
-
     /// <summary>
     /// Serialize session data
     /// </summary>
@@ -363,8 +343,6 @@ namespace Plugin.Main
         cTask.saveSession(pSessionName);
       } // if (cIsActiv...
     }
-
-
 
 
 
@@ -463,7 +441,7 @@ namespace Plugin.Main
                */
               if (lRemoteString.Length > 5)
               {
-                foreach (MngApplication.ApplicationPattern lPattern in this.cApplicationPatterns)
+                foreach (MngApplication.ApplicationPattern lPattern in cApplicationPatterns)
                 {
                   if (Regex.Match(lRemoteString, @lPattern.ApplicationPatternString).Success)
                   {
@@ -560,9 +538,9 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void DGV_Applications_DoubleClick(object sender, EventArgs e)
     {
-      MngApplication.Form_ManageApps lManageApps = new MngApplication.Form_ManageApps(cPluginParams.HostApplication);
+      MngApplication.Form_ManageApps lManageApps = new MngApplication.Form_ManageApps(this);
       lManageApps.ShowDialog();
-      readApplicationPatterns();
+      cApplicationPatterns = cTask.readApplicationPatterns();
     }
 
 

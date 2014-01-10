@@ -18,6 +18,9 @@ using Plugin.Main.Session.Config;
 using MngSessions = Plugin.Main.Session.ManageSessions;
 using MngSessionsConfig = Plugin.Main.Session.ManageSessions.Config;
 
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace Plugin.Main
 {
@@ -29,10 +32,9 @@ namespace Plugin.Main
     private String cIconsDir = @"\Icons";
     private List<String> cTargetList;
     private BindingList<Session.Config.Session> cSessions;
-    public BindingList<MngSessionsConfig.SessionPattern> cSessionPatterns;
+    public List<MngSessionsConfig.SessionPattern> cSessionPatterns;
     private TaskFacade cTask;
     private PluginParameters cPluginParams;
-//    private String cPatternFilePath = @"plugins\Sessions\Plugin_Session_Patterns.xml";
     private TreeNode mFilterNode;
 
     #endregion
@@ -141,7 +143,7 @@ namespace Plugin.Main
       };
 
 
-      cSessionPatterns = new BindingList<MngSessionsConfig.SessionPattern>();
+      cSessionPatterns = new List<MngSessionsConfig.SessionPattern>();
       TV_Sessions.DoubleClick += TreeView_DoubleClick;
 
       cTask = TaskFacade.getInstance(this);
@@ -475,7 +477,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.ToString()));
+          MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActiv...
     }
@@ -502,24 +504,7 @@ namespace Plugin.Main
     /// </summary>
     private void initSessionPatterns()
     {
-      //FileStream lFS = null;
-      //XmlSerializer lXMLSerial;
-
-      //try
-      //{
-      //  lFS = new FileStream(cPatternFilePath, FileMode.Open);
-      //  lXMLSerial = new XmlSerializer(cSessionPatterns.GetType());
-      //  cSessionPatterns = (BindingList<SessionPattern>) lXMLSerial.Deserialize(lFS);
-      //}
-      //catch (Exception lEx) 
-      //{
-      //  cPluginParams.HostApplication.LogMessage(String.Format("{0} : Error ocurred while reading pattern file : {1}", Config.PluginName, lEx.Message));          
-      //}
-      //finally
-      //{
-      //  if (lFS != null)
-      //    lFS.Close();
-      //}
+      cSessionPatterns = cTask.readSessionPatterns();
 
       /*
        * Clear and repopulate ImageList

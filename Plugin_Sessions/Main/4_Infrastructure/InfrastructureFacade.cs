@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
+using Plugin.Main.Session.ManageSessions.Config;
 using Simsang.Plugin;
 
 
@@ -20,6 +21,8 @@ namespace Plugin.Main.Session
 
     private static InfrastructureFacade cInstance;
     private IPlugin cPlugin;
+    private String cPatternFilePath = @"plugins\Sessions\Plugin_Session_Patterns.xml";
+
 
     #endregion
 
@@ -42,6 +45,33 @@ namespace Plugin.Main.Session
         cInstance = new InfrastructureFacade(pPlugin);
 
       return (cInstance);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public List<SessionPattern> readSessionPatterns()
+    {
+      List<SessionPattern> lPatterns = new List<SessionPattern>();
+      FileStream lFS = null;
+      XmlSerializer lXMLSerial;
+
+      try
+      {
+        String lPatternFilePath = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), cPatternFilePath);
+        lFS = new FileStream(cPatternFilePath, FileMode.Open);
+        lXMLSerial = new XmlSerializer(lPatterns.GetType());
+        lPatterns = (List<SessionPattern>) lXMLSerial.Deserialize(lFS);
+      }
+      finally
+      {
+        if (lFS != null)
+          lFS.Close();
+      }
+
+      return (lPatterns);
     }
 
     #endregion

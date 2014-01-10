@@ -7,7 +7,7 @@ using System.Text;
 using Simsang.Plugin;
 using Plugin.Main.Session;
 using Plugin.Main.Session.Config;
-
+using Plugin.Main.Session.ManageSessions.Config;
 
 namespace Plugin.Main.Session
 {
@@ -42,6 +42,16 @@ namespace Plugin.Main.Session
         cInstance = new TaskFacade(pPlugin);
 
       return (cInstance);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public List<SessionPattern> readSessionPatterns()
+    {
+      return (cDomain.readSessionPatterns());
     }
 
     #endregion

@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
+using Plugin.Main.Applications.ManageApplications;
 using Simsang.Plugin;
 
 
@@ -24,11 +25,19 @@ namespace Plugin.Main.Applications
     #endregion
 
 
+    #region PROPERTIES
+
+    public String ApplicationPatterns { get; private set; }
+
+    #endregion
+
+
     #region PUBLIC
 
     private InfrastructureFacade(IPlugin pPlugin)
     {
       cPlugin = pPlugin;
+      ApplicationPatterns = @"\plugins\UsedApps\Plugin_UsedApps_Patterns.xml";
     }
 
 
@@ -42,6 +51,33 @@ namespace Plugin.Main.Applications
         cInstance = new InfrastructureFacade(pPlugin);
 
       return (cInstance);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public List<ApplicationPattern> readApplicationPatterns()
+    {
+      List<ApplicationPattern> lRetVal = null;
+      FileStream lFS = null;
+      XmlSerializer lXMLSerial;
+
+      try
+      {
+        String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), ApplicationPatterns);
+
+        lFS = new FileStream(lPatternFile, FileMode.Open);
+        lXMLSerial = new XmlSerializer(typeof(List<ApplicationPattern>));
+        lRetVal = (List<ApplicationPattern>)lXMLSerial.Deserialize(lFS);
+      }
+      finally
+      {
+        if (lFS != null)
+          lFS.Close();
+      }
+
+      return (lRetVal);
     }
 
     #endregion

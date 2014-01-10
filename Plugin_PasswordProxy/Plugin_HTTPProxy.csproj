@@ -58,7 +58,7 @@
     <Compile Include="Main\Config\IObserver.cs" />
     <Compile Include="Main\3_Domain\DomainFacade.cs" />
     <Compile Include="Main\4_Infrastructure\InfrastructureFacade.cs" />
-    <Compile Include="Main\1_Presentation\ManageAuthentications\AccountPattern.cs" />
+    <Compile Include="Main\1_Presentation\ManageAuthentications\Config\AccountPattern.cs" />
     <Compile Include="Main\Config\Accounts.cs" />
     <Compile Include="Main\1_Presentation\ManageAuthentications\Config\GeneralMethods.cs" />
     <Compile Include="Main\1_Presentation\ManageAuthentications\1_Presentation\ManageAuthentications.cs">

@@ -61,9 +61,10 @@ namespace Plugin.Main.Session.ManageSessions
 
       try
       {
-        lFS = new FileStream(SessionPatternsFile, FileMode.Open);
+        String lPatternFilePath = String.Format(@"{0}{1}", Directory.GetCurrentDirectory(), SessionPatternsFile);
+        lFS = new FileStream(lPatternFilePath, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(List<SessionPattern>));
-        lSessionPatterns = (List<SessionPattern>)lXMLSerial.Deserialize(lFS);
+        lSessionPatterns = (List<SessionPattern>) lXMLSerial.Deserialize(lFS);
       }
       finally
       {

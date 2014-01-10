@@ -61,9 +61,14 @@ namespace Plugin.Main.IPAccounting.ManageServices
 
         try
         {
+          String lServicesFilePath = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), ServicesFile);
           lSerializer = new XmlSerializer(typeof(List<ServiceRecord>));
-          lFS = new FileStream(ServicesFile, FileMode.Create);
+          lFS = new FileStream(lServicesFilePath, FileMode.Create);
           lSerializer.Serialize(lFS, pRecords);
+        }
+        catch (Exception lEx)
+        {
+          String lErr = lEx.Message;
         }
         finally
         {
@@ -85,9 +90,14 @@ namespace Plugin.Main.IPAccounting.ManageServices
 
       try
       {
-        lFS = new FileStream(ServicesFile, FileMode.Open);
+        String lServicesFilePath = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), ServicesFile);
+        lFS = new FileStream(lServicesFilePath, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(List<ServiceRecord>));
         lRetVal = (List<ServiceRecord>)lXMLSerial.Deserialize(lFS);
+      }
+      catch (Exception lEx)
+      {
+        String lErr = lEx.Message;
       }
       finally
       {

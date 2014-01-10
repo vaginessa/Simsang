@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using Plugin.Main.Session.ManageSessions.Config;
 using Simsang.Plugin;
 
 
@@ -55,6 +56,16 @@ namespace Plugin.Main.Session
       return (cInstance);
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public List<SessionPattern> readSessionPatterns()
+    {
+      return (cInfrastructure.readSessionPatterns());
+    }
+
     #endregion
 
 
@@ -85,7 +96,7 @@ namespace Plugin.Main.Session
             throw new Exception("Session alrady exists.");
 
         // Check if URL is correct
-        if (!Regex.Match(pRecord.URL, @"[\w\d\-_\.]+/.+").Success)
+        if (!Regex.Match(pRecord.URL, @"[\w\d\-_\.:/]+/.+").Success)
           throw new Exception("Something is wrong with the URL.");
 
         // Check if destination port is correct

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 
 using Simsang.Plugin;
 using Plugin.Main.Applications.Config;
+using ManageApps = Plugin.Main.Applications.ManageApplications;
 
 
 namespace Plugin.Main.Applications
@@ -55,6 +56,14 @@ namespace Plugin.Main.Applications
         cInstance = new DomainFacade(pPlugin);
 
       return (cInstance);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public List<ManageApps.ApplicationPattern> readApplicationPatterns()
+    {
+      return (cInfrastructure.readApplicationPatterns());
     }
 
     #endregion

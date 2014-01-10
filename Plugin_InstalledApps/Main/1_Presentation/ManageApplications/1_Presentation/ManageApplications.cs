@@ -22,7 +22,7 @@ namespace Plugin.Main.Applications.ManageApplications
     #region MEMBERS
 
     private BindingList<ApplicationPattern> cApplicationPatterns;
-    private IPluginHost cHost;
+    private PluginUsedAppsUC cPluginMain;
     private TaskFacade cTask;
 
     #endregion
@@ -34,11 +34,12 @@ namespace Plugin.Main.Applications.ManageApplications
     /// 
     /// </summary>
     /// <param name="pHost"></param>
-    public Form_ManageApps(IPluginHost pHost)
+    public Form_ManageApps(PluginUsedAppsUC pPluginMain)
     {
       InitializeComponent();
 
-      cHost = pHost;
+      //cHost = pHost;
+      cPluginMain = pPluginMain;
 
       #region Datagrid header
 
@@ -83,13 +84,16 @@ namespace Plugin.Main.Applications.ManageApplications
       {
         cTask.readApplicationPatterns();
       }
-      catch (FileNotFoundException)
+      catch (FileNotFoundException lEx)
       {
+        cPluginMain.PluginHost.LogMessage(String.Format("Form_ManageApps() : {0}", lEx.Message));
+        return;
       }
       catch (Exception lEx)
       {
         MessageBox.Show(lEx.StackTrace, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        cHost.LogMessage(String.Format("Form_ManageApps() : {0}", lEx.Message));
+        cPluginMain.PluginHost.LogMessage(String.Format("Form_ManageApps() : {0}", lEx.Message));
+        return;
       }
     }
 
@@ -97,7 +101,6 @@ namespace Plugin.Main.Applications.ManageApplications
 
 
     #region PRIVATE
-
 
     /// <summary>
     /// 
@@ -117,7 +120,7 @@ namespace Plugin.Main.Applications.ManageApplications
       catch (Exception lEx)
       {
         MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        cHost.LogMessage(String.Format("Form_ManageApps() : {0}", lEx.Message));
+        cPluginMain.PluginHost.LogMessage(String.Format("Form_ManageApps() : {0}", lEx.Message));
       }
     }
 

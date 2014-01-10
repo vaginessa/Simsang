@@ -61,7 +61,6 @@ namespace Plugin.Main.Systems.ManageSystems
         {
           String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), SystemPatternFile);
 
-//          lFS = new FileStream(lPatternFile, FileMode.Open);
           lSerializer = new XmlSerializer(pSystemPatterns.GetType());
           lFS = new FileStream(lPatternFile, FileMode.Create);
           lSerializer.Serialize(lFS, pSystemPatterns);

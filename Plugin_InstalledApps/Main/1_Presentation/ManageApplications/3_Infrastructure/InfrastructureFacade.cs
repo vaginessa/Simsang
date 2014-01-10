@@ -59,7 +59,9 @@ namespace Plugin.Main.Applications.ManageApplications
 
       try
       {
-        lFS = new FileStream(ApplicationPatterns, FileMode.Open);
+        String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), ApplicationPatterns);
+
+        lFS = new FileStream(lPatternFile, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(List<ApplicationPattern>));
         lRetVal = (List<ApplicationPattern>)lXMLSerial.Deserialize(lFS);
       }
@@ -81,11 +83,12 @@ namespace Plugin.Main.Applications.ManageApplications
       {
         XmlSerializer lSerializer;
         FileStream lFS = null;
+        String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), ApplicationPatterns);
 
         try
         {
           lSerializer = new XmlSerializer(typeof(List<ApplicationPattern>));
-          lFS = new FileStream(ApplicationPatterns, FileMode.Create);
+          lFS = new FileStream(lPatternFile, FileMode.Create);
           lSerializer.Serialize(lFS, pRecords);
         }
         finally
