@@ -154,6 +154,7 @@ namespace Plugin.Main
       T_GUIUpdate.Start();
 
       cTask = TaskFacade.getInstance(this);
+      DomainFacade.getInstance(this).addObserver(this);
     }
 
     #endregion

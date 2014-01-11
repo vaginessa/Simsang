@@ -664,6 +664,9 @@ namespace Plugin.Main
       int lLastRowIndex = -1;
       bool lIsLastLine = false;
 
+
+      cDNSRequests.Clear();
+
       if (pDNSReqList != null && pDNSReqList.Count > 0)
       {
         if (DGV_DNSRequests.CurrentRow != null && DGV_DNSRequests.CurrentRow == DGV_DNSRequests.Rows[DGV_DNSRequests.Rows.Count - 1])
@@ -671,8 +674,6 @@ namespace Plugin.Main
 
         lLastPosition = DGV_DNSRequests.FirstDisplayedScrollingRowIndex;
         lLastRowIndex = DGV_DNSRequests.Rows.Count - 1;
-
-        cDNSRequests.Clear();
 
         foreach (DNSRequestRecord lTmp in pDNSReqList)
         {
