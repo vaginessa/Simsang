@@ -286,6 +286,7 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
       setGUIActive();
+      cTask.onStop();
       cPluginParams.HostApplication.PluginSetStatus(this, "grey");
     }
 

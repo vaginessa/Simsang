@@ -76,6 +76,7 @@
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DGV_Sessions.RowsDefaultCellStyle = dataGridViewCellStyle2;
       this.DGV_Sessions.RowTemplate.DefaultCellStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DGV_Sessions.RowTemplate.Height = 20;
       this.DGV_Sessions.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.DGV_Sessions.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
       this.DGV_Sessions.Size = new System.Drawing.Size(502, 206);
