@@ -28,7 +28,6 @@ namespace Plugin.Main
     private BindingList<InjectedURLRecord> cInjectedURLs;
     private TaskFacade cTask;
     private InjectionConfig cConfigParams;
-    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -103,9 +102,9 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
-      cPluginParams = pPluginParams;
-      String lBaseDir = String.Format(@"{0}\", (cPluginParams != null) ? cPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
-      String lSessionDir = (cPluginParams != null) ? cPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
+      PluginParameters = pPluginParams;
+      String lBaseDir = String.Format(@"{0}\", (PluginParameters != null) ? PluginParameters.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
+      String lSessionDir = (PluginParameters != null) ? PluginParameters.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
       Config = new PluginProperties()
       {
@@ -124,10 +123,10 @@ namespace Plugin.Main
        */
       cConfigParams = new InjectionConfig
       {
-        isDebuggingOn = (cPluginParams != null) ? cPluginParams.HostApplication.IsDebuggingOn() : false,
+        isDebuggingOn = (PluginParameters != null) ? PluginParameters.HostApplication.IsDebuggingOn() : false,
         BasisDirectory = Config.BaseDir,
         onWebServerExit = onMicroWebExited,
-        InjectionRulesPath = (cPluginParams != null) ? cPluginParams.HostApplication.GetAPEInjectionRulesFile() : String.Empty
+        InjectionRulesPath = (PluginParameters != null) ? PluginParameters.HostApplication.GetAPEInjectionRulesFile() : String.Empty
       };
 
       cTask = TaskFacade.getInstance(cConfigParams, this);
@@ -152,7 +151,7 @@ namespace Plugin.Main
       }
 
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "red");
+      PluginParameters.HostApplication.PluginSetStatus(this, "red");
     }
 
 
@@ -200,6 +199,7 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
+    public PluginParameters PluginParameters { get; private set; }
 
     #endregion
 
@@ -225,9 +225,9 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
       cTask.onInit();
-      cPluginParams.HostApplication.Register(this);
+      PluginParameters.HostApplication.Register(this);
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -252,19 +252,19 @@ namespace Plugin.Main
         {
           setGUIInactive();
           cTask.onStart();
-          cPluginParams.HostApplication.PluginSetStatus(this, "green");
+          PluginParameters.HostApplication.PluginSetStatus(this, "green");
         }
         catch (InjWarningException lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
-          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.PluginSetStatus(this, "grey");
           cTask.onStop();
         }
         catch (Exception lEx)
         {
           setGUIActive();
-          cPluginParams.HostApplication.PluginSetStatus(this, "red");
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.PluginSetStatus(this, "red");
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
           cTask.onStop();
         }
 
@@ -287,7 +287,7 @@ namespace Plugin.Main
 
       setGUIActive();
       cTask.onStop();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -335,7 +335,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       return (lRetVal);
@@ -378,7 +378,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       try
@@ -387,7 +387,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -411,7 +411,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -434,7 +434,7 @@ namespace Plugin.Main
 
       cTask.emptyInjectionList();
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -457,7 +457,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -484,7 +484,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
 
       } // if (cIsActiv...
@@ -551,7 +551,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
 
 
@@ -566,7 +566,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
           TB_ReplacementURL.Text = String.Empty;
         }
       }
@@ -623,7 +623,7 @@ namespace Plugin.Main
       try
       {
         if (RB_Inject.Checked)
-          cTask.addRecord(lType, lRequestedHost, lRequestedURL, cPluginParams.HostApplication.GetCurrentIP().ToString(), Path.GetFileName(lReplacementURL), lReplacementURL);
+          cTask.addRecord(lType, lRequestedHost, lRequestedURL, PluginParameters.HostApplication.GetCurrentIP().ToString(), Path.GetFileName(lReplacementURL), lReplacementURL);
         else
           cTask.addRecord(lType, lRequestedHost, lRequestedURL, lReplacementHost, lReplacementURL, String.Empty);
 
@@ -634,7 +634,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
     }
@@ -703,7 +703,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         return;
       }
     }

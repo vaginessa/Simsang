@@ -31,7 +31,6 @@ namespace Plugin.Main
     private const int cMaxTableRows = 128;
     private List<String> cDataBatch;
     private TaskFacade cTask;
-    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -132,7 +131,7 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
-      cPluginParams = pPluginParams;
+      PluginParameters = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -235,7 +234,7 @@ namespace Plugin.Main
                   }
                   catch (Exception lEx)
                   {
-                    cPluginParams.HostApplication.LogMessage(lEx.StackTrace);
+                    PluginParameters.HostApplication.LogMessage(lEx.StackTrace);
                   }
 
                   //UseFilter();
@@ -324,13 +323,13 @@ namespace Plugin.Main
             }
             catch (Exception lEx)
             {
-              cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+              PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
             }
           }
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         }
       }
 
@@ -343,6 +342,7 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
+    public PluginParameters PluginParameters { get; private set; }
 
     #endregion
 
@@ -366,8 +366,8 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cPluginParams.HostApplication.Register(this);
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.Register(this);
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -386,7 +386,7 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-        cPluginParams.HostApplication.PluginSetStatus(this, "green");
+        PluginParameters.HostApplication.PluginSetStatus(this, "green");
       } // if (cIsActi...
     }
 
@@ -404,7 +404,7 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -485,7 +485,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -505,7 +505,7 @@ namespace Plugin.Main
 
       TB_Filter.Text = String.Empty;
       cTask.emptyRequestList();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -529,7 +529,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       try
@@ -538,7 +538,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -562,7 +562,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -589,7 +589,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActiv...
     }
@@ -668,7 +668,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         }
 
       }
@@ -723,7 +723,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
     }
 
@@ -757,7 +757,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
     }
 
@@ -782,7 +782,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         DGV_HTTPRequests.ClearSelection();
       }
     }
@@ -810,12 +810,12 @@ namespace Plugin.Main
       }
       catch (ArgumentOutOfRangeException lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         return;
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
       }
 
 
@@ -826,7 +826,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         MessageBox.Show("MiniBrowser unexpectedly crashed : " + lEx.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
     }

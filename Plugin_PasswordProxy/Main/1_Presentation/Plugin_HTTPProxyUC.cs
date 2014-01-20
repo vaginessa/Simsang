@@ -60,7 +60,6 @@ namespace Plugin.Main
     private BindingList<Account> cAccounts;
     public List<ManageAuthentications.AccountPattern> cAccountPatterns;
     private TaskFacade cTask;
-    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -138,7 +137,7 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
-      cPluginParams = pPluginParams;
+      PluginParameters = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -170,6 +169,7 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
+    public PluginParameters PluginParameters { get; private set; }
 
     #endregion
 
@@ -194,9 +194,9 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cPluginParams.HostApplication.Register(this);
+      PluginParameters.HostApplication.Register(this);
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
 
       WebServerConfig lWebServerConfig = new WebServerConfig();
       lWebServerConfig.BasisDirectory = Config.BaseDir;
@@ -225,7 +225,7 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-        cPluginParams.HostApplication.PluginSetStatus(this, "green");
+        PluginParameters.HostApplication.PluginSetStatus(this, "green");
         setGUIInactive();
 
 
@@ -235,7 +235,7 @@ namespace Plugin.Main
           WebServerConfig pConfig = new WebServerConfig
           {
             BasisDirectory = Config.BaseDir,
-            isDebuggingOn = cPluginParams.HostApplication.IsDebuggingOn(),
+            isDebuggingOn = PluginParameters.HostApplication.IsDebuggingOn(),
             isRedirect = CB_RedirectTo.Checked,
             RedirectToURL = TB_RedirectURL.Text,
             RemoteHostName = TB_RemoteHost.Text,
@@ -251,17 +251,17 @@ namespace Plugin.Main
           {
             String lLogMsg = String.Format("{0}: {1}", Config.PluginName, lEx.Message);
             setGUIActive();
-            cPluginParams.HostApplication.LogMessage(lLogMsg);
-            cPluginParams.HostApplication.PluginSetStatus(this, "red");
+            PluginParameters.HostApplication.LogMessage(lLogMsg);
+            PluginParameters.HostApplication.PluginSetStatus(this, "red");
 
-            cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+            PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
             cTask.onStop();
           }
         }
         else
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: No forwarding host/URL defined. Stopping the pluggin.", Config.PluginName));
-          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: No forwarding host/URL defined. Stopping the pluggin.", Config.PluginName));
+          PluginParameters.HostApplication.PluginSetStatus(this, "grey");
           cTask.onStop();
         }  // if (lRemoteHost ...
 
@@ -284,7 +284,7 @@ namespace Plugin.Main
 
       setGUIActive();
       cTask.onStop();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -334,7 +334,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       return (lRetVal);
@@ -378,7 +378,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       try
@@ -387,7 +387,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -424,7 +424,7 @@ namespace Plugin.Main
       cTask.clearRecordList();
       TB_RemoteHost.Text = String.Empty;
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -449,7 +449,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -481,7 +481,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActiv...
     }
@@ -531,7 +531,7 @@ namespace Plugin.Main
               }
               catch (Exception lEx)
               {
-                cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+                PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
                 return;
               }
 
@@ -546,7 +546,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.LogMessage(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActiv...
     }
@@ -629,8 +629,8 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cPluginParams.HostApplication.PluginSetStatus(this, "red");
-      cPluginParams.HostApplication.LogMessage(String.Format("{0}: Stopped for unknown reason", Config.PluginName));
+      PluginParameters.HostApplication.PluginSetStatus(this, "red");
+      PluginParameters.HostApplication.LogMessage(String.Format("{0}: Stopped for unknown reason", Config.PluginName));
       setGUIActive();
     }
 
@@ -773,7 +773,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       } // if (e.Button ...
     }
@@ -813,7 +813,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -826,7 +826,7 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void DGV_Accounts_DoubleClick(object sender, EventArgs e)
     {
-      ManageAuthentications.Form_ManageAuthentications lManageSystems = new ManageAuthentications.Form_ManageAuthentications(cPluginParams.HostApplication);
+      ManageAuthentications.Form_ManageAuthentications lManageSystems = new ManageAuthentications.Form_ManageAuthentications(PluginParameters.HostApplication);
       lManageSystems.ShowDialog();
       cAccountPatterns = cTask.readAuthenticationPatterns();
     }

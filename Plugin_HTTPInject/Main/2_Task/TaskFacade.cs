@@ -37,10 +37,10 @@ namespace Plugin.Main.HTTPInject
     /// </summary>
     /// <param name="pFWConfig"></param>
     /// <returns></returns>
-    public static TaskFacade getInstance(InjectionConfig pFWConfig, IPlugin pPlugin)
+    public static TaskFacade getInstance(InjectionConfig pProxyConfig, IPlugin pPlugin)
     {
       if (cInstance == null)
-        cInstance = new TaskFacade(pFWConfig, pPlugin);
+        cInstance = new TaskFacade(pProxyConfig, pPlugin);
 
       return (cInstance);
     }
@@ -106,7 +106,6 @@ namespace Plugin.Main.HTTPInject
       cDomain.removeRecordAt(pRequestedHost, pRequestedURL);
     }
 
-
     #endregion
 
 
@@ -166,7 +165,6 @@ namespace Plugin.Main.HTTPInject
 
 
     #region EVENTS
-
 
     /// <summary>
     /// 

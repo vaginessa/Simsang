@@ -89,10 +89,16 @@ namespace Plugin.Main.Session.ManageSessions
         try
         {
           String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), SessionPatternsFile);
+          String lPath = Path.GetDirectoryName(lPatternFile);
+          Directory.CreateDirectory(lPath);
 
           lSerializer = new XmlSerializer(pRecords.GetType());
           lFS = new FileStream(lPatternFile, FileMode.Create);
           lSerializer.Serialize(lFS, pRecords);
+        }
+        catch (Exception lEx)
+        {
+          String lMsg = lEx.Message;
         }
         finally
         {

@@ -33,7 +33,7 @@ namespace Plugin.Main.Systems.ManageSystems
     /// </summary>
     private InfrastructureFacade()
     {
-      SystemPatternFile = @"\plugins\Systems\Plugin_SystemsOS_Patterns.xml";
+      SystemPatternFile = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), @"\plugins\Systems\Plugin_SystemsOS_Patterns.xml");
     }
 
 
@@ -59,10 +59,12 @@ namespace Plugin.Main.Systems.ManageSystems
 
         try
         {
-          String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), SystemPatternFile);
+          String lPath = Path.GetDirectoryName(SystemPatternFile);
+          if (!Directory.Exists(lPath))
+            Directory.CreateDirectory(lPath);
 
           lSerializer = new XmlSerializer(pSystemPatterns.GetType());
-          lFS = new FileStream(lPatternFile, FileMode.Create);
+          lFS = new FileStream(SystemPatternFile, FileMode.Create);
           lSerializer.Serialize(lFS, pSystemPatterns);
         }
         catch (Exception lEx)
@@ -89,9 +91,7 @@ namespace Plugin.Main.Systems.ManageSystems
 
       try
       {
-        String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), SystemPatternFile);
-
-        lFS = new FileStream(lPatternFile, FileMode.Open);
+        lFS = new FileStream(SystemPatternFile, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(List<SystemPattern>));
         lSystemPatterns = (List<SystemPattern>)lXMLSerial.Deserialize(lFS);
       }

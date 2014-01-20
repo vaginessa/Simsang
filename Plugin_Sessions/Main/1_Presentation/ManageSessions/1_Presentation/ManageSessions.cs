@@ -98,6 +98,10 @@ namespace Plugin.Main.Session.ManageSessions
       {
         cPluginMain.PluginHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
       }
+      catch (DirectoryNotFoundException lEx)
+      {
+        cPluginMain.PluginHost.LogMessage(String.Format("ManageSessions() : {0}", lEx.Message));
+      }
       catch (Exception lEx)
       {
         MessageBox.Show("Error ocurred: " + lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);

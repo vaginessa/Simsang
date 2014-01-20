@@ -34,7 +34,7 @@ namespace Plugin.Main.HTTPProxy.ManageAuthentications
     /// </summary>
     private InfrastructureFacade()
     {
-      PatternFile = @"plugins\HTTPProxy\Plugin_AccountsHTMLAuth_Patterns.xml";
+      PatternFile = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), @"plugins\HTTPProxy\Plugin_AccountsHTMLAuth_Patterns.xml");
     }
 
 
@@ -60,9 +60,19 @@ namespace Plugin.Main.HTTPProxy.ManageAuthentications
 
         try
         {
+          String lPath = Path.GetDirectoryName(PatternFile);
+          if (!Directory.Exists(lPath))
+            Directory.CreateDirectory(lPath);
+
+          Directory.CreateDirectory(Path.GetDirectoryName(PatternFile));
+
           lSerializer = new XmlSerializer(typeof(List<AccountPattern>));
           lFS = new FileStream(PatternFile, FileMode.Create);
           lSerializer.Serialize(lFS, pRecords);
+        }
+        catch (Exception lEx)
+        {
+          String lMsg = lEx.Message;
         }
         finally
         {
@@ -85,9 +95,9 @@ namespace Plugin.Main.HTTPProxy.ManageAuthentications
 
       try
       {
-        String lPatternFile = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), PatternFile);
+//        String lPatternFile = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), PatternFile);
 
-        lFS = new FileStream(lPatternFile, FileMode.Open);
+        lFS = new FileStream(PatternFile, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(List<AccountPattern>));
         lAccountPatternRecords = (List<AccountPattern>)lXMLSerial.Deserialize(lFS);
       }

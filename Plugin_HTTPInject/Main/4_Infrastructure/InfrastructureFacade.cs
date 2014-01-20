@@ -35,8 +35,15 @@ namespace Plugin.Main.HTTPInject
     private String cMicroWebProcName = "MicroWeb";
     private String cMicroWebPath;
     private Process cMicroWebProc;
-    private InjectionConfig cProxyConfig;
+//    private InjectionConfig cProxyConfig;
     private IPlugin cPlugin;
+
+    #endregion
+
+
+    #region PROPERTIES
+
+    public InjectionConfig InjectionConfig { get; set; }
 
     #endregion
 
@@ -45,10 +52,10 @@ namespace Plugin.Main.HTTPInject
 
     private InfrastructureFacade(InjectionConfig pProxyConfig, IPlugin pPlugin)
     {
-      cProxyConfig = pProxyConfig;
+      InjectionConfig = pProxyConfig;
       cPlugin = pPlugin;
 
-      cMicroWebPath = String.Format(@"{0}{1}", cProxyConfig.BasisDirectory, cMicroWebBin);
+      cMicroWebPath = String.Format(@"{0}{1}", InjectionConfig.BasisDirectory, cMicroWebBin);
     }
 
 
@@ -199,16 +206,16 @@ namespace Plugin.Main.HTTPInject
       String lInjectionRules = String.Empty;
       var lProcStartInfo = new ProcessStartInfo();
       cMicroWebProc = new Process();
+      String lMicroWebFullPath = String.Format(@"{0}\{1}", InjectionConfig.BasisDirectory, cMicroWebBin);
 
-
-      if (File.Exists(cMicroWebPath))
+      if (File.Exists(lMicroWebFullPath))
       {
-        lProcStartInfo.WorkingDirectory = cProxyConfig.BasisDirectory;
+        lProcStartInfo.WorkingDirectory = InjectionConfig.BasisDirectory;
         cMicroWebProc.StartInfo = lProcStartInfo;
-        cMicroWebProc.StartInfo.FileName = cMicroWebPath;
+        cMicroWebProc.StartInfo.FileName = lMicroWebFullPath;
         //cMicroWebProc.StartInfo.Arguments = String.Format("-i {0} {1} -x -f", cHost.GetInterface(), cAccountingBasis);
         cMicroWebProc.StartInfo.UseShellExecute = false;
-        cMicroWebProc.StartInfo.CreateNoWindow = cProxyConfig.isDebuggingOn ? false : true;
+        cMicroWebProc.StartInfo.CreateNoWindow = InjectionConfig.isDebuggingOn ? false : true;
         cMicroWebProc.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
         cMicroWebProc.Exited += new EventHandler(onMicroWebExited);
 
@@ -218,7 +225,7 @@ namespace Plugin.Main.HTTPInject
 
           try
           {
-            if (!cProxyConfig.isDebuggingOn)
+            if (!InjectionConfig.isDebuggingOn)
               ShowWindow(cMicroWebProc.MainWindowHandle, 0);
           }
           catch (Exception)
@@ -226,17 +233,17 @@ namespace Plugin.Main.HTTPInject
         }
         catch (Exception lEx)
         {
-          cProxyConfig.onWebServerExit();
+          InjectionConfig.onWebServerExit();
         }
 
 
         if (pURLList != null && pURLList.Count > 0)
         {
           // Write APE HTTPInjection rules file
-          if (!String.IsNullOrEmpty(cProxyConfig.InjectionRulesPath))
+          if (!String.IsNullOrEmpty(InjectionConfig.InjectionRulesPath))
           {
-            if (File.Exists(cProxyConfig.InjectionRulesPath))
-              File.Delete(cProxyConfig.InjectionRulesPath);
+            if (File.Exists(InjectionConfig.InjectionRulesPath))
+              File.Delete(InjectionConfig.InjectionRulesPath);
 
 
             /*
@@ -250,7 +257,7 @@ namespace Plugin.Main.HTTPInject
               if (lTmp.Type.ToLower().Contains("inject"))
               {
                 String lFileName = Path.GetFileName(lTmp.InjectedFileFullPath);
-                String lDstFile = String.Format("{0}{1}", cProxyConfig.BasisDirectory, lFileName);
+                String lDstFile = String.Format("{0}{1}", InjectionConfig.BasisDirectory, lFileName);
 
                 lInjectionRules += String.Format("{0},{1},{2}/{3}\r\n", lTmp.RequestedHost, lTmp.RequestedURL, lTmp.InjectedHost, lTmp.InjectedURL);
 
@@ -295,7 +302,7 @@ namespace Plugin.Main.HTTPInject
            */
           if (pURLList != null && pURLList.Count > 0)
           {
-            using (StreamWriter outfile = new StreamWriter(cProxyConfig.InjectionRulesPath))
+            using (StreamWriter outfile = new StreamWriter(InjectionConfig.InjectionRulesPath))
             {
               outfile.Write(lInjectionRules);
             } // using (Strea...
@@ -366,8 +373,8 @@ namespace Plugin.Main.HTTPInject
     {
       killAllInstances();
 
-      if (cProxyConfig.onWebServerExit != null)
-        cProxyConfig.onWebServerExit();
+      if (InjectionConfig.onWebServerExit != null)
+        InjectionConfig.onWebServerExit();
     }
 
     #endregion

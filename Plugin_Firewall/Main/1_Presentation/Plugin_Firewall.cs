@@ -27,7 +27,6 @@ namespace Plugin.Main
     private BindingList<FWRule> cFWRules;
     private TaskFacade cTask;
     private DomainFacade cDomain;
-    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -123,7 +122,7 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
-      cPluginParams = pPluginParams;
+      PluginParameters = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -157,6 +156,7 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
+    public PluginParameters PluginParameters { get; private set; }
 
     #endregion
 
@@ -180,9 +180,9 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cPluginParams.HostApplication.Register(this);
+      PluginParameters.HostApplication.Register(this);
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -203,16 +203,16 @@ namespace Plugin.Main
 
         try
         {
-          String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
+          String lFWRulesPath = PluginParameters.HostApplication.GetAPEFWRulesFile();
           cTask.onStart(lFWRulesPath);
 
           setGUIInactive();
-          cPluginParams.HostApplication.PluginSetStatus(this, "green");
+          PluginParameters.HostApplication.PluginSetStatus(this, "green");
         }
         catch (ExceptionWarning lEx)
         {
-          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.PluginSetStatus(this, "grey");
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
 
       } // if (cIsActiv...
@@ -233,10 +233,10 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
 
       // Delete firewall rules file
-      String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
+      String lFWRulesPath = PluginParameters.HostApplication.GetAPEFWRulesFile();
       cTask.onStop(lFWRulesPath);
     }
 
@@ -282,7 +282,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       return (lRetVal);
@@ -296,7 +296,7 @@ namespace Plugin.Main
     /// </summary>
     public void onShutDown()
     {
-      String lFWRulesPath = cPluginParams.HostApplication.GetAPEFWRulesFile();
+      String lFWRulesPath = PluginParameters.HostApplication.GetAPEFWRulesFile();
       cTask.onStop(lFWRulesPath);
     }
 
@@ -323,7 +323,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -351,7 +351,7 @@ namespace Plugin.Main
 
       cTask.emptyRuleList();
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -375,7 +375,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       try
@@ -384,7 +384,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -409,7 +409,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
@@ -436,7 +436,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
       } // if (cIsActiv...
     }
@@ -508,7 +508,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
         MessageBox.Show(String.Format(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning));
       }
     }
@@ -545,7 +545,7 @@ namespace Plugin.Main
         }
         catch (Exception lEx)
         {
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));     
           MessageBox.Show(String.Format("Error occurred : {0}", lEx.Message), "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
           return;
         }

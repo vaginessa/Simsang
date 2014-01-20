@@ -33,7 +33,7 @@ namespace Plugin.Main.Applications.ManageApplications
     /// </summary>
     private InfrastructureFacade()
     {
-      ApplicationPatterns = @"\plugins\UsedApps\Plugin_UsedApps_Patterns.xml";
+      ApplicationPatterns = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), @"\plugins\UsedApps\Plugin_UsedApps_Patterns.xml");
     }
 
 
@@ -59,9 +59,8 @@ namespace Plugin.Main.Applications.ManageApplications
 
       try
       {
-        String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), ApplicationPatterns);
 
-        lFS = new FileStream(lPatternFile, FileMode.Open);
+        lFS = new FileStream(ApplicationPatterns, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(List<ApplicationPattern>));
         lRetVal = (List<ApplicationPattern>)lXMLSerial.Deserialize(lFS);
       }
@@ -83,12 +82,15 @@ namespace Plugin.Main.Applications.ManageApplications
       {
         XmlSerializer lSerializer;
         FileStream lFS = null;
-        String lPatternFile = String.Format("{0}{1}", Directory.GetCurrentDirectory(), ApplicationPatterns);
 
         try
         {
+          String lPath = Path.GetDirectoryName(ApplicationPatterns);
+          if (!Directory.Exists(lPath))
+            Directory.CreateDirectory(lPath);
+
           lSerializer = new XmlSerializer(typeof(List<ApplicationPattern>));
-          lFS = new FileStream(lPatternFile, FileMode.Create);
+          lFS = new FileStream(ApplicationPatterns, FileMode.Create);
           lSerializer.Serialize(lFS, pRecords);
         }
         finally

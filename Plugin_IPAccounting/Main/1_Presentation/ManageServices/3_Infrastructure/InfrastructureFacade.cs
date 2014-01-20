@@ -34,7 +34,7 @@ namespace Plugin.Main.IPAccounting.ManageServices
     /// </summary>
     private InfrastructureFacade()
     {
-      ServicesFile = @"\plugins\IPAccounting\Service_Definitions.xml";
+      ServicesFile = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), @"\plugins\IPAccounting\Service_Definitions.xml");
     }
 
 
@@ -61,9 +61,12 @@ namespace Plugin.Main.IPAccounting.ManageServices
 
         try
         {
-          String lServicesFilePath = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), ServicesFile);
+          String lPath = Path.GetDirectoryName(ServicesFile);
+          if (!Directory.Exists(lPath))
+            Directory.CreateDirectory(lPath);
+
           lSerializer = new XmlSerializer(typeof(List<ServiceRecord>));
-          lFS = new FileStream(lServicesFilePath, FileMode.Create);
+          lFS = new FileStream(ServicesFile, FileMode.Create);
           lSerializer.Serialize(lFS, pRecords);
         }
         catch (Exception lEx)
@@ -90,8 +93,8 @@ namespace Plugin.Main.IPAccounting.ManageServices
 
       try
       {
-        String lServicesFilePath = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), ServicesFile);
-        lFS = new FileStream(lServicesFilePath, FileMode.Open);
+//        String lServicesFilePath = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), ServicesFile);
+        lFS = new FileStream(ServicesFile, FileMode.Open);
         lXMLSerial = new XmlSerializer(typeof(List<ServiceRecord>));
         lRetVal = (List<ServiceRecord>)lXMLSerial.Deserialize(lFS);
       }

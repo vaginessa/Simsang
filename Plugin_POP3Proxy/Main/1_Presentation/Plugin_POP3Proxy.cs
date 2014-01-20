@@ -33,7 +33,6 @@ namespace Plugin.Main
     private List<String> cTargetList;
     private BindingList<POP3Account> cAccounts;
     private TaskFacade cTask;
-    private PluginParameters cPluginParams;
 
     #endregion
 
@@ -123,7 +122,7 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
-      cPluginParams = pPluginParams;
+      PluginParameters = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
 
@@ -146,7 +145,7 @@ namespace Plugin.Main
                   {
                     BasisDirectory = Config.BaseDir,
                     //RemoteHostName = String.Empty,
-                    isDebuggingOn = (cPluginParams.HostApplication != null) ? cPluginParams.HostApplication.IsDebuggingOn() : false,
+                    isDebuggingOn = (PluginParameters.HostApplication != null) ? PluginParameters.HostApplication.IsDebuggingOn() : false,
                     onProxyExit = onPOP3ProxyExited
                   };
       cTask = TaskFacade.getInstance(lConfig, this);
@@ -206,10 +205,10 @@ namespace Plugin.Main
         return;
       } // if (InvokeRequired)
 
-      cPluginParams.HostApplication.LogMessage(String.Format("{0}: Stopped for unknown reason", Config.PluginName));
+      PluginParameters.HostApplication.LogMessage(String.Format("{0}: Stopped for unknown reason", Config.PluginName));
       setGUIActive();
       cTask.onStop();
-      cPluginParams.HostApplication.PluginSetStatus(this, "red");
+      PluginParameters.HostApplication.PluginSetStatus(this, "red");
     }
 
     #endregion
@@ -218,6 +217,7 @@ namespace Plugin.Main
     #region PROPERTIES
 
     public Control PluginControl { get { return (this); } }
+    public PluginParameters PluginParameters { get; private set; }
 
     #endregion
 
@@ -243,10 +243,10 @@ namespace Plugin.Main
       } // if (InvokeRequired)
 
 
-      cPluginParams.HostApplication.Register(this);
+      PluginParameters.HostApplication.Register(this);
       cTask.onInit();
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -271,13 +271,13 @@ namespace Plugin.Main
           ProxyConfig lConfig = new ProxyConfig()
           {
             BasisDirectory = Directory.GetCurrentDirectory(),
-            isDebuggingOn = cPluginParams.HostApplication.IsDebuggingOn(),
+            isDebuggingOn = PluginParameters.HostApplication.IsDebuggingOn(),
             onProxyExit = onPOP3ProxyExited,
             RemoteHostName = TB_POP3Server.Text
           };
 
           setGUIInactive();
-          cPluginParams.HostApplication.PluginSetStatus(this, "green");
+          PluginParameters.HostApplication.PluginSetStatus(this, "green");
           cTask.onStart(lConfig);
         }
         catch (ExceptionWarning lEx)
@@ -285,17 +285,17 @@ namespace Plugin.Main
           setGUIActive();
           cTask.onStop();
 
-          cPluginParams.HostApplication.PluginSetStatus(this, "grey");
-          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          PluginParameters.HostApplication.PluginSetStatus(this, "grey");
+          PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
         }
         catch (Exception lEx)
         {
           setGUIActive();
           cTask.onStop();
-          cPluginParams.HostApplication.PluginSetStatus(this, "red");
+          PluginParameters.HostApplication.PluginSetStatus(this, "red");
 
           String lMsg = String.Format("Error occurred while starting plugin \"{0}\": {1}", Config.PluginName, lEx.Message);
-          cPluginParams.HostApplication.LogMessage(lMsg);
+          PluginParameters.HostApplication.LogMessage(lMsg);
           MessageBox.Show(lMsg, "Can't start proxy server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
       } // if (cIsActi...
@@ -317,7 +317,7 @@ namespace Plugin.Main
 
       setGUIActive();
       cTask.onStop();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -465,7 +465,7 @@ namespace Plugin.Main
       cTask.onInit();
       TB_POP3Server.Text = String.Empty;
       setGUIActive();
-      cPluginParams.HostApplication.PluginSetStatus(this, "grey");
+      PluginParameters.HostApplication.PluginSetStatus(this, "grey");
     }
 
 
@@ -489,7 +489,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
 
       try
@@ -498,7 +498,7 @@ namespace Plugin.Main
       }
       catch (Exception lEx)
       {
-        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
       }
     }
 
