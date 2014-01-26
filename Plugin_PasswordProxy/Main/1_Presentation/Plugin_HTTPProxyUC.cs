@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Configuration;
+using System.Reflection;
 
 using Simsang.Plugin;
 using Plugin.Main.HTTPProxy;
@@ -21,35 +22,6 @@ using Plugin.Main.HTTPProxy.Config;
 namespace Plugin.Main
 {
 
-  #region DATATYPES
-  /// <summary>
-  /// 
-  /// </summary>
-  public struct sHTTPAccount
-  {
-    public String Username;
-    public String Password;
-    public String Company;
-    public String CompanyURL;
-  }
-
-  [Serializable]
-  public struct PluginData
-  {
-    public String RemoteHost;
-    public String RedirectURL;
-    public List<Account> Records;
-  }
-
-  public class PeerSystems
-  {
-    public String Name { get; set; }
-    public String Value { get; set; }
-  }
-
-  #endregion
-
-
   public partial class PluginHTTPProxyUC : UserControl, IPlugin, IObserver
   {
 
@@ -58,6 +30,7 @@ namespace Plugin.Main
     private List<String> cTargetList;
     private List<PeerSystems> cPeersDataSource;
     private BindingList<Account> cAccounts;
+    private List<String> cDataBatch;
     public List<ManageAuthentications.AccountPattern> cAccountPatterns;
     private TaskFacade cTask;
 
@@ -155,6 +128,11 @@ namespace Plugin.Main
         IsActive = true
       };
 
+      cDataBatch = new List<String>();
+
+      // Make it double buffered.
+      typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, DGV_Accounts, new object[] { true });
+      T_GUIUpdate.Start();
 
       WebServerConfig lWebServerConfig = new WebServerConfig();
       lWebServerConfig.BasisDirectory = Config.BaseDir;
@@ -503,51 +481,11 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-
-        try
+        lock (this)
         {
-          if (pData != null && pData.Length > 0)
-          {
-            String[] lSplitter = Regex.Split(pData, @"\|\|");
-            if (lSplitter.Length == 7)
-            {
-              String lProto = lSplitter[0];
-              String lSMAC = lSplitter[1];
-              String lSIP = lSplitter[2];
-              String lSPort = lSplitter[3];
-              String lDIP = lSplitter[4];
-              String lDPort = lSplitter[5];
-              String lData = lSplitter[6];
-
-
-              /*
-               * HTML GET authentication strings
-               */
-              sHTTPAccount lAuthData = new sHTTPAccount();
-
-              try
-              {
-                lAuthData = FindAuthString(lData);
-              }
-              catch (Exception lEx)
-              {
-                PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
-                return;
-              }
-
-              if (lAuthData.CompanyURL.Length > 0 &&
-                  lAuthData.Username.Length > 0 &&
-                  lAuthData.Password.Length > 0)
-              {
-                cTask.addRecord(new Account(lSMAC, lSIP, lAuthData.CompanyURL, lDPort, lAuthData.Username, lAuthData.Password));                
-              } // if (lAuthData.Co...
-            } // if (lSplitter...
-          } // if (pData.Lengt ...
-        }
-        catch (Exception lEx)
-        {
-          PluginParameters.HostApplication.LogMessage(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
-        }
+          if (cDataBatch != null && pData != null && pData.Length > 0)
+            cDataBatch.Add(pData);
+        } // lock (this)
       } // if (cIsActiv...
     }
 
@@ -566,6 +504,94 @@ namespace Plugin.Main
 
 
     #region PRIVATE
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void ProcessEntries()
+    {
+      if (cDataBatch != null && cDataBatch.Count > 0)
+      {
+        List<Account> lNewRecords = new List<Account>();
+        List<String> lNewData;
+        bool lIsLastLine = false;
+        int lLastPosition = -1;
+        int lLastRowIndex = -1;
+        int lSelectedIndex = -1;
+
+
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Accounts.CurrentRow != null && DGV_Accounts.CurrentRow == DGV_Accounts.Rows[DGV_Accounts.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Accounts.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Accounts.Rows.Count - 1;
+
+        if (DGV_Accounts.CurrentCell != null)
+          lSelectedIndex = DGV_Accounts.CurrentCell.RowIndex;
+
+
+        lock (this)
+        {
+          lNewData = new List<String>(cDataBatch);
+          cDataBatch.Clear();
+        } // lock (this)...
+
+
+        foreach (String lEntry in lNewData)
+        {
+          try
+          {
+            if (lEntry != null && lEntry.Length > 0)
+            {
+              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
+              if (lSplitter.Length == 7)
+              {
+                String lProto = lSplitter[0];
+                String lSMAC = lSplitter[1];
+                String lSIP = lSplitter[2];
+                String lSPort = lSplitter[3];
+                String lDIP = lSplitter[4];
+                String lDPort = lSplitter[5];
+                String lData = lSplitter[6];
+
+
+                /*
+                 * HTML GET authentication strings
+                 */
+                sHTTPAccount lAuthData = new sHTTPAccount();
+
+                try
+                {
+                  lAuthData = FindAuthString(lData);
+                }
+                catch (Exception lEx)
+                {
+                  PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+                  return;
+                }
+
+                if (lAuthData.CompanyURL.Length > 0 &&
+                    lAuthData.Username.Length > 0 &&
+                    lAuthData.Password.Length > 0)
+                {
+                  lock (this)
+                  {
+                    cTask.addRecord(new Account(lSMAC, lSIP, lAuthData.CompanyURL, lDPort, lAuthData.Username, lAuthData.Password));
+                  } // lock (this...
+                } // if (lAuthData.Co...
+              } // if (lSplitter...
+            } // if (pData.Lengt ...
+          }
+          catch (Exception lEx)
+          {
+            PluginParameters.HostApplication.LogMessage(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
+          }
+        } // foreach ...
+      } // if (cDataBat...
+    }
 
     /// <summary>
     /// 
@@ -786,7 +812,10 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void TSMI_Clear_Click(object sender, EventArgs e)
     {
-      cTask.clearRecordList();
+      lock (this)
+      {
+        cTask.clearRecordList();
+      }
     }
 
     /// <summary>
@@ -851,6 +880,16 @@ namespace Plugin.Main
       }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void T_GUIUpdate_Tick(object sender, EventArgs e)
+    {
+      ProcessEntries();
+    }
+
     #endregion
 
 
@@ -878,5 +917,38 @@ namespace Plugin.Main
 
     #endregion
 
+
+
   }
+
+
+
+  #region DATATYPES
+  /// <summary>
+  /// 
+  /// </summary>
+  public struct sHTTPAccount
+  {
+    public String Username;
+    public String Password;
+    public String Company;
+    public String CompanyURL;
+  }
+
+  [Serializable]
+  public struct PluginData
+  {
+    public String RemoteHost;
+    public String RedirectURL;
+    public List<Account> Records;
+  }
+
+  public class PeerSystems
+  {
+    public String Name { get; set; }
+    public String Value { get; set; }
+  }
+
+  #endregion
+
 }

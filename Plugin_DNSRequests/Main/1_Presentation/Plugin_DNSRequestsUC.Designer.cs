@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       this.DGV_DNSRequests = new System.Windows.Forms.DataGridView();
       this.BT_Set = new System.Windows.Forms.Button();
       this.TB_Filter = new System.Windows.Forms.TextBox();
@@ -49,14 +49,14 @@
       this.DGV_DNSRequests.AllowUserToDeleteRows = false;
       this.DGV_DNSRequests.AllowUserToResizeColumns = false;
       this.DGV_DNSRequests.AllowUserToResizeRows = false;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.DGV_DNSRequests.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.DGV_DNSRequests.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.DGV_DNSRequests.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.DGV_DNSRequests.Location = new System.Drawing.Point(17, 44);
       this.DGV_DNSRequests.MultiSelect = false;
@@ -133,6 +133,11 @@
       this.copyHostNameToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.copyHostNameToolStripMenuItem.Text = "Copy host name";
       this.copyHostNameToolStripMenuItem.Click += new System.EventHandler(this.copyHostNameToolStripMenuItem_Click);
+      // 
+      // T_GUIUpdate
+      // 
+      this.T_GUIUpdate.Interval = 500;
+      this.T_GUIUpdate.Tick += new System.EventHandler(this.T_GUIUpdate_Tick);
       // 
       // PluginDNSRequestsUC
       // 
