@@ -28,10 +28,12 @@
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+      this.components = new System.ComponentModel.Container();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       this.DGV_Accounts = new System.Windows.Forms.DataGridView();
       this.L_ForwardHost = new System.Windows.Forms.Label();
       this.TB_ForwardHost = new System.Windows.Forms.TextBox();
+      this.T_GUIUpdate = new System.Windows.Forms.Timer(this.components);
       ((System.ComponentModel.ISupportInitialize)(this.DGV_Accounts)).BeginInit();
       this.SuspendLayout();
       // 
@@ -46,8 +48,8 @@
       this.DGV_Accounts.MultiSelect = false;
       this.DGV_Accounts.Name = "DGV_Accounts";
       this.DGV_Accounts.RowHeadersVisible = false;
-      dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.DGV_Accounts.RowsDefaultCellStyle = dataGridViewCellStyle6;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DGV_Accounts.RowsDefaultCellStyle = dataGridViewCellStyle1;
       this.DGV_Accounts.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
       this.DGV_Accounts.Size = new System.Drawing.Size(830, 309);
       this.DGV_Accounts.TabIndex = 0;
@@ -71,6 +73,11 @@
       this.TB_ForwardHost.Size = new System.Drawing.Size(200, 20);
       this.TB_ForwardHost.TabIndex = 1;
       // 
+      // T_GUIUpdate
+      // 
+      this.T_GUIUpdate.Interval = 500;
+      this.T_GUIUpdate.Tick += new System.EventHandler(this.T_GUIUpdate_Tick);
+      // 
       // PluginIMAP4ProxyUC
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -92,5 +99,6 @@
     private System.Windows.Forms.DataGridView DGV_Accounts;
     private System.Windows.Forms.Label L_ForwardHost;
     private System.Windows.Forms.TextBox TB_ForwardHost;
+    private System.Windows.Forms.Timer T_GUIUpdate;
   }
 }

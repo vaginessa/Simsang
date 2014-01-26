@@ -382,7 +382,6 @@ namespace Plugin.Main
     /// </summary>
     public void onShutDown()
     {
-
     }
 
 
