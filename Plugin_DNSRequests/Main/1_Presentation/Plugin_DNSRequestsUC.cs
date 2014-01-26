@@ -25,6 +25,7 @@ namespace Plugin.Main
 
     private List<String> cTargetList;
     private BindingList<DNSRequestRecord> cDNSRequests;
+    private List<String> cDataBatch;
     private TaskFacade cTask;
     private DomainFacade cDomain;
 
@@ -99,7 +100,7 @@ namespace Plugin.Main
       PluginParameters = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
-      
+
       Config = new PluginProperties()
       {
         BaseDir = lBaseDir,
@@ -110,10 +111,12 @@ namespace Plugin.Main
         Ports = "UDP:53;",
         IsActive = true
       };
-      
-      // Make it double buffered.
-      typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, DGV_HTTPRequests, new object[] { true });
 
+      cDataBatch = new List<String>();
+
+      // Make it double buffered.
+      typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, DGV_DNSRequests, new object[] { true });
+      T_GUIUpdate.Start();
 
       cTask = TaskFacade.getInstance(this);
       cDomain = DomainFacade.getInstance(this);
@@ -379,7 +382,7 @@ namespace Plugin.Main
     /// </summary>
     public void onShutDown()
     {
-      
+
     }
 
 
@@ -399,39 +402,11 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-
-
-        try
+        lock (this)
         {
-          if (pData != null && pData.Length > 0)
-          {
-            String[] lSplitter = Regex.Split(pData, @"\|\|");
-            if (lSplitter.Length == 7)
-            {
-              String lProto = lSplitter[0];
-              String lSMAC = lSplitter[1];
-              String lSIP = lSplitter[2];
-              String lSrcPort = lSplitter[3];
-              String lDstIP = lSplitter[4];
-              String lDstPort = lSplitter[5];
-              String lHostName = lSplitter[6];
-
-
-              if (lDstPort != null && lDstPort == "53")
-              {
-                lock (this)
-                {
-                  cTask.addRecord(new DNSRequestRecord(lSMAC, lSIP, lHostName, lProto));
-                } // lock (this)
-              } // if (lDstPort != null ...
-            }
-          } // if (pData.Le... 
-        }
-        catch (Exception lEx)
-        {
-          if (PluginParameters.HostApplication != null)
-            PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
-        }
+          if (cDataBatch != null && pData != null && pData.Length > 0)
+            cDataBatch.Add(pData);
+        } // lock (this)
       } // if (cIsActive)
     }
 
@@ -451,6 +426,79 @@ namespace Plugin.Main
 
 
     #region PRIVATE
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void ProcessEntries()
+    {
+      if (cDataBatch != null && cDataBatch.Count > 0)
+      {
+        List<DNSRequestRecord> lNewRecords = new List<DNSRequestRecord>();
+        List<String> lNewData;
+        bool lIsLastLine = false;
+        int lLastPosition = -1;
+        int lLastRowIndex = -1;
+        int lSelectedIndex = -1;
+
+
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_DNSRequests.CurrentRow != null && DGV_DNSRequests.CurrentRow == DGV_DNSRequests.Rows[DGV_DNSRequests.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_DNSRequests.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_DNSRequests.Rows.Count - 1;
+
+        if (DGV_DNSRequests.CurrentCell != null)
+          lSelectedIndex = DGV_DNSRequests.CurrentCell.RowIndex;
+
+
+        lock (this)
+        {
+          lNewData = new List<String>(cDataBatch);
+          cDataBatch.Clear();
+        } // lock (this)...
+
+        foreach (String lEntry in lNewData)
+        {
+          try
+          {
+            if (lEntry != null && lEntry.Length > 0)
+            {
+              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
+              if (lSplitter.Length == 7)
+              {
+                String lProto = lSplitter[0];
+                String lSMAC = lSplitter[1];
+                String lSIP = lSplitter[2];
+                String lSrcPort = lSplitter[3];
+                String lDstIP = lSplitter[4];
+                String lDstPort = lSplitter[5];
+                String lHostName = lSplitter[6];
+
+
+                if (lDstPort != null && lDstPort == "53")
+                {
+                  lock (this)
+                  {
+                    cTask.addRecord(new DNSRequestRecord(lSMAC, lSIP, lHostName, lProto));
+                  } // lock (this)
+                } // if (lDstPort != null ...
+              } // if (lSplitter...
+            } // if (pData.Le... 
+          }
+          catch (Exception lEx)
+          {
+            if (PluginParameters.HostApplication != null)
+              PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          }
+        } // foreach(..
+      } // if (cDataBatch...
+    }
+
 
     /// <summary>
     /// 
@@ -656,6 +704,17 @@ namespace Plugin.Main
       }
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void T_GUIUpdate_Tick(object sender, EventArgs e)
+    {
+      ProcessEntries();
+    }
+
     #endregion
 
 
@@ -674,6 +733,9 @@ namespace Plugin.Main
         if (DGV_DNSRequests.CurrentRow != null && DGV_DNSRequests.CurrentRow == DGV_DNSRequests.Rows[DGV_DNSRequests.Rows.Count - 1])
           lIsLastLine = true;
 
+        /*
+         * Remember last position
+         */
         lLastPosition = DGV_DNSRequests.FirstDisplayedScrollingRowIndex;
         lLastRowIndex = DGV_DNSRequests.Rows.Count - 1;
 
@@ -684,7 +746,7 @@ namespace Plugin.Main
         cDNSRequests.Clear();
         foreach (DNSRequestRecord lTmp in pDNSReqList)
           cDNSRequests.Add(lTmp);
-        
+
 
         // Filter
         try
@@ -702,12 +764,13 @@ namespace Plugin.Main
           DGV_DNSRequests.CurrentCell = DGV_DNSRequests.Rows[lSelectedIndex].Cells[0];
         DGV_DNSRequests.ResumeLayout();
 
-        DGV_DNSRequests.Refresh();       
+        DGV_DNSRequests.Refresh();
       } // if (pDNSReqL...
     }
 
 
     #endregion
+
 
   }
 }

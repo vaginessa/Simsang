@@ -146,7 +146,6 @@ namespace Plugin.Main
         IsActive = true
       };
 
-
       cDataBatch = new List<String>();
 
       // Make it double buffered.

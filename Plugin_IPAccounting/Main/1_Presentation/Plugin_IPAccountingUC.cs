@@ -773,11 +773,36 @@ namespace Plugin.Main
         BeginInvoke(new updateDelegate(update), new object[] { pRecordList });
         return;
       }
-      
-      cAccountingRecords.Clear();
-      foreach (AccountingItem lTmp in pRecordList)
-        cAccountingRecords.Add(lTmp);
 
+      int lLastPosition = -1;
+      int lLastRowIndex = -1;
+      int lSelectedIndex = -1;
+
+      /*
+       * Remember last position
+       */
+      lLastPosition = DGV_TrafficData.FirstDisplayedScrollingRowIndex;
+      lLastRowIndex = DGV_TrafficData.Rows.Count - 1;
+
+      if (DGV_TrafficData.CurrentCell != null)
+        lSelectedIndex = DGV_TrafficData.CurrentCell.RowIndex;
+
+      try
+      {
+        DGV_TrafficData.SuspendLayout();
+        cAccountingRecords.Clear();
+        foreach (AccountingItem lTmp in pRecordList)
+          cAccountingRecords.Add(lTmp);
+      }
+      catch (Exception) {}
+
+      // Reset position
+      if (lLastPosition >= 0)
+        DGV_TrafficData.FirstDisplayedScrollingRowIndex = lLastPosition;
+
+      if (lSelectedIndex >= 0)
+        DGV_TrafficData.CurrentCell = DGV_TrafficData.Rows[lSelectedIndex].Cells[0];
+      DGV_TrafficData.ResumeLayout();
       DGV_TrafficData.Refresh();
     }
 

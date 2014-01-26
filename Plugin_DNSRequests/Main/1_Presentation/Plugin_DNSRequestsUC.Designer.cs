@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
       this.DGV_DNSRequests = new System.Windows.Forms.DataGridView();
       this.BT_Set = new System.Windows.Forms.Button();
       this.TB_Filter = new System.Windows.Forms.TextBox();
@@ -38,6 +38,7 @@
       this.TSMI_Clear = new System.Windows.Forms.ToolStripMenuItem();
       this.deleteEntryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.copyHostNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.T_GUIUpdate = new System.Windows.Forms.Timer(this.components);
       ((System.ComponentModel.ISupportInitialize)(this.DGV_DNSRequests)).BeginInit();
       this.CMS_DNSRequests.SuspendLayout();
       this.SuspendLayout();
@@ -48,14 +49,14 @@
       this.DGV_DNSRequests.AllowUserToDeleteRows = false;
       this.DGV_DNSRequests.AllowUserToResizeColumns = false;
       this.DGV_DNSRequests.AllowUserToResizeRows = false;
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.DGV_DNSRequests.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.DGV_DNSRequests.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
       this.DGV_DNSRequests.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.DGV_DNSRequests.Location = new System.Drawing.Point(17, 44);
       this.DGV_DNSRequests.MultiSelect = false;
@@ -161,5 +162,6 @@
         private System.Windows.Forms.ToolStripMenuItem TSMI_Clear;
         private System.Windows.Forms.ToolStripMenuItem deleteEntryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem copyHostNameToolStripMenuItem;
+        private System.Windows.Forms.Timer T_GUIUpdate;
     }
 }
