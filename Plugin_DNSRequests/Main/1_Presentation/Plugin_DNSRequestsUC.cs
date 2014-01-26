@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Configuration;
-
+using System.Reflection;
 
 using Simsang.Plugin;
 using Plugin.Main.DNSRequest;
@@ -110,6 +110,9 @@ namespace Plugin.Main
         Ports = "UDP:53;",
         IsActive = true
       };
+      
+      // Make it double buffered.
+      typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, DGV_HTTPRequests, new object[] { true });
 
 
       cTask = TaskFacade.getInstance(this);
@@ -662,10 +665,9 @@ namespace Plugin.Main
     {
       int lLastPosition = -1;
       int lLastRowIndex = -1;
+      int lSelectedIndex = -1;
       bool lIsLastLine = false;
 
-
-      cDNSRequests.Clear();
 
       if (pDNSReqList != null && pDNSReqList.Count > 0)
       {
@@ -675,10 +677,14 @@ namespace Plugin.Main
         lLastPosition = DGV_DNSRequests.FirstDisplayedScrollingRowIndex;
         lLastRowIndex = DGV_DNSRequests.Rows.Count - 1;
 
+        if (DGV_DNSRequests.CurrentCell != null)
+          lSelectedIndex = DGV_DNSRequests.CurrentCell.RowIndex;
+
+        DGV_DNSRequests.SuspendLayout();
+        cDNSRequests.Clear();
         foreach (DNSRequestRecord lTmp in pDNSReqList)
-        {
           cDNSRequests.Add(lTmp);
-        } // foreach (DNSReq...
+        
 
         // Filter
         try
@@ -687,6 +693,16 @@ namespace Plugin.Main
             DGV_DNSRequests.Rows[lLastRowIndex + 1].Visible = false;
         }
         catch (Exception) { }
+
+        // Reset position
+        if (lLastPosition >= 0)
+          DGV_DNSRequests.FirstDisplayedScrollingRowIndex = lLastPosition;
+
+        if (lSelectedIndex >= 0)
+          DGV_DNSRequests.CurrentCell = DGV_DNSRequests.Rows[lSelectedIndex].Cells[0];
+        DGV_DNSRequests.ResumeLayout();
+
+        DGV_DNSRequests.Refresh();       
       } // if (pDNSReqL...
     }
 

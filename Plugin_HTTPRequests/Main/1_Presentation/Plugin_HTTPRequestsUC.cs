@@ -149,6 +149,7 @@ namespace Plugin.Main
 
       cDataBatch = new List<String>();
 
+      // Make it double buffered.
       typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, DGV_HTTPRequests, new object[] { true });
       T_GUIUpdate.Start();
 
@@ -171,6 +172,24 @@ namespace Plugin.Main
       {
         List<HTTPRequests> lNewRecords = new List<HTTPRequests>();
         List<String> lNewData;
+        bool lIsLastLine = false;
+        int lLastPosition = -1;
+        int lLastRowIndex = -1;
+        int lSelectedIndex = -1;
+
+
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_HTTPRequests.CurrentRow != null && DGV_HTTPRequests.CurrentRow == DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_HTTPRequests.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_HTTPRequests.Rows.Count - 1;
+
+        if (DGV_HTTPRequests.CurrentCell != null)
+          lSelectedIndex = DGV_HTTPRequests.CurrentCell.RowIndex;
+
 
         lock (this)
         {
@@ -202,11 +221,6 @@ namespace Plugin.Main
                 String lRemoteHost = String.Empty;
                 String lReqString = String.Empty;
                 String lCookies = String.Empty;
-                bool lIsLastLine = false;
-                int lLastPosition = -1;
-                int lLastRowIndex = -1;
-
-
 
 
                 if (((lMatchURI = Regex.Match(lData, @"(\s+|^)(GET|POST)\s+([^\s]+)\s+HTTP\/"))).Success &&
@@ -218,11 +232,6 @@ namespace Plugin.Main
                   lReqString = lMatchURI.Groups[3].Value.ToString();
                   lCookies = lMatchCookies.Groups[1].Value.ToString();
 
-                  if (DGV_HTTPRequests.CurrentRow != null && DGV_HTTPRequests.CurrentRow == DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1])
-                    lIsLastLine = true;
-
-                  lLastPosition = DGV_HTTPRequests.FirstDisplayedScrollingRowIndex;
-                  lLastRowIndex = DGV_HTTPRequests.Rows.Count - 1;
 
                   lNewRecords.Add(new HTTPRequests(lMAC, lSrcIP, lMethod, lRemoteHost, lReqString, lCookies, lData));
 
@@ -237,31 +246,7 @@ namespace Plugin.Main
                     PluginParameters.HostApplication.LogMessage(lEx.StackTrace);
                   }
 
-                  //UseFilter();
 
-                  /*
-                   * Filter
-                   */
-                  try
-                  {
-                    if (!CompareToFilter(DGV_HTTPRequests.Rows[lLastRowIndex + 1].Cells["URL"].Value.ToString()))
-                      DGV_HTTPRequests.Rows[lLastRowIndex + 1].Visible = false;
-                  }
-                  catch { }
-
-                  try
-                  {
-                    if (lIsLastLine)
-                    {
-                      DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1].Selected = true;
-                      DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition + 1;
-                    }
-                    else
-                      DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition;
-                  }
-                  catch { }
-
-                  //DGV_HTTPRequests.Refresh();
                 } // if (lDstPort == "80" ...
               } // if (lSpli...
             } // if (pData.Le...
@@ -273,7 +258,36 @@ namespace Plugin.Main
         } // for (String lE...
 
         cTask.addRecords(lNewRecords);
-      } // if (mDat...
+
+        //UseFilter();
+
+        /*
+         * Filter
+         */
+        try
+        {
+          if (!CompareToFilter(DGV_HTTPRequests.Rows[lLastRowIndex + 1].Cells["URL"].Value.ToString()))
+            DGV_HTTPRequests.Rows[lLastRowIndex + 1].Visible = false;
+        }
+        catch { }
+
+        try
+        {
+          if (lIsLastLine)
+          {
+            DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1].Selected = true;
+            DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition + 1;
+          }
+          else
+            DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition;
+        }
+        catch { }
+
+        if (lSelectedIndex >= 0)
+          DGV_HTTPRequests.CurrentCell = DGV_HTTPRequests.Rows[lSelectedIndex].Cells[0];
+
+        DGV_HTTPRequests.Refresh();
+      } // if (cDat...
     }
 
 
