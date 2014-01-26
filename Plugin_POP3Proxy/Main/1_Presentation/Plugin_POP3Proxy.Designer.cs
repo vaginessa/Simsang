@@ -28,11 +28,13 @@
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      this.components = new System.ComponentModel.Container();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
       this.DGV_Accounts = new System.Windows.Forms.DataGridView();
       this.L_RemoteHost = new System.Windows.Forms.Label();
       this.TB_POP3Server = new System.Windows.Forms.TextBox();
+      this.T_GUIUpdate = new System.Windows.Forms.Timer(this.components);
       ((System.ComponentModel.ISupportInitialize)(this.DGV_Accounts)).BeginInit();
       this.SuspendLayout();
       // 
@@ -42,21 +44,21 @@
       this.DGV_Accounts.AllowUserToDeleteRows = false;
       this.DGV_Accounts.AllowUserToResizeColumns = false;
       this.DGV_Accounts.AllowUserToResizeRows = false;
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.DGV_Accounts.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.DGV_Accounts.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.DGV_Accounts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.DGV_Accounts.Location = new System.Drawing.Point(17, 44);
       this.DGV_Accounts.MultiSelect = false;
       this.DGV_Accounts.Name = "DGV_Accounts";
       this.DGV_Accounts.RowHeadersVisible = false;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.DGV_Accounts.RowsDefaultCellStyle = dataGridViewCellStyle2;
+      dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DGV_Accounts.RowsDefaultCellStyle = dataGridViewCellStyle4;
       this.DGV_Accounts.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.DGV_Accounts.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
       this.DGV_Accounts.Size = new System.Drawing.Size(830, 309);
@@ -81,6 +83,11 @@
       this.TB_POP3Server.Size = new System.Drawing.Size(200, 20);
       this.TB_POP3Server.TabIndex = 1;
       // 
+      // T_GUIUpdate
+      // 
+      this.T_GUIUpdate.Interval = 500;
+      this.T_GUIUpdate.Tick += new System.EventHandler(this.T_GUIUpdate_Tick);
+      // 
       // PluginPOP3ProxyUC
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -102,5 +109,6 @@
     private System.Windows.Forms.DataGridView DGV_Accounts;
     private System.Windows.Forms.Label L_RemoteHost;
     private System.Windows.Forms.TextBox TB_POP3Server;
+    private System.Windows.Forms.Timer T_GUIUpdate;
   }
 }

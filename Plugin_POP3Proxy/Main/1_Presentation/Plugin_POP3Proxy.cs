@@ -10,6 +10,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Configuration;
+using System.Reflection;
 
 using Simsang.Plugin;
 using Plugin.Main.POP3Proxy;
@@ -31,6 +32,7 @@ namespace Plugin.Main
     #region MEMBERS
 
     private List<String> cTargetList;
+    private List<String> cDataBatch;
     private BindingList<POP3Account> cAccounts;
     private TaskFacade cTask;
 
@@ -148,6 +150,14 @@ namespace Plugin.Main
                     isDebuggingOn = (PluginParameters.HostApplication != null) ? PluginParameters.HostApplication.IsDebuggingOn() : false,
                     onProxyExit = onPOP3ProxyExited
                   };
+
+      cDataBatch = new List<String>();
+
+
+      // Make it double buffered.
+      typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, DGV_Accounts, new object[] { true });
+      T_GUIUpdate.Start();
+
       cTask = TaskFacade.getInstance(lConfig, this);
       DomainFacade.getInstance(lConfig, this).addObserver(this);
     }
@@ -156,6 +166,76 @@ namespace Plugin.Main
 
 
     #region PRIVATE
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void ProcessEntries()
+    {
+      if (cDataBatch != null && cDataBatch.Count > 0)
+      {
+        List<POP3Account> lNewRecords = new List<POP3Account>();
+        List<String> lNewData;
+        bool lIsLastLine = false;
+        int lLastPosition = -1;
+        int lLastRowIndex = -1;
+        int lSelectedIndex = -1;
+
+
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Accounts.CurrentRow != null && DGV_Accounts.CurrentRow == DGV_Accounts.Rows[DGV_Accounts.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Accounts.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Accounts.Rows.Count - 1;
+
+        if (DGV_Accounts.CurrentCell != null)
+          lSelectedIndex = DGV_Accounts.CurrentCell.RowIndex;
+
+
+        lock (this)
+        {
+          lNewData = new List<String>(cDataBatch);
+          cDataBatch.Clear();
+        } // lock (this)...
+
+        foreach (String lEntry in lNewData)
+        {
+
+          if (!String.IsNullOrEmpty(lEntry))
+          {
+            try
+            {
+              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
+              if (lSplitter.Length == 9)
+              {
+                String lProto = lSplitter[0];
+                String lSMAC = lSplitter[1];
+                String lSIP = lSplitter[2];
+                String lSPort = lSplitter[3];
+                String lDIP = lSplitter[4];
+                String lDPort = lSplitter[5];
+                String lData = lSplitter[6];
+                String lPassword = lSplitter[7];
+                String lServer = lSplitter[8];
+
+                lock (this)
+                {
+                  cTask.addRecord(new POP3Account(lSMAC, lSIP, lDIP, lDPort, lData, lPassword, lServer));
+                }
+              } // if (lSplitter...
+            }
+            catch (Exception)
+            {
+            }
+          } // if (!String....
+        } // foreach (Str...
+      } // if (cDataB...
+    }
+
 
     /// <summary>
     /// 
@@ -209,6 +289,17 @@ namespace Plugin.Main
       setGUIActive();
       cTask.onStop();
       PluginParameters.HostApplication.PluginSetStatus(this, "red");
+    }
+
+    #endregion
+
+
+    #region EVENTS
+
+
+    private void T_GUIUpdate_Tick(object sender, EventArgs e)
+    {
+      ProcessEntries();
     }
 
     #endregion
@@ -410,31 +501,11 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-        if (!String.IsNullOrEmpty(pData))
+        lock (this)
         {
-          try
-          {
-            String[] lSplitter = Regex.Split(pData, @"\|\|");
-            if (lSplitter.Length == 9)
-            {
-              String lProto = lSplitter[0];
-              String lSMAC = lSplitter[1];
-              String lSIP = lSplitter[2];
-              String lSPort = lSplitter[3];
-              String lDIP = lSplitter[4];
-              String lDPort = lSplitter[5];
-              String lData = lSplitter[6];
-              String lPassword = lSplitter[7];
-              String lServer = lSplitter[8];
-
-              cTask.addRecord(new POP3Account(lSMAC, lSIP, lDIP, lDPort, lData, lPassword, lServer));
-            } // if (lSplitter...
-          }
-          catch (Exception)
-          {
-          }
-
-        } // if (!String....
+          if (cDataBatch != null && pData != null && pData.Length > 0)
+            cDataBatch.Add(pData);
+        } // lock (this)
       } // if (cIsActiv...
     }
 
@@ -572,6 +643,7 @@ namespace Plugin.Main
     }
 
     #endregion
+
 
   }
 }
