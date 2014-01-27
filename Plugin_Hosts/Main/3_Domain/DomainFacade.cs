@@ -111,7 +111,7 @@ namespace Plugin.Main.Systems
         // Check if record already exists
         foreach (SystemRecord lTmp in cRecordList)
           if (lTmp.ID == pRecord.ID)
-            throw new RecordException("System alrady exists.");
+            throw new RecordExistsException("System alrady exists.");
 
         if (!Regex.Match(pRecord.SrcMAC.Trim(), @"^[\da-f]{1,2}[\-:][\da-f]{1,2}[\-:][\da-f]{1,2}[\-:][\da-f]{1,2}[\-:][\da-f]{1,2}[\-:][\da-f]{1,2}$", RegexOptions.IgnoreCase).Success)
           throw new RecordException("Something is wrong with the MAC address");

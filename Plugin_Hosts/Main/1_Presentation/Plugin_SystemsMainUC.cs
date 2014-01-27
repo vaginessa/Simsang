@@ -43,6 +43,7 @@ namespace Plugin.Main
     private List<String> cTargetList;
     private BindingList<SystemRecord> cSystems;
     public List<ManageSystems.SystemPattern> cSystemPatterns;
+    private List<String> cDataBatch;
     private TaskFacade cTask;
     private PluginParameters cPluginParams;
 
@@ -135,6 +136,13 @@ namespace Plugin.Main
         IsActive = true
       };
 
+      cDataBatch = new List<String>();
+
+      // Make it double buffered.
+      typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, DGV_Systems, new object[] { true });
+      T_GUIUpdate.Start();
+
+
       cTask = TaskFacade.getInstance(this);
       DomainFacade.getInstance(this).addRecordObserver(this);
       DomainFacade.getInstance(this).addSystemPatternObserver(this);
@@ -145,6 +153,177 @@ namespace Plugin.Main
 
 
     #region PRIVATE
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void ProcessEntries()
+    {
+      if (cDataBatch != null && cDataBatch.Count > 0)
+      {
+        List<SystemRecord> lNewRecords = new List<SystemRecord>();
+        List<String> lNewData;
+        bool lIsLastLine = false;
+        int lLastPosition = -1;
+        int lLastRowIndex = -1;
+        int lSelectedIndex = -1;
+
+
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Systems.CurrentRow != null && DGV_Systems.CurrentRow == DGV_Systems.Rows[DGV_Systems.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Systems.Rows.Count - 1;
+
+        if (DGV_Systems.CurrentCell != null)
+          lSelectedIndex = DGV_Systems.CurrentCell.RowIndex;
+        
+
+        lock (this)
+        {
+          lNewData = new List<String>(cDataBatch);
+          cDataBatch.Clear();
+        } // lock (this)...
+
+
+        foreach (String lEntry in lNewData)
+        {
+          try
+          {
+            if (lEntry != null && lEntry.Length > 0)
+            {
+              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
+
+              if (lSplitter.Length == 7)
+              {
+                String lProto = lSplitter[0];
+                String lSMAC = lSplitter[1];
+                String lSIP = lSplitter[2];
+                String lSPort = lSplitter[3];
+                String lDIP = lSplitter[4];
+                String lDPort = lSplitter[5];
+                String lData = lSplitter[6];
+                String lOperatingSystem = String.Empty;
+                String lUserAgent = String.Empty;
+                Match lMatchUserAgent;
+                EntryType lEntryType;
+                DataGridViewRow lTabelRow;
+
+                lSMAC = Regex.Replace(lSMAC, @"-", ":");
+                lEntryType = FullEntryExists(lSMAC, lSIP);
+
+                /*
+                 * Determine the operating system due to the HTTP User-Agent string.
+                 */
+                if (((lMatchUserAgent = Regex.Match(lData, @"\.\.User-Agent\s*:\s*(.+?)\.\.", RegexOptions.IgnoreCase))).Success)
+                {
+                  try
+                  {
+                    lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+                    lUserAgent = lMatchUserAgent.Groups[1].Value.ToString();
+                    lOperatingSystem = GetOperatingSystem(lUserAgent);
+                  }
+                  catch (Exception lEx)
+                  {
+                    cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+                  }
+
+
+                  /*
+                   * 
+                   */
+                  try
+                  {
+                    if (lEntryType != EntryType.Full && lOperatingSystem.Length > 0)
+                    {
+                      if (lEntryType == EntryType.Empty)
+                      {
+                        lock (this)
+                        {
+                          cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, lOperatingSystem, String.Empty));
+                        }
+                      }
+                      else if (lEntryType == EntryType.Half)
+                        SetOS(lSMAC, lSIP, lOperatingSystem);
+
+
+                      if ((lTabelRow = GetRowByMAC(lSMAC)) != null)
+                        lTabelRow.Cells["OperatingSystem"].ToolTipText = lUserAgent;
+
+                      if (lLastPosition >= 0)
+                        DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+                    }
+                    else if (lSIP.Length > 0 && lSMAC.Length > 0)
+                    {
+                      lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+                      lock (this)
+                      {
+                        cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));
+                      }
+
+                      if (lLastPosition >= 0)
+                        DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+                    }
+                  }
+                  catch (RecordException lEx)
+                  {
+                    cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+                  }
+                  catch (RecordExistsException lEx)
+                  {
+                  }
+                  catch (Exception lEx)
+                  {
+                    cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+                  }
+
+                /*
+                 * The operating system cant be determined.
+                 */
+                }
+                else if (lEntryType == EntryType.Empty && lSIP.Length > 0 && lSMAC.Length > 0)
+                {
+                  lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+                  try
+                  {
+                    lock (this)
+                    {
+                      cTask.addRecord(new SystemRecord(lSMAC, lSIP, String.Empty, lUserAgent, String.Empty, String.Empty));
+                    }
+                  }
+                  catch (RecordException)
+                  {
+                  }
+
+                  if (lLastPosition >= 0)
+                    DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+                } // if (lDstPort...
+
+
+                /*
+                 * Updating LastSeen column.
+                 */
+                using (DataGridViewRow lRow = ListEntryExists(lSMAC))
+                {
+                  if (lRow != null && lRow.Cells["LastSeen"] != null)
+                    lRow.Cells["LastSeen"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+
+              } // if (lSplit.Leng..
+            } // if (pData.Leng...
+          }
+          catch (Exception lEx)
+          {
+            MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.ToString()));
+          }
+        } // foreach (St...
+      } // if (cDataBat...
+    }
+
 
     /// <summary>
     /// 
@@ -511,8 +690,6 @@ namespace Plugin.Main
     }
 
 
-
-
     /// <summary>
     /// Serialize session data
     /// </summary>
@@ -548,123 +725,11 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-        try
+        lock (this)
         {
-          if (pData != null && pData.Length > 0)
-          {
-            String[] lSplitter = Regex.Split(pData, @"\|\|");
-
-            if (lSplitter.Length == 7)
-            {
-              String lProto = lSplitter[0];
-              String lSMAC = lSplitter[1];
-              String lSIP = lSplitter[2];
-              String lSPort = lSplitter[3];
-              String lDIP = lSplitter[4];
-              String lDPort = lSplitter[5];
-              String lData = lSplitter[6];
-              String lOperatingSystem = String.Empty;
-              String lUserAgent = String.Empty;
-              Match lMatchUserAgent;
-              int lLastPosition = -1;
-              EntryType lEntryType;
-              DataGridViewRow lTabelRow;
-
-              lSMAC = Regex.Replace(lSMAC, @"-", ":");
-              lEntryType = FullEntryExists(lSMAC, lSIP);
-
-              /*
-               * Determine the operating system due to the HTTP User-Agent string.
-               */
-              if (((lMatchUserAgent = Regex.Match(lData, @"\.\.User-Agent\s*:\s*(.+?)\.\.", RegexOptions.IgnoreCase))).Success)
-              {
-                try
-                {
-                  lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
-                  lUserAgent = lMatchUserAgent.Groups[1].Value.ToString();
-                  lOperatingSystem = GetOperatingSystem(lUserAgent);
-                }
-                catch (Exception lEx)
-                {
-                  cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
-                }
-
-
-                /*
-                 * 
-                 */
-                try
-                {
-                  if (lEntryType != EntryType.Full && lOperatingSystem.Length > 0)
-                  {
-                    if (lEntryType == EntryType.Empty)
-                      cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, lOperatingSystem, String.Empty));
-                    else if (lEntryType == EntryType.Half)
-                      SetOS(lSMAC, lSIP, lOperatingSystem);
-
-
-                    if ((lTabelRow = GetRowByMAC(lSMAC)) != null)
-                      lTabelRow.Cells["OperatingSystem"].ToolTipText = lUserAgent;
-
-                    if (lLastPosition >= 0)
-                      DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
-                  }
-                  else if (lSIP.Length > 0 && lSMAC.Length > 0)
-                  {
-                    lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
-                    cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));
-
-                    if (lLastPosition >= 0)
-                      DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
-                  }
-                }
-                catch (RecordException lEx)
-                {
-                  cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
-                }
-                catch (Exception lEx)
-                {
-                  cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
-                }
-
-                /*
-                 * The operating system cant be determined.
-                 */
-              }
-              else if (lEntryType == EntryType.Empty && lSIP.Length > 0 && lSMAC.Length > 0)
-              {
-                lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
-                try
-                {
-                  cTask.addRecord(new SystemRecord(lSMAC, lSIP, String.Empty, lUserAgent, String.Empty, String.Empty));
-//DGV_Systems.Refresh();
-                }
-                catch (RecordException)
-                {
-                }
-
-                if (lLastPosition >= 0)
-                  DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
-              } // if (lDstPort...
-
-
-
-              /*
-               * Updating LastSeen column.
-               */
-              using (DataGridViewRow lRow = ListEntryExists(lSMAC))
-              {
-                if (lRow != null && lRow.Cells["LastSeen"] != null)
-                  lRow.Cells["LastSeen"].Value = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-              }
-
-            } // if (lSplit.Leng..
-          } // if (pData.Leng...
-        }
-        catch (Exception lEx)
-        {
-          MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.ToString()));
-        }
+          if (cDataBatch != null && pData != null && pData.Length > 0)
+            cDataBatch.Add(pData);
+        } // lock (this)
       } // if (cIsActiv...
     }
 
@@ -682,6 +747,17 @@ namespace Plugin.Main
 
 
     #region EVENTS
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void T_GUIUpdate_Tick(object sender, EventArgs e)
+    {
+      ProcessEntries();
+    }
+
 
     /// <summary>
     /// 
@@ -787,10 +863,13 @@ namespace Plugin.Main
     /// <param name="pRecordList"></param>
     public void updateRecordList(List<SystemRecord> pRecordList)
     {
-      cSystems.Clear();
-      if (pRecordList != null)
-        foreach (SystemRecord lTmp in pRecordList)
-          cSystems.Add(new SystemRecord(lTmp.SrcMAC, lTmp.SrcIP, lTmp.UserAgent, lTmp.HWVendor, lTmp.OperatingSystem, lTmp.LastSeen));
+      lock (this)
+      {
+        cSystems.Clear();
+        if (pRecordList != null)
+          foreach (SystemRecord lTmp in pRecordList)
+            cSystems.Add(new SystemRecord(lTmp.SrcMAC, lTmp.SrcIP, lTmp.UserAgent, lTmp.HWVendor, lTmp.OperatingSystem, lTmp.LastSeen));
+      }
     }
 
     /// <summary>
