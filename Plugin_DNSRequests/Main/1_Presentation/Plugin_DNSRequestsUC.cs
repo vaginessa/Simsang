@@ -436,24 +436,6 @@ namespace Plugin.Main
       {
         List<DNSRequestRecord> lNewRecords = new List<DNSRequestRecord>();
         List<String> lNewData;
-        bool lIsLastLine = false;
-        int lLastPosition = -1;
-        int lLastRowIndex = -1;
-        int lSelectedIndex = -1;
-
-
-        /*
-         * Remember DGV positions
-         */
-        if (DGV_DNSRequests.CurrentRow != null && DGV_DNSRequests.CurrentRow == DGV_DNSRequests.Rows[DGV_DNSRequests.Rows.Count - 1])
-          lIsLastLine = true;
-
-        lLastPosition = DGV_DNSRequests.FirstDisplayedScrollingRowIndex;
-        lLastRowIndex = DGV_DNSRequests.Rows.Count - 1;
-
-        if (DGV_DNSRequests.CurrentCell != null)
-          lSelectedIndex = DGV_DNSRequests.CurrentCell.RowIndex;
-
 
         lock (this)
         {
@@ -571,10 +553,7 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void TSMI_Clear_Click(object sender, EventArgs e)
     {
-      lock (this)
-      {
-        cTask.clearRecordList();
-      } // lock (this) ...
+      cTask.clearRecordList();
     }
 
 
@@ -727,40 +706,55 @@ namespace Plugin.Main
       bool lIsLastLine = false;
 
 
-      if (pDNSReqList != null && pDNSReqList.Count > 0)
+      if (pDNSReqList != null)
       {
         if (DGV_DNSRequests.CurrentRow != null && DGV_DNSRequests.CurrentRow == DGV_DNSRequests.Rows[DGV_DNSRequests.Rows.Count - 1])
           lIsLastLine = true;
 
-        /*
-         * Remember last position
-         */
-        lLastPosition = DGV_DNSRequests.FirstDisplayedScrollingRowIndex;
-        lLastRowIndex = DGV_DNSRequests.Rows.Count - 1;
-
-        if (DGV_DNSRequests.CurrentCell != null)
-          lSelectedIndex = DGV_DNSRequests.CurrentCell.RowIndex;
-
-        DGV_DNSRequests.SuspendLayout();
-        cDNSRequests.Clear();
-        foreach (DNSRequestRecord lTmp in pDNSReqList)
-          cDNSRequests.Add(lTmp);
-
-
-        // Filter
-        try
+        lock (this)
         {
-          if (!CompareToFilter(DGV_DNSRequests.Rows[lLastRowIndex + 1].Cells["DNSHostname"].Value.ToString()))
-            DGV_DNSRequests.Rows[lLastRowIndex + 1].Visible = false;
+          /*
+           * Remember last position
+           */
+          lLastPosition = DGV_DNSRequests.FirstDisplayedScrollingRowIndex;
+          lLastRowIndex = DGV_DNSRequests.Rows.Count - 1;
+
+          if (DGV_DNSRequests.CurrentCell != null)
+            lSelectedIndex = DGV_DNSRequests.CurrentCell.RowIndex;
+
+          DGV_DNSRequests.SuspendLayout();
+          cDNSRequests.Clear();
+          foreach (DNSRequestRecord lTmp in pDNSReqList)
+            cDNSRequests.Add(lTmp);
+
+
+          // Filter
+          try
+          {
+            if (!CompareToFilter(DGV_DNSRequests.Rows[lLastRowIndex + 1].Cells["DNSHostname"].Value.ToString()))
+              DGV_DNSRequests.Rows[lLastRowIndex + 1].Visible = false;
+          }
+          catch (Exception) { }
+
+          // Selected cell/row
+          try
+          {
+            if (lSelectedIndex >= 0)
+              DGV_DNSRequests.CurrentCell = DGV_DNSRequests.Rows[lSelectedIndex].Cells[0];
+          }
+          catch (Exception) { }
+
+
+          // Reset position
+          try
+          {
+            if (lLastPosition >= 0)
+              DGV_DNSRequests.FirstDisplayedScrollingRowIndex = lLastPosition;
+          }
+          catch (Exception) { }
+
         }
-        catch (Exception) { }
 
-        // Reset position
-        if (lLastPosition >= 0)
-          DGV_DNSRequests.FirstDisplayedScrollingRowIndex = lLastPosition;
-
-        if (lSelectedIndex >= 0)
-          DGV_DNSRequests.CurrentCell = DGV_DNSRequests.Rows[lSelectedIndex].Cells[0];
         DGV_DNSRequests.ResumeLayout();
 
         DGV_DNSRequests.Refresh();

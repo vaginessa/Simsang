@@ -485,24 +485,6 @@ namespace Plugin.Main
       {
         List<Session.Config.Session> lNewRecords = new List<Session.Config.Session>();
         List<String> lNewData;
-        bool lIsLastLine = false;
-        int lLastPosition = -1;
-        int lLastRowIndex = -1;
-        int lSelectedIndex = -1;
-
-        
-        /*
-         * Remember DGV positions
-         */
-        if (DGV_Sessions.CurrentRow != null && DGV_Sessions.CurrentRow == DGV_Sessions.Rows[DGV_Sessions.Rows.Count - 1])
-          lIsLastLine = true;
-
-        lLastPosition = DGV_Sessions.FirstDisplayedScrollingRowIndex;
-        lLastRowIndex = DGV_Sessions.Rows.Count - 1;
-
-        if (DGV_Sessions.CurrentCell != null)
-          lSelectedIndex = DGV_Sessions.CurrentCell.RowIndex;
-
 
         lock (this)
         {
@@ -1117,21 +1099,51 @@ namespace Plugin.Main
 
     public void update(List<Session.Config.Session> pRecordList)
     {
-      int lLastPosition = DGV_Sessions.FirstDisplayedScrollingRowIndex;
+      bool lIsLastLine = false;
+      int lLastPosition = -1;
+      int lLastRowIndex = -1;
+      int lSelectedIndex = -1;
 
       lock (this)
       {
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Sessions.CurrentRow != null && DGV_Sessions.CurrentRow == DGV_Sessions.Rows[DGV_Sessions.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Sessions.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Sessions.Rows.Count - 1;
+
+        if (DGV_Sessions.CurrentCell != null)
+          lSelectedIndex = DGV_Sessions.CurrentCell.RowIndex;
+
+
         cSessions.Clear();
         foreach (Session.Config.Session lTmp in pRecordList)
           cSessions.Add(lTmp);
 
         DGVFilter();
 
-        if (lLastPosition >= 0)
-          DGV_Sessions.FirstDisplayedScrollingRowIndex = lLastPosition;
-      }
+        // Selected cell/row
+        try
+        {
+          if (lSelectedIndex >= 0)
+            DGV_Sessions.CurrentCell = DGV_Sessions.Rows[lSelectedIndex].Cells[0];
+        }
+        catch (Exception) { }
 
-      DGV_Sessions.Refresh();
+
+        // Reset position
+        try
+        {
+          if (lLastPosition >= 0)
+            DGV_Sessions.FirstDisplayedScrollingRowIndex = lLastPosition;
+        }
+        catch (Exception) { }
+
+        DGV_Sessions.Refresh();
+      } // lock (th...
     }
 
     #endregion

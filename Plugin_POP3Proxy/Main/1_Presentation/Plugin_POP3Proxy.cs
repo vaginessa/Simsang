@@ -177,23 +177,6 @@ namespace Plugin.Main
       {
         List<POP3Account> lNewRecords = new List<POP3Account>();
         List<String> lNewData;
-        bool lIsLastLine = false;
-        int lLastPosition = -1;
-        int lLastRowIndex = -1;
-        int lSelectedIndex = -1;
-
-
-        /*
-         * Remember DGV positions
-         */
-        if (DGV_Accounts.CurrentRow != null && DGV_Accounts.CurrentRow == DGV_Accounts.Rows[DGV_Accounts.Rows.Count - 1])
-          lIsLastLine = true;
-
-        lLastPosition = DGV_Accounts.FirstDisplayedScrollingRowIndex;
-        lLastRowIndex = DGV_Accounts.Rows.Count - 1;
-
-        if (DGV_Accounts.CurrentCell != null)
-          lSelectedIndex = DGV_Accounts.CurrentCell.RowIndex;
 
 
         lock (this)
@@ -637,9 +620,49 @@ namespace Plugin.Main
 
     public void update(List<POP3Account> pRecordList)
     {
-      cAccounts.Clear();
-      foreach (POP3Account lTmp in pRecordList)
-        cAccounts.Add(new POP3Account(lTmp.SrcMAC, lTmp.SrcIP, lTmp.DstIP, lTmp.DstPort, lTmp.Username, lTmp.Password, lTmp.Server));
+      bool lIsLastLine = false;
+      int lLastPosition = -1;
+      int lLastRowIndex = -1;
+      int lSelectedIndex = -1;
+
+      lock (this)
+      {
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Accounts.CurrentRow != null && DGV_Accounts.CurrentRow == DGV_Accounts.Rows[DGV_Accounts.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Accounts.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Accounts.Rows.Count - 1;
+
+        if (DGV_Accounts.CurrentCell != null)
+          lSelectedIndex = DGV_Accounts.CurrentCell.RowIndex;
+
+        cAccounts.Clear();
+        foreach (POP3Account lTmp in pRecordList)
+          cAccounts.Add(new POP3Account(lTmp.SrcMAC, lTmp.SrcIP, lTmp.DstIP, lTmp.DstPort, lTmp.Username, lTmp.Password, lTmp.Server));
+
+
+        // Selected cell/row
+        try
+        {
+          if (lSelectedIndex >= 0)
+            DGV_Accounts.CurrentCell = DGV_Accounts.Rows[lSelectedIndex].Cells[0];
+        }
+        catch (Exception) { }
+
+
+        // Reset position
+        try
+        {
+          if (lLastPosition >= 0)
+            DGV_Accounts.FirstDisplayedScrollingRowIndex = lLastPosition;
+        }
+        catch (Exception) { }
+
+        DGV_Accounts.Refresh();
+      }
     }
 
     #endregion

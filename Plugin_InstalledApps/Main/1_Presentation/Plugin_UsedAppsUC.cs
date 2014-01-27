@@ -143,24 +143,6 @@ namespace Plugin.Main
       {
         List<ApplicationRecord> lNewRecords = new List<ApplicationRecord>();
         List<String> lNewData;
-        bool lIsLastLine = false;
-        int lLastPosition = -1;
-        int lLastRowIndex = -1;
-        int lSelectedIndex = -1;
-
-
-        /*
-         * Remember DGV positions
-         */
-        if (DGV_Applications.CurrentRow != null && DGV_Applications.CurrentRow == DGV_Applications.Rows[DGV_Applications.Rows.Count - 1])
-          lIsLastLine = true;
-
-        lLastPosition = DGV_Applications.FirstDisplayedScrollingRowIndex;
-        lLastRowIndex = DGV_Applications.Rows.Count - 1;
-
-        if (DGV_Applications.CurrentCell != null)
-          lSelectedIndex = DGV_Applications.CurrentCell.RowIndex;
-
 
         lock (this)
         {
@@ -644,14 +626,48 @@ namespace Plugin.Main
 
     public void update(List<ApplicationRecord> pRecordList)
     {
+      bool lIsLastLine = false;
+      int lLastPosition = -1;
+      int lLastRowIndex = -1;
+      int lSelectedIndex = -1;
+
+
       lock (this)
       {
-        pRecordList.Clear();
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Applications.CurrentRow != null && DGV_Applications.CurrentRow == DGV_Applications.Rows[DGV_Applications.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Applications.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Applications.Rows.Count - 1;
+
+        if (DGV_Applications.CurrentCell != null)
+          lSelectedIndex = DGV_Applications.CurrentCell.RowIndex;
+
+        cApplications.Clear();
         foreach (ApplicationRecord lTmp in pRecordList)
           cApplications.Add(lTmp);
-      }
+        // Selected cell/row
+        try
+        {
+          if (lSelectedIndex >= 0)
+            DGV_Applications.CurrentCell = DGV_Applications.Rows[lSelectedIndex].Cells[0];
+        }
+        catch (Exception) { }
 
-      DGV_Applications.Refresh();
+
+        // Reset position
+        try
+        {
+          if (lLastPosition >= 0)
+            DGV_Applications.FirstDisplayedScrollingRowIndex = lLastPosition;
+        }
+        catch (Exception) { }
+
+        DGV_Applications.Refresh();
+      } // lock (thi...
     }
 
     #endregion

@@ -171,23 +171,7 @@ namespace Plugin.Main
       {
         List<HTTPRequests> lNewRecords = new List<HTTPRequests>();
         List<String> lNewData;
-        bool lIsLastLine = false;
-        int lLastPosition = -1;
-        int lLastRowIndex = -1;
-        int lSelectedIndex = -1;
 
-
-        /*
-         * Remember DGV positions
-         */
-        if (DGV_HTTPRequests.CurrentRow != null && DGV_HTTPRequests.CurrentRow == DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1])
-          lIsLastLine = true;
-
-        lLastPosition = DGV_HTTPRequests.FirstDisplayedScrollingRowIndex;
-        lLastRowIndex = DGV_HTTPRequests.Rows.Count - 1;
-
-        if (DGV_HTTPRequests.CurrentCell != null)
-          lSelectedIndex = DGV_HTTPRequests.CurrentCell.RowIndex;
 
 
         lock (this)
@@ -234,6 +218,10 @@ namespace Plugin.Main
 
                   lNewRecords.Add(new HTTPRequests(lMAC, lSrcIP, lMethod, lRemoteHost, lReqString, lCookies, lData));
 
+
+                  /*
+                   * If we reached the max no. of records remove records on the top.
+                   */
                   try
                   {
                     cHTTPRequests.Add(new HTTPRequests(lMAC, lSrcIP, lMethod, lRemoteHost, lReqString, lCookies, lData));
@@ -244,8 +232,6 @@ namespace Plugin.Main
                   {
                     PluginParameters.HostApplication.LogMessage(lEx.StackTrace);
                   }
-
-
                 } // if (lDstPort == "80" ...
               } // if (lSpli...
             } // if (pData.Le...
@@ -257,35 +243,6 @@ namespace Plugin.Main
         } // for (String lE...
 
         cTask.addRecords(lNewRecords);
-
-        //UseFilter();
-
-        /*
-         * Filter
-         */
-        try
-        {
-          if (!CompareToFilter(DGV_HTTPRequests.Rows[lLastRowIndex + 1].Cells["URL"].Value.ToString()))
-            DGV_HTTPRequests.Rows[lLastRowIndex + 1].Visible = false;
-        }
-        catch { }
-
-        try
-        {
-          if (lIsLastLine)
-          {
-            DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1].Selected = true;
-            DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition + 1;
-          }
-          else
-            DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition;
-        }
-        catch { }
-
-        if (lSelectedIndex >= 0)
-          DGV_HTTPRequests.CurrentCell = DGV_HTTPRequests.Rows[lSelectedIndex].Cells[0];
-
-        DGV_HTTPRequests.Refresh();
       } // if (cDat...
     }
 
@@ -628,7 +585,7 @@ namespace Plugin.Main
 
         lock (this)
         {
-          if (cDataBatch != null && pData != null && pData.Length > 0)
+          if (cDataBatch != null && !String.IsNullOrEmpty(pData))
           {
             cDataBatch.Add(pData);
           }
@@ -851,9 +808,66 @@ namespace Plugin.Main
 
     public void update(List<HTTPRequests> pHTTPReqList)
     {
-      cHTTPRequests.Clear();
-      foreach (HTTPRequests lTmp in pHTTPReqList)
-        cHTTPRequests.Add(lTmp);
+      lock (this)
+      {
+        bool lIsLastLine = false;
+        int lLastPosition = -1;
+        int lLastRowIndex = -1;
+        int lSelectedIndex = -1;
+
+
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_HTTPRequests.CurrentRow != null && DGV_HTTPRequests.CurrentRow == DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_HTTPRequests.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_HTTPRequests.Rows.Count - 1;
+
+        if (DGV_HTTPRequests.CurrentCell != null)
+          lSelectedIndex = DGV_HTTPRequests.CurrentCell.RowIndex;
+
+
+        cHTTPRequests.Clear();
+        foreach (HTTPRequests lTmp in pHTTPReqList)
+          cHTTPRequests.Add(lTmp);
+
+        //UseFilter();
+
+        // Filter
+        try
+        {
+          if (!CompareToFilter(DGV_HTTPRequests.Rows[lLastRowIndex + 1].Cells["URL"].Value.ToString()))
+            DGV_HTTPRequests.Rows[lLastRowIndex + 1].Visible = false;
+        }
+        catch { }
+
+        // Selected cell/row
+        try
+        {
+          if (lSelectedIndex >= 0)
+            DGV_HTTPRequests.CurrentCell = DGV_HTTPRequests.Rows[lSelectedIndex].Cells[0];
+        }
+        catch { }
+
+        // Reset position
+        try
+        {
+          if (lIsLastLine)
+          {
+            DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1].Selected = true;
+            DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition + 1;
+          }
+          else
+            DGV_HTTPRequests.FirstDisplayedScrollingRowIndex = lLastPosition;
+        }
+        catch { }
+
+
+        DGV_HTTPRequests.Refresh();
+
+      }
     }
 
 

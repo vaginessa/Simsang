@@ -514,23 +514,6 @@ namespace Plugin.Main
       {
         List<Account> lNewRecords = new List<Account>();
         List<String> lNewData;
-        bool lIsLastLine = false;
-        int lLastPosition = -1;
-        int lLastRowIndex = -1;
-        int lSelectedIndex = -1;
-
-
-        /*
-         * Remember DGV positions
-         */
-        if (DGV_Accounts.CurrentRow != null && DGV_Accounts.CurrentRow == DGV_Accounts.Rows[DGV_Accounts.Rows.Count - 1])
-          lIsLastLine = true;
-
-        lLastPosition = DGV_Accounts.FirstDisplayedScrollingRowIndex;
-        lLastRowIndex = DGV_Accounts.Rows.Count - 1;
-
-        if (DGV_Accounts.CurrentCell != null)
-          lSelectedIndex = DGV_Accounts.CurrentCell.RowIndex;
 
 
         lock (this)
@@ -812,10 +795,7 @@ namespace Plugin.Main
     /// <param name="e"></param>
     private void TSMI_Clear_Click(object sender, EventArgs e)
     {
-      lock (this)
-      {
-        cTask.clearRecordList();
-      }
+      cTask.clearRecordList();      
     }
 
     /// <summary>
@@ -897,11 +877,50 @@ namespace Plugin.Main
 
     public void updateRecords(List<Account> pHostnameIPPair)
     {
-      cAccounts.Clear();
-      foreach (Account lTmp in pHostnameIPPair)
-        cAccounts.Add(new Account(lTmp.SrcMAC, lTmp.SrcIP, lTmp.DstIP, lTmp.DstPort, lTmp.Username, lTmp.Password));
+      bool lIsLastLine = false;
+      int lLastPosition = -1;
+      int lLastRowIndex = -1;
+      int lSelectedIndex = -1;
 
-      DGV_Accounts.Refresh();
+      lock (this)
+      {
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Accounts.CurrentRow != null && DGV_Accounts.CurrentRow == DGV_Accounts.Rows[DGV_Accounts.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Accounts.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Accounts.Rows.Count - 1;
+
+        if (DGV_Accounts.CurrentCell != null)
+          lSelectedIndex = DGV_Accounts.CurrentCell.RowIndex;
+
+
+        cAccounts.Clear();
+        foreach (Account lTmp in pHostnameIPPair)
+          cAccounts.Add(new Account(lTmp.SrcMAC, lTmp.SrcIP, lTmp.DstIP, lTmp.DstPort, lTmp.Username, lTmp.Password));
+
+        // Selected cell/row
+        try
+        {
+          if (lSelectedIndex >= 0)
+            DGV_Accounts.CurrentCell = DGV_Accounts.Rows[lSelectedIndex].Cells[0];
+        }
+        catch (Exception) { }
+
+
+        // Reset position
+        try
+        {
+          if (lLastPosition >= 0)
+            DGV_Accounts.FirstDisplayedScrollingRowIndex = lLastPosition;
+        }
+        catch (Exception) { }
+
+
+        DGV_Accounts.Refresh();
+      } // lock (thi...
     }
 
     public void updateRedirectURL(String pRedirectURL)

@@ -164,24 +164,6 @@ namespace Plugin.Main
       {
         List<SystemRecord> lNewRecords = new List<SystemRecord>();
         List<String> lNewData;
-        bool lIsLastLine = false;
-        int lLastPosition = -1;
-        int lLastRowIndex = -1;
-        int lSelectedIndex = -1;
-
-
-        /*
-         * Remember DGV positions
-         */
-        if (DGV_Systems.CurrentRow != null && DGV_Systems.CurrentRow == DGV_Systems.Rows[DGV_Systems.Rows.Count - 1])
-          lIsLastLine = true;
-
-        lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
-        lLastRowIndex = DGV_Systems.Rows.Count - 1;
-
-        if (DGV_Systems.CurrentCell != null)
-          lSelectedIndex = DGV_Systems.CurrentCell.RowIndex;
-        
 
         lock (this)
         {
@@ -223,7 +205,7 @@ namespace Plugin.Main
                 {
                   try
                   {
-                    lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+//                    lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
                     lUserAgent = lMatchUserAgent.Groups[1].Value.ToString();
                     lOperatingSystem = GetOperatingSystem(lUserAgent);
                   }
@@ -254,19 +236,19 @@ namespace Plugin.Main
                       if ((lTabelRow = GetRowByMAC(lSMAC)) != null)
                         lTabelRow.Cells["OperatingSystem"].ToolTipText = lUserAgent;
 
-                      if (lLastPosition >= 0)
-                        DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+//                      if (lLastPosition >= 0)
+//                        DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
                     }
                     else if (lSIP.Length > 0 && lSMAC.Length > 0)
                     {
-                      lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+//                      lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
                       lock (this)
                       {
                         cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));
                       }
 
-                      if (lLastPosition >= 0)
-                        DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+//                      if (lLastPosition >= 0)
+//                        DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
                     }
                   }
                   catch (RecordException lEx)
@@ -287,7 +269,7 @@ namespace Plugin.Main
                 }
                 else if (lEntryType == EntryType.Empty && lSIP.Length > 0 && lSMAC.Length > 0)
                 {
-                  lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+//                  lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
                   try
                   {
                     lock (this)
@@ -299,8 +281,8 @@ namespace Plugin.Main
                   {
                   }
 
-                  if (lLastPosition >= 0)
-                    DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+//                  if (lLastPosition >= 0)
+//                    DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
                 } // if (lDstPort...
 
 
@@ -863,12 +845,49 @@ namespace Plugin.Main
     /// <param name="pRecordList"></param>
     public void updateRecordList(List<SystemRecord> pRecordList)
     {
+      bool lIsLastLine = false;
+      int lLastPosition = -1;
+      int lLastRowIndex = -1;
+      int lSelectedIndex = -1;
+
       lock (this)
       {
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Systems.CurrentRow != null && DGV_Systems.CurrentRow == DGV_Systems.Rows[DGV_Systems.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Systems.Rows.Count - 1;
+
+        if (DGV_Systems.CurrentCell != null)
+          lSelectedIndex = DGV_Systems.CurrentCell.RowIndex;
+        
+
         cSystems.Clear();
         if (pRecordList != null)
           foreach (SystemRecord lTmp in pRecordList)
             cSystems.Add(new SystemRecord(lTmp.SrcMAC, lTmp.SrcIP, lTmp.UserAgent, lTmp.HWVendor, lTmp.OperatingSystem, lTmp.LastSeen));
+
+        // Selected cell/row
+        try
+        {
+          if (lSelectedIndex >= 0)
+            DGV_Systems.CurrentCell = DGV_Systems.Rows[lSelectedIndex].Cells[0];
+        }
+        catch (Exception) { }
+
+
+        // Reset position
+        try
+        {
+          if (lLastPosition >= 0)
+            DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
+        }
+        catch (Exception) { }
+
+        DGV_Systems.Refresh();
       }
     }
 
