@@ -13,6 +13,7 @@ using System.Configuration;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using System.Reflection;
 
 using Simsang.Plugin;
 using Simsang.MiniBrowser;
@@ -33,6 +34,7 @@ namespace Plugin.Main
     private List<String> cTargetList;
     private BindingList<Session.Config.Session> cSessions;
     public List<MngSessionsConfig.SessionPattern> cSessionPatterns;
+    private List<String> cDataBatch;
     private TaskFacade cTask;
     private PluginParameters cPluginParams;
     private TreeNode mFilterNode;
@@ -141,7 +143,11 @@ namespace Plugin.Main
         Ports = "TCP:80;TCP:443;",
         IsActive = true
       };
+      cDataBatch = new List<String>();
 
+      // Make it double buffered.
+      typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, DGV_Sessions, new object[] { true });
+      T_GUIUpdate.Start();
 
       cSessionPatterns = new List<MngSessionsConfig.SessionPattern>();
       TV_Sessions.DoubleClick += TreeView_DoubleClick;
@@ -446,40 +452,11 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-
-        try
+        lock (this)
         {
-          if (pData != null && pData.Length > 0)
-          {
-            String[] lSplitter = Regex.Split(pData, @"\|\|");
-            if (lSplitter.Length == 7)
-            {
-              String lProto = lSplitter[0];
-              String lSMAC = lSplitter[1];
-              String lSIP = lSplitter[2];
-              String lSPort = lSplitter[3];
-              String lDIP = lSplitter[4];
-              String lDPort = lSplitter[5];
-              String lData = lSplitter[6];
-
-
-              foreach (MngSessionsConfig.SessionPattern lTmp in cSessionPatterns)
-              {
-                String lHost = String.Format(@"\.\.Host\s*:\s*{0}\.\.", lTmp.HTTPHost);
-                if (Regex.Match(lData, @lHost, RegexOptions.IgnoreCase).Success &&
-                    Regex.Match(lData, @lTmp.SessionPatternString, RegexOptions.IgnoreCase).Success)
-                {
-                  EvaluateSession(lData, lSMAC, lSIP, lTmp.Webpage, lTmp.SessionName.ToLower());
-                  break;
-                } // if (Rege...
-              } // foreach (Sessio...
-            } // if (lSplitt...
-          } // if (pData.L..
-        }
-        catch (Exception lEx)
-        {
-          MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
-        }
+          if (cDataBatch != null && pData != null && pData.Length > 0)
+            cDataBatch.Add(pData);
+        } // lock (this)
       } // if (cIsActiv...
     }
 
@@ -499,6 +476,83 @@ namespace Plugin.Main
 
 
     #region PRIVATE
+    /// <summary>
+    /// 
+    /// </summary>
+    public void ProcessEntries()
+    {
+      if (cDataBatch != null && cDataBatch.Count > 0)
+      {
+        List<Session.Config.Session> lNewRecords = new List<Session.Config.Session>();
+        List<String> lNewData;
+        bool lIsLastLine = false;
+        int lLastPosition = -1;
+        int lLastRowIndex = -1;
+        int lSelectedIndex = -1;
+
+        
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Sessions.CurrentRow != null && DGV_Sessions.CurrentRow == DGV_Sessions.Rows[DGV_Sessions.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Sessions.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Sessions.Rows.Count - 1;
+
+        if (DGV_Sessions.CurrentCell != null)
+          lSelectedIndex = DGV_Sessions.CurrentCell.RowIndex;
+
+
+        lock (this)
+        {
+          lNewData = new List<String>(cDataBatch);
+          cDataBatch.Clear();
+        } // lock (this)...
+
+
+        foreach (String lEntry in lNewData)
+        {
+          try
+          {
+            if (!String.IsNullOrEmpty(lEntry))
+            {
+              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
+              if (lSplitter.Length == 7)
+              {
+                String lProto = lSplitter[0];
+                String lSMAC = lSplitter[1];
+                String lSIP = lSplitter[2];
+                String lSPort = lSplitter[3];
+                String lDIP = lSplitter[4];
+                String lDPort = lSplitter[5];
+                String lData = lSplitter[6];
+
+
+                foreach (MngSessionsConfig.SessionPattern lTmp in cSessionPatterns)
+                {
+                  String lHost = String.Format(@"\.\.Host\s*:\s*{0}\.\.", lTmp.HTTPHost);
+                  if (Regex.Match(lData, @lHost, RegexOptions.IgnoreCase).Success &&
+                      Regex.Match(lData, @lTmp.SessionPatternString, RegexOptions.IgnoreCase).Success)
+                  {
+                    lock (this)
+                    {
+                      EvaluateSession(lData, lSMAC, lSIP, lTmp.Webpage, lTmp.SessionName.ToLower());
+                    }
+                    break;
+                  } // if (Rege...
+                } // foreach (Sessio...
+              } // if (lSplitt...
+            } // if (pData.L..
+          }
+          catch (Exception lEx)
+          {
+            MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
+          }
+        } // foreach (...
+      } // if (cBatch...
+    }
+
 
     /// <summary>
     /// 
@@ -830,6 +884,17 @@ namespace Plugin.Main
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+    private void T_GUIUpdate_Tick(object sender, EventArgs e)
+    {
+      ProcessEntries();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void TreeView_DoubleClick(object sender, EventArgs e)
     {
       try
@@ -1054,14 +1119,17 @@ namespace Plugin.Main
     {
       int lLastPosition = DGV_Sessions.FirstDisplayedScrollingRowIndex;
 
-      cSessions.Clear();
-      foreach (Session.Config.Session lTmp in pRecordList)
-        cSessions.Add(lTmp);
+      lock (this)
+      {
+        cSessions.Clear();
+        foreach (Session.Config.Session lTmp in pRecordList)
+          cSessions.Add(lTmp);
 
-      DGVFilter();
+        DGVFilter();
 
-      if (lLastPosition >= 0)
-        DGV_Sessions.FirstDisplayedScrollingRowIndex = lLastPosition;
+        if (lLastPosition >= 0)
+          DGV_Sessions.FirstDisplayedScrollingRowIndex = lLastPosition;
+      }
 
       DGV_Sessions.Refresh();
     }
