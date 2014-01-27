@@ -169,7 +169,7 @@
       this.ClientSize = new System.Drawing.Size(636, 409);
       this.Controls.Add(this.GB_NewPattern);
       this.Controls.Add(this.DGV_ApplicationPatterns);
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MaximizeBox = false;
       this.MinimizeBox = false;

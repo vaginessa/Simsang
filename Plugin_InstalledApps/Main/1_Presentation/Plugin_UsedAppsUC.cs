@@ -10,6 +10,7 @@ using System.Collections;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Configuration;
+using System.Reflection;
 
 using Simsang.Plugin;
 using Plugin.Main.Applications;
@@ -27,6 +28,7 @@ namespace Plugin.Main
     private List<String> cTargetList;
     private BindingList<ApplicationRecord> cApplications;
     public List<MngApplication.ApplicationPattern> cApplicationPatterns;
+    private List<String> cDataBatch;
     private String cPatternFilePath = @"plugins\UsedApps\Plugin_UsedApps_Patterns.xml";
     private TaskFacade cTask;
     private PluginParameters cPluginParams;
@@ -116,6 +118,12 @@ namespace Plugin.Main
         IsActive = true
       };
 
+      cDataBatch = new List<String>();
+
+      // Make it double buffered.
+      typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, DGV_Applications, new object[] { true });
+      T_GUIUpdate.Start();
+      
       cApplicationPatterns = new List<MngApplication.ApplicationPattern>();
       cTask = TaskFacade.getInstance(this);
     }
@@ -124,6 +132,118 @@ namespace Plugin.Main
 
 
     #region PRIVATE
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void ProcessEntries()
+    {
+      if (cDataBatch != null && cDataBatch.Count > 0)
+      {
+        List<ApplicationRecord> lNewRecords = new List<ApplicationRecord>();
+        List<String> lNewData;
+        bool lIsLastLine = false;
+        int lLastPosition = -1;
+        int lLastRowIndex = -1;
+        int lSelectedIndex = -1;
+
+
+        /*
+         * Remember DGV positions
+         */
+        if (DGV_Applications.CurrentRow != null && DGV_Applications.CurrentRow == DGV_Applications.Rows[DGV_Applications.Rows.Count - 1])
+          lIsLastLine = true;
+
+        lLastPosition = DGV_Applications.FirstDisplayedScrollingRowIndex;
+        lLastRowIndex = DGV_Applications.Rows.Count - 1;
+
+        if (DGV_Applications.CurrentCell != null)
+          lSelectedIndex = DGV_Applications.CurrentCell.RowIndex;
+
+
+        lock (this)
+        {
+          lNewData = new List<String>(cDataBatch);
+          cDataBatch.Clear();
+        } // lock (this)...
+
+
+        foreach (String lEntry in lNewData)
+        {
+          try
+          {
+            if (!String.IsNullOrEmpty(lEntry))
+            {
+              string[] lSplitter = Regex.Split(lEntry, @"\|\|");
+              if (lSplitter.Length == 7)
+              {
+                String lProto = lSplitter[0];
+                String lSMAC = lSplitter[1];
+                String lSIP = lSplitter[2];
+                String lSPort = lSplitter[3];
+                String lDIP = lSplitter[4];
+                String lDPort = lSplitter[5];
+                String lData = lSplitter[6];
+                Match lMatchURI;
+                Match lMatchHost;
+                String lRemoteHost = String.Empty;
+                String lReqString = String.Empty;
+                String lRemotePort = "0";
+                String lRemoteString = String.Empty;
+
+
+                if (lProto == "TCP" && lDPort == "80" &&
+                    ((lMatchURI = Regex.Match(lData, @"(\s+|^)(GET|POST|HEAD)\s+([^\s]+)\s+HTTP\/"))).Success &&
+                    ((lMatchHost = Regex.Match(lData, @"\.\.Host\s*:\s*([\w\d\.]+?)\.\.", RegexOptions.IgnoreCase))).Success)
+                {
+                  lRemotePort = "80";
+                  lRemoteHost = lMatchHost.Groups[1].Value.ToString();
+                  lReqString = lMatchURI.Groups[3].Value.ToString();
+
+                  lRemoteString = lRemoteHost + ":" + lRemotePort + lReqString;
+
+
+                  //Write2Pipe() : |DNSREQ||00:1B:77:53:5C:F8||192.168.100.117||35976||192.168.100.1||53||wl.tac.ch
+                }
+                else if (lProto == "DNSREQ" && lDPort == "53")
+                {
+                  lRemoteString = lData;
+                }
+
+
+                /*
+                 * Browse through patterns to identify the app
+                 */
+                if (lRemoteString.Length > 5)
+                {
+                  foreach (MngApplication.ApplicationPattern lPattern in cApplicationPatterns)
+                  {
+                    if (Regex.Match(lRemoteString, @lPattern.ApplicationPatternString).Success)
+                    {
+                      ApplicationRecord lNewApplication = new ApplicationRecord(lSMAC, lSIP, lDPort, lRemoteHost, lReqString, lPattern.ApplicationName, lPattern.CompanyURL);
+                      if (!cApplications.Contains(lNewApplication))
+                      {
+                        lock (this)
+                        {
+                          cApplications.Add(lNewApplication);
+                        }
+                      }
+                    } // if (lSplit2.L...
+                  } //foreach (st...
+
+                  //mApplications.Add(new Applications(lSMAC, lSIP, lDPort, lRemoteHost, lReqString, "", lRemoteString));
+                } // if (lRemoteString...
+              } // if (lSplitte...
+            } // if (pData.Leng...
+          }
+          catch (Exception lEx)
+          {
+            MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.ToString()));
+          }
+        } // foreach (...
+      } // if (cDataBa...
+    }
 
     /// <summary>
     /// 
@@ -394,73 +514,11 @@ namespace Plugin.Main
           return;
         } // if (InvokeRequired)
 
-
-        try
+        lock (this)
         {
-          if (pData != null && pData.Length > 0)
-          {
-            string[] lSplitter = Regex.Split(pData, @"\|\|");
-            if (lSplitter.Length == 7)
-            {
-              String lProto = lSplitter[0];
-              String lSMAC = lSplitter[1];
-              String lSIP = lSplitter[2];
-              String lSPort = lSplitter[3];
-              String lDIP = lSplitter[4];
-              String lDPort = lSplitter[5];
-              String lData = lSplitter[6];
-              Match lMatchURI;
-              Match lMatchHost;
-              String lRemoteHost = String.Empty;
-              String lReqString = String.Empty;
-              String lRemotePort = "0";
-              String lRemoteString = String.Empty;
-
-
-              if (lProto == "TCP" && lDPort == "80" &&
-                  ((lMatchURI = Regex.Match(lData, @"(\s+|^)(GET|POST|HEAD)\s+([^\s]+)\s+HTTP\/"))).Success &&
-                  ((lMatchHost = Regex.Match(lData, @"\.\.Host\s*:\s*([\w\d\.]+?)\.\.", RegexOptions.IgnoreCase))).Success)
-              {
-                lRemotePort = "80";
-                lRemoteHost = lMatchHost.Groups[1].Value.ToString();
-                lReqString = lMatchURI.Groups[3].Value.ToString();
-
-                lRemoteString = lRemoteHost + ":" + lRemotePort + lReqString;
-
-
-                //Write2Pipe() : |DNSREQ||00:1B:77:53:5C:F8||192.168.100.117||35976||192.168.100.1||53||wl.tac.ch
-              }
-              else if (lProto == "DNSREQ" && lDPort == "53")
-              {
-                lRemoteString = lData;
-              }
-
-
-              /*
-               * Browse through patterns to identify the app
-               */
-              if (lRemoteString.Length > 5)
-              {
-                foreach (MngApplication.ApplicationPattern lPattern in cApplicationPatterns)
-                {
-                  if (Regex.Match(lRemoteString, @lPattern.ApplicationPatternString).Success)
-                  {
-                    ApplicationRecord lNewApplication = new ApplicationRecord(lSMAC, lSIP, lDPort, lRemoteHost, lReqString, lPattern.ApplicationName, lPattern.CompanyURL);
-                    if (!cApplications.Contains(lNewApplication))
-                      cApplications.Add(lNewApplication);
-
-                  } // if (lSplit2.L...
-                } //foreach (st...
-
-                //mApplications.Add(new Applications(lSMAC, lSIP, lDPort, lRemoteHost, lReqString, "", lRemoteString));
-              } // if (lRemoteString...
-            } // if (lSplitte...
-          } // if (pData.Leng...
-        }
-        catch (Exception lEx)
-        {
-          MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.ToString()));
-        }
+          if (cDataBatch != null && pData != null && pData.Length > 0)
+            cDataBatch.Add(pData);
+        } // lock (this)
       } // if (cIsActi...
     }
 
@@ -480,6 +538,17 @@ namespace Plugin.Main
 
 
     #region EVENTS
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void T_GUIUpdate_Tick(object sender, EventArgs e)
+    {
+      ProcessEntries();
+    }
+
 
     /// <summary>
     /// 
@@ -575,9 +644,12 @@ namespace Plugin.Main
 
     public void update(List<ApplicationRecord> pRecordList)
     {
-      pRecordList.Clear();
-      foreach (ApplicationRecord lTmp in pRecordList)
-        cApplications.Add(lTmp);
+      lock (this)
+      {
+        pRecordList.Clear();
+        foreach (ApplicationRecord lTmp in pRecordList)
+          cApplications.Add(lTmp);
+      }
 
       DGV_Applications.Refresh();
     }
