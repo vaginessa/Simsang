@@ -16,6 +16,7 @@ namespace Plugin.Main.HTTPRequest
 
     private static DomainFacade cInstance;
     private InfrastructureFacade cInfrastructure;
+    private const int cMaxTableRows = 128;
     private List<HTTPRequests> cRecordList;
     private List<IObserver> cObserverList;
     private IPlugin cPlugin;
@@ -68,6 +69,10 @@ namespace Plugin.Main.HTTPRequest
       {
         foreach (HTTPRequests lTmp in pRecords)
           cRecordList.Add(lTmp);
+
+        // Resize the DGV to the defined maximum size.
+        while (cRecordList.Count > cMaxTableRows)
+          cRecordList.RemoveAt(0);
 
         notify();
       }

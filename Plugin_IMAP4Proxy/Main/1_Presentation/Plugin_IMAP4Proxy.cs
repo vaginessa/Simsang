@@ -182,36 +182,44 @@ namespace Plugin.Main
       {
         List<IMAP4Account> lNewRecords = new List<IMAP4Account>();
         List<String> lNewData;
-        
+        String[] lSplitter;
+        String lProto; 
+        String lSMAC;
+        String lSIP;
+        String lSPort; 
+        String lDIP;
+        String lDPort; 
+        String lData;
+        String lPassword;
+        String lServer;
+
         lock (this)
         {
           lNewData = new List<String>(cDataBatch);
           cDataBatch.Clear();
         } // lock (this)...
 
+
+        List<IMAP4Account> lNewRecordsBatch = new List<IMAP4Account>();
         foreach (String lEntry in lNewData)
         {
           if (!String.IsNullOrEmpty(lEntry))
           {
             try
             {
-              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
-              if (lSplitter.Length == 9)
+              if ((lSplitter = Regex.Split(lEntry, @"\|\|")).Length == 9)
               {
-                String lProto = lSplitter[0];
-                String lSMAC = lSplitter[1];
-                String lSIP = lSplitter[2];
-                String lSPort = lSplitter[3];
-                String lDIP = lSplitter[4];
-                String lDPort = lSplitter[5];
-                String lData = lSplitter[6];
-                String lPassword = lSplitter[7];
-                String lServer = lSplitter[8];
+                lProto = lSplitter[0];
+                lSMAC = lSplitter[1];
+                lSIP = lSplitter[2];
+                lSPort = lSplitter[3];
+                lDIP = lSplitter[4];
+                lDPort = lSplitter[5];
+                lData = lSplitter[6];
+                lPassword = lSplitter[7];
+                lServer = lSplitter[8];
 
-                lock (this)
-                {
-                  cTask.addRecord(new IMAP4Account(lSMAC, lSIP, lDIP, lDPort, lData, lPassword, lServer));
-                }
+                lNewRecordsBatch.Add(new IMAP4Account(lSMAC, lSIP, lDIP, lDPort, lData, lPassword, lServer));
               } // if (lSplitter...
             }
             catch (Exception)
@@ -219,6 +227,9 @@ namespace Plugin.Main
             }
           } // if (!String...
         } // foreach (Str...
+
+        if (lNewRecordsBatch.Count > 0)
+          cTask.addRecord(lNewRecordsBatch);                
       } // if (cData...
     }
 

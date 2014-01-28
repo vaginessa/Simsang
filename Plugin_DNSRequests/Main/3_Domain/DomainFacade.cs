@@ -19,7 +19,7 @@ namespace Plugin.Main.DNSRequest
     private List<IObserver> cObserverList;
     private BindingList<DNSRequestRecord> cRecordList;
     private InfrastructureFacade cInfrastructure;
-    private const int cMaxTableRows = 512;
+    private const int cMaxTableRows = 128;
     private IPlugin cPlugin;
 
     #endregion
@@ -64,21 +64,25 @@ namespace Plugin.Main.DNSRequest
     /// 
     /// </summary>
     /// <param name="pDNSReq"></param>
-    public void addRecord(DNSRequestRecord pDNSReq)
+    public void addRecord(List<DNSRequestRecord> pDNSReq)
     {
-      if (pDNSReq != null)
+      if (pDNSReq != null && pDNSReq.Count > 0)
       {
-        if (String.IsNullOrEmpty(pDNSReq.SrcIP))
-          throw new Exception("Something is wrong with the source IP.");
-        else if (String.IsNullOrEmpty(pDNSReq.DNSHostname))
-          throw new Exception("Something is wrong with the source host name.");
-        else if (String.IsNullOrEmpty(pDNSReq.PacketType))
-          throw new Exception("Something is wrong with the source request type.");
+        foreach (DNSRequestRecord lTmpReq in pDNSReq)
+        {
+          if (String.IsNullOrEmpty(lTmpReq.SrcIP))
+            throw new Exception("Something is wrong with the source IP.");
+          else if (String.IsNullOrEmpty(lTmpReq.DNSHostname))
+            throw new Exception("Something is wrong with the source host name.");
+          else if (String.IsNullOrEmpty(lTmpReq.PacketType))
+            throw new Exception("Something is wrong with the source request type.");
+
+          cRecordList.Add(lTmpReq);
+        } // foreach ...
 
 
-        cRecordList.Add(pDNSReq);
-
-        if (cRecordList.Count > cMaxTableRows)
+        // Resize the DGV to the defined maximum size. \
+        while (cRecordList.Count > cMaxTableRows)
           cRecordList.RemoveAt(0);
 
         notify();

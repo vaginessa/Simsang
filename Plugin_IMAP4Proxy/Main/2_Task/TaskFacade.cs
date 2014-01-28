@@ -83,7 +83,7 @@ namespace Plugin.Main.IMAP4Proxy
     /// 
     /// </summary>
     /// <param name="pRecord"></param>
-    public void addRecord(IMAP4Account pRecord)
+    public void addRecord(List<IMAP4Account> pRecord)
     {
       cDomain.addRecord(pRecord);
     }

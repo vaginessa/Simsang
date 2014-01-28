@@ -243,7 +243,6 @@ namespace Plugin.Main
           PluginParameters.HostApplication.PluginSetStatus(this, "grey");
           cTask.onStop();
         }  // if (lRemoteHost ...
-
       } // if (cIsActiv...
     }
 
@@ -515,7 +514,15 @@ namespace Plugin.Main
       {
         List<Account> lNewRecords = new List<Account>();
         List<String> lNewData;
-
+        int lDstPortInt;
+        String[] lSplitter;
+        String lProto;
+        String lSMAC;
+        String lSIP;
+        String lSPort;
+        String lDIP;
+        String lDPort;
+        String lData;
 
         lock (this)
         {
@@ -528,18 +535,17 @@ namespace Plugin.Main
         {
           try
           {
-            if (lEntry != null && lEntry.Length > 0)
+            if (!String.IsNullOrEmpty(lEntry))
             {
-              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
-              if (lSplitter.Length == 7)
+              if ((lSplitter = Regex.Split(lEntry, @"\|\|")).Length == 7)
               {
-                String lProto = lSplitter[0];
-                String lSMAC = lSplitter[1];
-                String lSIP = lSplitter[2];
-                String lSPort = lSplitter[3];
-                String lDIP = lSplitter[4];
-                String lDPort = lSplitter[5];
-                String lData = lSplitter[6];
+                lProto = lSplitter[0];
+                lSMAC = lSplitter[1];
+                lSIP = lSplitter[2];
+                lSPort = lSplitter[3];
+                lDIP = lSplitter[4];
+                lDPort = lSplitter[5];
+                lData = lSplitter[6];
 
 
                 /*
@@ -557,14 +563,14 @@ namespace Plugin.Main
                   return;
                 }
 
-                if (lAuthData.CompanyURL.Length > 0 &&
-                    lAuthData.Username.Length > 0 &&
-                    lAuthData.Password.Length > 0)
+                if (lAuthData.CompanyURL.Length > 0 && lAuthData.Username.Length > 0 && lAuthData.Password.Length > 0)
                 {
-                  lock (this)
-                  {
-                    cTask.addRecord(new Account(lSMAC, lSIP, lAuthData.CompanyURL, lDPort, lAuthData.Username, lAuthData.Password));
-                  } // lock (this...
+                  if (!Int32.TryParse(lDPort, out lDstPortInt))
+                    throw new Exception("Something is wrong with the remote port.");
+                  else if (!Regex.Match(lDIP, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$").Success && !Regex.Match(lDIP, @"\.[\d\w]+").Success)
+                    throw new Exception("Something is wrong with the remote system.");
+                  
+                  lNewRecords.Add(new Account(lSMAC, lSIP, lAuthData.CompanyURL, lDPort, lAuthData.Username, lAuthData.Password));
                 } // if (lAuthData.Co...
               } // if (lSplitter...
             } // if (pData.Lengt ...
@@ -574,6 +580,10 @@ namespace Plugin.Main
             PluginParameters.HostApplication.LogMessage(String.Format("{0} : {1}", Config.PluginName, lEx.Message));
           }
         } // foreach ...
+
+        if (lNewRecords.Count > 0)
+          cTask.addRecord(lNewRecords);
+
       } // if (cDataBat...
     }
 

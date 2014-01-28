@@ -86,9 +86,9 @@ namespace Plugin.Main.POP3Proxy
     /// 
     /// </summary>
     /// <param name="pRecord"></param>
-    public void addRecord(POP3Account pRecord)
+    public void addRecord(List<POP3Account> pRecords)
     {
-      cDomain.addRecord(pRecord);
+      cDomain.addRecord(pRecords);
     }
 
 

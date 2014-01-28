@@ -17,8 +17,9 @@ namespace Plugin.Main.Applications
     #region MEMBERS
 
     private static DomainFacade cInstance;
-    private List<IObserver> cObserverList;
     private InfrastructureFacade cInfrastructure;
+    private const int cMaxTableRows = 128;
+    private List<IObserver> cObserverList;
     private List<ApplicationRecord> cRecordList;
     private IPlugin cPlugin;
 
@@ -116,6 +117,11 @@ namespace Plugin.Main.Applications
           throw new Exception("Something is wrong with the IP address");
 
         cRecordList.Add(pRecord);
+
+        // Resize the DGV to the defined maximum size. \
+        while (cRecordList.Count > cMaxTableRows)
+          cRecordList.RemoveAt(0);
+
         notify();
       }
     }

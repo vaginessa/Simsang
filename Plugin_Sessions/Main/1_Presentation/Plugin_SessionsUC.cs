@@ -484,8 +484,15 @@ namespace Plugin.Main
     {
       if (cDataBatch != null && cDataBatch.Count > 0)
       {
-        List<Session.Config.Session> lNewRecords = new List<Session.Config.Session>();
         List<String> lNewData;
+        String[] lSplitter;
+        String lProto;
+        String lSMAC;
+        String lSIP;
+        String lSPort;
+        String lDIP;
+        String lDPort;
+        String lData;
 
         lock (this)
         {
@@ -500,16 +507,15 @@ namespace Plugin.Main
           {
             if (!String.IsNullOrEmpty(lEntry))
             {
-              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
-              if (lSplitter.Length == 7)
+              if ((lSplitter = Regex.Split(lEntry, @"\|\|")).Length == 7)
               {
-                String lProto = lSplitter[0];
-                String lSMAC = lSplitter[1];
-                String lSIP = lSplitter[2];
-                String lSPort = lSplitter[3];
-                String lDIP = lSplitter[4];
-                String lDPort = lSplitter[5];
-                String lData = lSplitter[6];
+                lProto = lSplitter[0];
+                lSMAC = lSplitter[1];
+                lSIP = lSplitter[2];
+                lSPort = lSplitter[3];
+                lDIP = lSplitter[4];
+                lDPort = lSplitter[5];
+                lData = lSplitter[6];
 
 
                 foreach (MngSessionsConfig.SessionPattern lTmp in cSessionPatterns)
@@ -518,10 +524,7 @@ namespace Plugin.Main
                   if (Regex.Match(lData, @lHost, RegexOptions.IgnoreCase).Success &&
                       Regex.Match(lData, @lTmp.SessionPatternString, RegexOptions.IgnoreCase).Success)
                   {
-                    lock (this)
-                    {
-                      EvaluateSession(lData, lSMAC, lSIP, lTmp.Webpage, lTmp.SessionName.ToLower());
-                    }
+                    EvaluateSession(lData, lSMAC, lSIP, lTmp.Webpage, lTmp.SessionName.ToLower());
                     break;
                   } // if (Rege...
                 } // foreach (Sessio...
@@ -637,16 +640,8 @@ namespace Plugin.Main
         {
           if (IsInDGV(pSrcIP, lBrowser, lCookies) == false)
           {
-            //  int lLastPosition = DGV_Sessions.FirstDisplayedScrollingRowIndex;
             AddNode(pSessionName, pSrcIP, IL_Sessions.Images.IndexOfKey(pSessionName));
-
-            //  cSessions.Add(new Session.Config.Session(pSrcMAC, pSrcIP, lHost, "80", lCookies, lBrowser, pSessionName));
             cTask.addRecord(new Session.Config.Session(pSrcMAC, pSrcIP, lHost, "80", lCookies, lBrowser, pSessionName));
-            //  DGVFilter();  // Respect the set filter rule!
-            ////  DGV_Sessions.Refresh();
-
-            //  if (lLastPosition >= 0)
-            //    DGV_Sessions.FirstDisplayedScrollingRowIndex = lLastPosition;
           }
         } // if (lCookies.L...
       } // if (((lMatc...

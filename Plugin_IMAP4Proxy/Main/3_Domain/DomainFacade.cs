@@ -17,6 +17,7 @@ namespace Plugin.Main.IMAP4Proxy
 
     private static DomainFacade cInstance;
     private InfrastructureFacade cInfrastructure;
+    private const int cMaxTableRows = 128;
     private List<IObserver> cObserverList;
     private List<IMAP4Account> cRecordList;
     private IPlugin cPlugin;
@@ -122,10 +123,19 @@ namespace Plugin.Main.IMAP4Proxy
     /// <summary>
     /// 
     /// </summary>
-    public void addRecord(IMAP4Account pRecord)
+    public void addRecord(List<IMAP4Account> pNewRecords)
     {
-      cRecordList.Add(pRecord);
-      notify();
+      if (pNewRecords != null && pNewRecords.Count > 0)
+      {
+        foreach (IMAP4Account lTmpRecord in pNewRecords)
+          cRecordList.Add(lTmpRecord);
+
+        // Resize the DGV to the defined maximum size. \
+        while (cRecordList.Count > cMaxTableRows)
+          cRecordList.RemoveAt(0);
+
+        notify();
+      }
     }
 
     #endregion

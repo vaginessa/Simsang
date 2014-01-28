@@ -19,6 +19,7 @@ namespace Plugin.Main.Session
 
     private static DomainFacade cInstance;
     private InfrastructureFacade cInfrastructure;
+    private const int cMaxTableRows = 128;
     private List<Session.Config.Session> cRecordList;
     private List<IObserver> cObserverList;
     private IPlugin cPlugin;
@@ -104,6 +105,11 @@ namespace Plugin.Main.Session
           throw new Exception("Something is wrong with the destination port.");
 
         cRecordList.Add(pRecord);
+
+        // Resize the DGV to the defined maximum size. \
+        while (cRecordList.Count > cMaxTableRows)
+          cRecordList.RemoveAt(0);
+
         notify();
       }
     }

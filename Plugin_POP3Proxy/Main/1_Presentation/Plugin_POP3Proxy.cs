@@ -178,7 +178,16 @@ namespace Plugin.Main
       {
         List<POP3Account> lNewRecords = new List<POP3Account>();
         List<String> lNewData;
-
+        String[] lSplitter;
+        String lProto; 
+        String lSMAC;
+        String lSIP;
+        String lSPort; 
+        String lDIP;
+        String lDPort; 
+        String lData;
+        String lPassword;
+        String lServer;
 
         lock (this)
         {
@@ -188,28 +197,23 @@ namespace Plugin.Main
 
         foreach (String lEntry in lNewData)
         {
-
           if (!String.IsNullOrEmpty(lEntry))
           {
             try
             {
-              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
-              if (lSplitter.Length == 9)
+              if ((lSplitter = Regex.Split(lEntry, @"\|\|")).Length == 9)
               {
-                String lProto = lSplitter[0];
-                String lSMAC = lSplitter[1];
-                String lSIP = lSplitter[2];
-                String lSPort = lSplitter[3];
-                String lDIP = lSplitter[4];
-                String lDPort = lSplitter[5];
-                String lData = lSplitter[6];
-                String lPassword = lSplitter[7];
-                String lServer = lSplitter[8];
+                lProto = lSplitter[0];
+                lSMAC = lSplitter[1];
+                lSIP = lSplitter[2];
+                lSPort = lSplitter[3];
+                lDIP = lSplitter[4];
+                lDPort = lSplitter[5];
+                lData = lSplitter[6];
+                lPassword = lSplitter[7];
+                lServer = lSplitter[8];
 
-                lock (this)
-                {
-                  cTask.addRecord(new POP3Account(lSMAC, lSIP, lDIP, lDPort, lData, lPassword, lServer));
-                }
+                lNewRecords.Add(new POP3Account(lSMAC, lSIP, lDIP, lDPort, lData, lPassword, lServer));                
               } // if (lSplitter...
             }
             catch (Exception)
@@ -217,6 +221,10 @@ namespace Plugin.Main
             }
           } // if (!String....
         } // foreach (Str...
+
+        if (lNewRecords.Count > 0)
+          cTask.addRecord(lNewRecords);
+
       } // if (cDataB...
     }
 

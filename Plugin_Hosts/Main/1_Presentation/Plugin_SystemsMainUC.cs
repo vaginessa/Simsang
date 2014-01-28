@@ -165,6 +165,19 @@ namespace Plugin.Main
       {
         List<SystemRecord> lNewRecords = new List<SystemRecord>();
         List<String> lNewData;
+        Match lMatchUserAgent;
+        EntryType lEntryType;
+        DataGridViewRow lTabelRow;
+        String[] lSplitter;
+        String lProto;
+        String lSMAC;
+        String lSIP;
+        String lSPort;
+        String lDIP;
+        String lDPort;
+        String lData;
+        String lOperatingSystem = String.Empty;
+        String lUserAgent = String.Empty;
 
         lock (this)
         {
@@ -177,25 +190,18 @@ namespace Plugin.Main
         {
           try
           {
-            if (lEntry != null && lEntry.Length > 0)
+            if (!String.IsNullOrEmpty(lEntry))
             {
-              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
-
-              if (lSplitter.Length == 7)
+              if ((lSplitter = Regex.Split(lEntry, @"\|\|")).Length == 7)
               {
-                String lProto = lSplitter[0];
-                String lSMAC = lSplitter[1];
-                String lSIP = lSplitter[2];
-                String lSPort = lSplitter[3];
-                String lDIP = lSplitter[4];
-                String lDPort = lSplitter[5];
-                String lData = lSplitter[6];
-                String lOperatingSystem = String.Empty;
-                String lUserAgent = String.Empty;
-                Match lMatchUserAgent;
-                EntryType lEntryType;
-                DataGridViewRow lTabelRow;
-
+                lProto = lSplitter[0];
+                lSMAC = lSplitter[1];
+                lSIP = lSplitter[2];
+                lSPort = lSplitter[3];
+                lDIP = lSplitter[4];
+                lDPort = lSplitter[5];
+                lData = lSplitter[6];
+                                
                 lSMAC = Regex.Replace(lSMAC, @"-", ":");
                 lEntryType = FullEntryExists(lSMAC, lSIP);
 
@@ -206,7 +212,6 @@ namespace Plugin.Main
                 {
                   try
                   {
-//                    lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
                     lUserAgent = lMatchUserAgent.Groups[1].Value.ToString();
                     lOperatingSystem = GetOperatingSystem(lUserAgent);
                   }
@@ -233,24 +238,11 @@ namespace Plugin.Main
                       else if (lEntryType == EntryType.Half)
                         SetOS(lSMAC, lSIP, lOperatingSystem);
 
-
                       if ((lTabelRow = GetRowByMAC(lSMAC)) != null)
                         lTabelRow.Cells["OperatingSystem"].ToolTipText = lUserAgent;
-
-//                      if (lLastPosition >= 0)
-//                        DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
                     }
                     else if (lSIP.Length > 0 && lSMAC.Length > 0)
-                    {
-//                      lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
-                      lock (this)
-                      {
-                        cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));
-                      }
-
-//                      if (lLastPosition >= 0)
-//                        DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
-                    }
+                        cTask.addRecord(new SystemRecord(lSMAC, lSIP, lUserAgent, String.Empty, String.Empty, String.Empty));                                          
                   }
                   catch (RecordException lEx)
                   {
@@ -270,7 +262,6 @@ namespace Plugin.Main
                 }
                 else if (lEntryType == EntryType.Empty && lSIP.Length > 0 && lSMAC.Length > 0)
                 {
-//                  lLastPosition = DGV_Systems.FirstDisplayedScrollingRowIndex;
                   try
                   {
                     lock (this)
@@ -281,9 +272,6 @@ namespace Plugin.Main
                   catch (RecordException)
                   {
                   }
-
-//                  if (lLastPosition >= 0)
-//                    DGV_Systems.FirstDisplayedScrollingRowIndex = lLastPosition;
                 } // if (lDstPort...
 
 

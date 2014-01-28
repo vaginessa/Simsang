@@ -16,6 +16,7 @@ namespace Plugin.Main.POP3Proxy
 
     private static DomainFacade cInstance;
     private InfrastructureFacade cInfrastructure;
+    private const int cMaxTableRows = 128;
     private List<IObserver> cObserverList;
     private List<POP3Account> cRecordList;
     private IPlugin cPlugin;
@@ -125,10 +126,19 @@ namespace Plugin.Main.POP3Proxy
     /// <summary>
     /// 
     /// </summary>
-    public void addRecord(POP3Account pRecord)
+    public void addRecord(List<POP3Account> pRecords)
     {
-      cRecordList.Add(pRecord);
-      notify();
+      if (pRecords != null && pRecords.Count > 0)
+      {
+        foreach (POP3Account lTmpRecord in pRecords)
+          cRecordList.Add(lTmpRecord);
+
+        // Resize the DGV to the defined maximum size. \
+        while (cRecordList.Count > cMaxTableRows)
+          cRecordList.RemoveAt(0);
+
+        notify();
+      }
     }
 
     #endregion

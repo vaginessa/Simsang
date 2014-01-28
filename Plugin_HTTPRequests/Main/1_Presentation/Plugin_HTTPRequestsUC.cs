@@ -172,8 +172,21 @@ namespace Plugin.Main
       {
         List<HTTPRequests> lNewRecords = new List<HTTPRequests>();
         List<String> lNewData;
-
-
+        Match lMatchURI;
+        Match lMatchHost;
+        Match lMatchCookies;
+        String lMethod = String.Empty;
+        String lRemoteHost = String.Empty;
+        String lReqString = String.Empty;
+        String lCookies = String.Empty;
+        String[] lSplit;
+        String lProto;
+        String lMAC;
+        String lSrcIP;
+        String lSrcPort;
+        String lDstIP;
+        String lDstPort;
+        String lData;
 
         lock (this)
         {
@@ -186,26 +199,17 @@ namespace Plugin.Main
         {
           try
           {
-            if (lEntry != null && lEntry.Length > 0)
+            if (!String.IsNullOrEmpty(lEntry))
             {
-              String[] lSplit = Regex.Split(lEntry, @"\|\|");
-              if (lSplit.Length > 0)
+              if ((lSplit = Regex.Split(lEntry, @"\|\|")).Length > 0)
               {
-                String lProto = lSplit[0];
-                String lMAC = lSplit[1];
-                String lSrcIP = lSplit[2];
-                String lSrcPort = lSplit[3];
-                String lDstIP = lSplit[4];
-                String lDstPort = lSplit[5];
-                String lData = lSplit[6];
-                Match lMatchURI;
-                Match lMatchHost;
-                Match lMatchCookies;
-                String lMethod = String.Empty;
-                String lRemoteHost = String.Empty;
-                String lReqString = String.Empty;
-                String lCookies = String.Empty;
-
+                lProto = lSplit[0];
+                lMAC = lSplit[1];
+                lSrcIP = lSplit[2];
+                lSrcPort = lSplit[3];
+                lDstIP = lSplit[4];
+                lDstPort = lSplit[5];
+                lData = lSplit[6];
 
                 if (((lMatchURI = Regex.Match(lData, @"(\s+|^)(GET|POST)\s+([^\s]+)\s+HTTP\/"))).Success &&
                     ((lMatchHost = Regex.Match(lData, @"\.\.Host\s*:\s*([\w\d\.]+?)\.\.", RegexOptions.IgnoreCase))).Success &&
@@ -215,7 +219,6 @@ namespace Plugin.Main
                   lRemoteHost = lMatchHost.Groups[1].Value.ToString();
                   lReqString = lMatchURI.Groups[3].Value.ToString();
                   lCookies = lMatchCookies.Groups[1].Value.ToString();
-
 
                   lNewRecords.Add(new HTTPRequests(lMAC, lSrcIP, lMethod, lRemoteHost, lReqString, lCookies, lData));
 

@@ -17,6 +17,7 @@ namespace Plugin.Main.HTTPProxy
 
     private static DomainFacade cInstance;
     private InfrastructureFacade cInfrastructure;
+    private const int cMaxTableRows = 128;
     private List<IObserver> cObserverList;
     private List<Account> cRecordList;
     private String cRedirectURL;
@@ -79,14 +80,25 @@ namespace Plugin.Main.HTTPProxy
     /// 
     /// </summary>
     /// <param name="pRecord"></param>
-    public void addRecord(Account pRecord)
+    public void addRecord(List<Account> pRecords)
     {
-      foreach (Account lTmp in cRecordList)
-        if (lTmp.DstIP == pRecord.DstIP && lTmp.DstPort == pRecord.DstPort && lTmp.Username == pRecord.Username && lTmp.Password == pRecord.Password)
-          throw new Exception("Account record already exists.");
+      if (pRecords != null && pRecords.Count > 0)
+      {
+        foreach (Account lNewAccount in pRecords)
+        {
+          foreach (Account lTmp in cRecordList)
+            if (lTmp.DstIP == lNewAccount.DstIP && lTmp.DstPort == lNewAccount.DstPort && lTmp.Username == lNewAccount.Username && lTmp.Password == lNewAccount.Password)
+              throw new Exception("Account record already exists.");
 
-      cRecordList.Add(pRecord);
-      notifyRecords();
+          cRecordList.Add(lNewAccount);
+        }
+
+        // Resize the DGV to the defined maximum size.
+        while (cRecordList.Count > cMaxTableRows)
+          cRecordList.RemoveAt(0);
+
+        notifyRecords();
+      }
     }
 
 

@@ -144,6 +144,20 @@ namespace Plugin.Main
       {
         List<ApplicationRecord> lNewRecords = new List<ApplicationRecord>();
         List<String> lNewData;
+        Match lMatchURI;
+        Match lMatchHost;
+        String lRemoteHost = String.Empty;
+        String lReqString = String.Empty;
+        String lRemotePort = "0";
+        String lRemoteString = String.Empty;
+        String lProto = String.Empty;
+        String lSMAC = String.Empty;
+        String lSIP = String.Empty;
+        String lSPort = String.Empty;
+        String lDIP = String.Empty;
+        String lDPort = String.Empty;
+        String lData = String.Empty;
+        String[] lSplitter;
 
         lock (this)
         {
@@ -158,24 +172,16 @@ namespace Plugin.Main
           {
             if (!String.IsNullOrEmpty(lEntry))
             {
-              string[] lSplitter = Regex.Split(lEntry, @"\|\|");
-              if (lSplitter.Length == 7)
+              if ((lSplitter = Regex.Split(lEntry, @"\|\|")).Length == 7)
               {
-                String lProto = lSplitter[0];
-                String lSMAC = lSplitter[1];
-                String lSIP = lSplitter[2];
-                String lSPort = lSplitter[3];
-                String lDIP = lSplitter[4];
-                String lDPort = lSplitter[5];
-                String lData = lSplitter[6];
-                Match lMatchURI;
-                Match lMatchHost;
-                String lRemoteHost = String.Empty;
-                String lReqString = String.Empty;
-                String lRemotePort = "0";
-                String lRemoteString = String.Empty;
-
-
+                lProto = lSplitter[0];
+                lSMAC = lSplitter[1];
+                lSIP = lSplitter[2];
+                lSPort = lSplitter[3];
+                lDIP = lSplitter[4];
+                lDPort = lSplitter[5];
+                lData = lSplitter[6];
+   
                 if (lProto == "TCP" && lDPort == "80" &&
                     ((lMatchURI = Regex.Match(lData, @"(\s+|^)(GET|POST|HEAD)\s+([^\s]+)\s+HTTP\/"))).Success &&
                     ((lMatchHost = Regex.Match(lData, @"\.\.Host\s*:\s*([\w\d\.]+?)\.\.", RegexOptions.IgnoreCase))).Success)
@@ -185,9 +191,6 @@ namespace Plugin.Main
                   lReqString = lMatchURI.Groups[3].Value.ToString();
 
                   lRemoteString = lRemoteHost + ":" + lRemotePort + lReqString;
-
-
-                  //Write2Pipe() : |DNSREQ||00:1B:77:53:5C:F8||192.168.100.117||35976||192.168.100.1||53||wl.tac.ch
                 }
                 else if (lProto == "DNSREQ" && lDPort == "53")
                 {
@@ -207,15 +210,10 @@ namespace Plugin.Main
                       ApplicationRecord lNewApplication = new ApplicationRecord(lSMAC, lSIP, lDPort, lRemoteHost, lReqString, lPattern.ApplicationName, lPattern.CompanyURL);
                       if (!cApplications.Contains(lNewApplication))
                       {
-                        lock (this)
-                        {
-                          cApplications.Add(lNewApplication);
-                        }
+                        cApplications.Add(lNewApplication);                        
                       } // if (!cApp...
                     } // if (lSplit2.L...
-                  } //foreach (st...
-
-                  //mApplications.Add(new Applications(lSMAC, lSIP, lDPort, lRemoteHost, lReqString, "", lRemoteString));
+                  } //foreach (st...                 
                 } // if (lRemoteString...
               } // if (lSplitte...
             } // if (pData.Leng...

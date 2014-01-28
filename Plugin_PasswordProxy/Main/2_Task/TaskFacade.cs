@@ -63,17 +63,9 @@ namespace Plugin.Main.HTTPProxy
     /// 
     /// </summary>
     /// <param name="pRecord"></param>
-    public void addRecord(Account pRecord)
+    public void addRecord(List<Account> pRecords)
     {
-      int lDstPort;
-      String lRemSystem = pRecord.DstIP.Trim();
-
-      if (!Int32.TryParse(pRecord.DstPort, out lDstPort))
-        throw new Exception("Something is wrong with the remote port.");
-      else if (!Regex.Match(lRemSystem, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$").Success && !Regex.Match(lRemSystem, @"\.[\d\w]+").Success)
-        throw new Exception("Something is wrong with the remote system.");
-
-      cDomain.addRecord(pRecord);
+      cDomain.addRecord(pRecords);
     }
 
 

@@ -437,6 +437,14 @@ namespace Plugin.Main
       {
         List<DNSRequestRecord> lNewRecords = new List<DNSRequestRecord>();
         List<String> lNewData;
+        String[] lSplitter;
+        String lProto; 
+        String lSMAC;
+        String lSIP;
+        String lSrcPort; 
+        String lDstIP;
+        String lDstPort;
+        String lHostName;
 
         lock (this)
         {
@@ -444,31 +452,25 @@ namespace Plugin.Main
           cDataBatch.Clear();
         } // lock (this)...
 
+
         foreach (String lEntry in lNewData)
         {
           try
           {
-            if (lEntry != null && lEntry.Length > 0)
+            if (!String.IsNullOrEmpty(lEntry))
             {
-              String[] lSplitter = Regex.Split(lEntry, @"\|\|");
-              if (lSplitter.Length == 7)
+              if ((lSplitter = Regex.Split(lEntry, @"\|\|")).Length == 7)
               {
-                String lProto = lSplitter[0];
-                String lSMAC = lSplitter[1];
-                String lSIP = lSplitter[2];
-                String lSrcPort = lSplitter[3];
-                String lDstIP = lSplitter[4];
-                String lDstPort = lSplitter[5];
-                String lHostName = lSplitter[6];
-
+                lProto = lSplitter[0];
+                lSMAC = lSplitter[1];
+                lSIP = lSplitter[2];
+                lSrcPort = lSplitter[3];
+                lDstIP = lSplitter[4];
+                lDstPort = lSplitter[5];
+                lHostName = lSplitter[6];
 
                 if (lDstPort != null && lDstPort == "53")
-                {
-                  lock (this)
-                  {
-                    cTask.addRecord(new DNSRequestRecord(lSMAC, lSIP, lHostName, lProto));
-                  } // lock (this)
-                } // if (lDstPort != null ...
+                  lNewRecords.Add(new DNSRequestRecord(lSMAC, lSIP, lHostName, lProto));
               } // if (lSplitter...
             } // if (pData.Le... 
           }
@@ -477,7 +479,11 @@ namespace Plugin.Main
             if (PluginParameters.HostApplication != null)
               PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
           }
-        } // foreach(..
+        } // foreach(...
+
+        if (lNewRecords.Count > 0)
+          cTask.addRecord(lNewRecords);
+
       } // if (cDataBatch...
     }
 

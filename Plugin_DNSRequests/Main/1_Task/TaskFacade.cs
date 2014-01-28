@@ -51,7 +51,7 @@ namespace Plugin.Main.DNSRequest
     ///
     /// </summary>
     /// <param name="pDNSReq"></param>
-    public void addRecord(DNSRequestRecord pDNSReq)
+    public void addRecord(List<DNSRequestRecord> pDNSReq)
     {
       cDomain.addRecord(pDNSReq);
     }

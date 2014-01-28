@@ -19,6 +19,7 @@ namespace Plugin.Main.Systems
 
     private static DomainFacade cInstance;
     private InfrastructureFacade cInfrastructure;
+    private const int cMaxTableRows = 128;
     private List<SystemRecord> cRecordList;
     private List<ManageSystems.SystemPattern> cSystemPatternList;
     private List<IRecordObserver> cRecordObserverList;
@@ -120,6 +121,11 @@ namespace Plugin.Main.Systems
           throw new RecordException("Something is wrong with the IP address");
 
         cRecordList.Add(pRecord);
+
+        // Resize the DGV to the defined maximum size. \
+        while (cRecordList.Count > cMaxTableRows)
+          cRecordList.RemoveAt(0);
+
         notifyRecords();
       }
     }
