@@ -103,6 +103,7 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
+      T_GUIUpdate.Interval = 1000;
       cPluginParams = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
@@ -210,7 +211,7 @@ namespace Plugin.Main
                         {
                           cApplications.Add(lNewApplication);
                         }
-                      }
+                      } // if (!cApp...
                     } // if (lSplit2.L...
                   } //foreach (st...
 
