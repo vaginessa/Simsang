@@ -217,7 +217,7 @@ namespace Plugin.Main
         try
         {
           cTask.onInit();
-          setGUIInactive();
+//          setGUIInactive();
 
           IPAccountingConfig lConfig = new IPAccountingConfig
           {
@@ -232,12 +232,13 @@ namespace Plugin.Main
           cTask.onStart(lConfig);
           cPluginParams.HostApplication.PluginSetStatus(this, "green");
         }
-        catch (Exception)
+        catch (Exception lEx)
         {
           cTask.onStop();
           cPluginParams.HostApplication.PluginSetStatus(this, "red");
-        }
 
+          cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+        }
       } // if (cIsActi...
     }
 
@@ -797,11 +798,20 @@ namespace Plugin.Main
       catch (Exception) {}
 
       // Reset position
-      if (lLastPosition >= 0)
-        DGV_TrafficData.FirstDisplayedScrollingRowIndex = lLastPosition;
+      try
+      {
+        if (lLastPosition >= 0)
+          DGV_TrafficData.FirstDisplayedScrollingRowIndex = lLastPosition;
+      }
+      catch (Exception) { }
 
-      if (lSelectedIndex >= 0)
-        DGV_TrafficData.CurrentCell = DGV_TrafficData.Rows[lSelectedIndex].Cells[0];
+      try
+      {
+        if (lSelectedIndex >= 0)
+          DGV_TrafficData.CurrentCell = DGV_TrafficData.Rows[lSelectedIndex].Cells[0];
+      }
+      catch (Exception) { }
+
       DGV_TrafficData.ResumeLayout();
       DGV_TrafficData.Refresh();
     }

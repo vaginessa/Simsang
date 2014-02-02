@@ -36,6 +36,7 @@ namespace Simsang
     public static readonly String PluginDir = @"plugins\";
     public static readonly String PluginVersionFile = "version.txt";
     public static readonly String BinaryDir = @"\bin\";
+    public static readonly String DLLDir = @"\DLL\";
     public static readonly String ARPScanBinary = "ARPScan.exe";
 
     public static readonly String SessionDir = @"\sessions\";

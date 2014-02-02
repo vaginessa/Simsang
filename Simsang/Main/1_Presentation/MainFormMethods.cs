@@ -61,44 +61,6 @@ namespace Simsang
     /// <returns></returns>
     public bool ConfigOK(String pBaseDir)
     {
-      /*
-       * Plugins binary at its place
-       */
-      try
-      {
-        if (!Directory.Exists(String.Format(@"{0}\{1}", pBaseDir, Config.PluginDir)))
-          Directory.CreateDirectory(String.Format(@"{0}\{1}", pBaseDir, Config.PluginDir));
-      }
-      catch (Exception lEx)
-      {
-        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-      }
-
-      /*
-       * Session direction
-       */
-      try
-      {
-        if (!Directory.Exists(pBaseDir + Config.SessionDir))
-          Directory.CreateDirectory(pBaseDir + Config.SessionDir);
-      }
-      catch (Exception lEx)
-      {
-        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-      }
-
-      /*
-       * Sniffer/Poisoner binary at its place
-       */
-      try
-      {
-        if (!Directory.Exists(pBaseDir + Config.BinaryDir))
-          Directory.CreateDirectory(pBaseDir + Config.BinaryDir);
-      }
-      catch (Exception lEx)
-      {
-        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-      }
 
       try
       {

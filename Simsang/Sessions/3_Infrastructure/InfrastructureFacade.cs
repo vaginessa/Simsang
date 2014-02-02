@@ -113,34 +113,42 @@ namespace Simsang.Session
     {
       List<AttackSession> lRetVal = new List<AttackSession>();
       DirectoryInfo lDirInfo = new DirectoryInfo(mSessionDir);
-      FileInfo[] lSessionFiles = lDirInfo.GetFiles("*.xml");
+      FileInfo[] lSessionFiles = null;
 
+      try
+      {
+        lSessionFiles = lDirInfo.GetFiles("*.xml");
+      }
+      catch (Exception lEx) { }
 
       /*
        * 
        */
-      foreach (FileInfo lSessionFile in lSessionFiles)
+      if (lSessionFiles != null && lSessionFiles.Length > 0)
       {
-        FileStream lFS = null;
-        XmlSerializer lXMLSerial;
+        foreach (FileInfo lSessionFile in lSessionFiles)
+        {
+          FileStream lFS = null;
+          XmlSerializer lXMLSerial;
 
-        try
-        {
-          lFS = new FileStream(lSessionFile.FullName, FileMode.Open);
-          lXMLSerial = new XmlSerializer(typeof(AttackSession));
-          AttackSession lAttackSession = (AttackSession) lXMLSerial.Deserialize(lFS);
-          lRetVal.Add(lAttackSession);
-        }
-        catch (Exception lEx)
-        {
-          LogConsole.Main.LogConsole.pushMsg(String.Format("TaskFacade.GetAllSessions(): {0} ({1})", lEx.Message, lSessionFile.FullName));
-        }
-        finally
-        {
-          if (lFS != null)
-            lFS.Close();
-        }
-      } // foreach (FileIn...
+          try
+          {
+            lFS = new FileStream(lSessionFile.FullName, FileMode.Open);
+            lXMLSerial = new XmlSerializer(typeof(AttackSession));
+            AttackSession lAttackSession = (AttackSession)lXMLSerial.Deserialize(lFS);
+            lRetVal.Add(lAttackSession);
+          }
+          catch (Exception lEx)
+          {
+            LogConsole.Main.LogConsole.pushMsg(String.Format("TaskFacade.GetAllSessions(): {0} ({1})", lEx.Message, lSessionFile.FullName));
+          }
+          finally
+          {
+            if (lFS != null)
+              lFS.Close();
+          }
+        } // foreach (FileIn...
+      } // if (lSess...
 
       return (lRetVal);
     }
