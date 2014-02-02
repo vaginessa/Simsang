@@ -648,6 +648,7 @@ namespace Plugin.Main
         cApplications.Clear();
         foreach (ApplicationRecord lTmp in pRecordList)
           cApplications.Add(lTmp);
+
         // Selected cell/row
         try
         {

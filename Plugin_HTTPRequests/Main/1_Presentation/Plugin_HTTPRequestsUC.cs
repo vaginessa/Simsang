@@ -870,7 +870,6 @@ namespace Plugin.Main
 
 
         DGV_HTTPRequests.Refresh();
-
       }
     }
 

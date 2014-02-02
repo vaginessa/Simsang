@@ -805,6 +805,7 @@ namespace Plugin.Main
       }
       catch (Exception) { }
 
+      // Selected cell/row
       try
       {
         if (lSelectedIndex >= 0)
