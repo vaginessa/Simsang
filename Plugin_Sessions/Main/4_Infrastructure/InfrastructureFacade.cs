@@ -32,6 +32,16 @@ namespace Plugin.Main.Session
     private InfrastructureFacade(IPlugin pPlugin)
     {
       cPlugin = pPlugin;
+
+      // Create Session directory if it doesn't exist
+      try
+      {
+        if (!Directory.Exists(cPlugin.Config.SessionDir))
+          Directory.CreateDirectory(cPlugin.Config.SessionDir);
+      }
+      catch (Exception lEx)
+      {
+      }
     }
 
 

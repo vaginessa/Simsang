@@ -52,18 +52,17 @@ namespace Simsang.Contribute.Infrastructure
       bool lRetVal = false;
       HttpWebRequest httpWReq = (HttpWebRequest)WebRequest.Create("http://buglist.io/c/contribute.php");
       ASCIIEncoding encoding = new ASCIIEncoding();
-      String lUserAgent = String.Format("Mozilla/4.0 (compatible; MSIE 10.0; Windows NT {0}; .NET CLR {1})", Config.OS, Config.DotNetVersion);
+      String lUserAgent = String.Format("Mozilla/4.0 (compatible; MSIE 10.0; Windows NT 6.4; .NET CLR 4.1234)");
+
       try
       {
         byte[] data = encoding.GetBytes(pData);
         String lEncodedData = String.Format("data={0}", System.Web.HttpUtility.UrlEncode(data));
 
-
         httpWReq.Method = "POST";
         httpWReq.ContentType = "application/x-www-form-urlencoded";
         httpWReq.ContentLength = lEncodedData.Length;
         httpWReq.UserAgent = lUserAgent;
-
 
         using (Stream stream = httpWReq.GetRequestStream())
         {

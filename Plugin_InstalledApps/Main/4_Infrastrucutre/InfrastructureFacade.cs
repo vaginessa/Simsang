@@ -38,6 +38,16 @@ namespace Plugin.Main.Applications
     {
       cPlugin = pPlugin;
       ApplicationPatterns = @"\plugins\UsedApps\Plugin_UsedApps_Patterns.xml";
+
+      // Create Session directory if it doesn't exist
+      try
+      {
+        if (!Directory.Exists(cPlugin.Config.SessionDir))
+          Directory.CreateDirectory(cPlugin.Config.SessionDir);
+      }
+      catch (Exception lEx)
+      {
+      }
     }
 
 

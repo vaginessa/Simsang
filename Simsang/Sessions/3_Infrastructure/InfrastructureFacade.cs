@@ -115,15 +115,17 @@ namespace Simsang.Session
       DirectoryInfo lDirInfo = new DirectoryInfo(mSessionDir);
       FileInfo[] lSessionFiles = null;
 
+      // Make sure session directory exists
+      createSessionDirectory();
+
+
+      // Get all sessions
       try
       {
         lSessionFiles = lDirInfo.GetFiles("*.xml");
       }
       catch (Exception lEx) { }
 
-      /*
-       * 
-       */
       if (lSessionFiles != null && lSessionFiles.Length > 0)
       {
         foreach (FileInfo lSessionFile in lSessionFiles)
@@ -163,7 +165,10 @@ namespace Simsang.Session
       XmlSerializer lSerializer;
       FileStream lFS = null;
 
+      // Make sure session directory exists
+      createSessionDirectory();
 
+      // Save session data to file
       lSessionFile = String.Format(@"{0}\{1}.xml", mSessionDir, Path.GetFileNameWithoutExtension(pAttackSession.SessionFileName));
       if (File.Exists(lSessionFile))
         throw new Exception("A session with this name already exists");
@@ -176,7 +181,6 @@ namespace Simsang.Session
       }
       catch (Exception lEx)
       {
-//MessageBox.Show("Can't save session data : " + lEx.ToString());
       }
       finally
       {
@@ -193,6 +197,9 @@ namespace Simsang.Session
     {
       String lSessionFilePath = String.Format(@"{0}\{1}.xml", mSessionDir, pSessionFileName);
       String lSessionData = String.Empty;
+
+      // Make sure session directory exists
+      createSessionDirectory();
 
       try
       {
@@ -386,6 +393,24 @@ namespace Simsang.Session
     private InfrastructureFacade()
     {
       mSessionDir = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), ConfigurationManager.AppSettings["sessiondir"] ?? @"Sessions\");
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void createSessionDirectory()
+    {
+      try
+      {
+        if (!Directory.Exists(mSessionDir))
+          Directory.CreateDirectory(mSessionDir);
+      }
+      catch (Exception lEx)
+      {
+        String lErrorMsg = String.Format("Error occurred while creating Main.Session directory: {0}", lEx.Message);
+        LogConsole.Main.LogConsole.pushMsg(lErrorMsg);
+      }
     }
 
     #endregion

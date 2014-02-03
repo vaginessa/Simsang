@@ -56,6 +56,16 @@ namespace Plugin.Main.HTTPInject
       cPlugin = pPlugin;
 
       cMicroWebPath = String.Format(@"{0}{1}", InjectionConfig.BasisDirectory, cMicroWebBin);
+
+      // Create Session directory if it doesn't exist
+      try
+      {
+        if (!Directory.Exists(cPlugin.Config.SessionDir))
+          Directory.CreateDirectory(cPlugin.Config.SessionDir);
+      }
+      catch (Exception lEx)
+      {
+      }
     }
 
 

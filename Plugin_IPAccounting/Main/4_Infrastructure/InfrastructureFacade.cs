@@ -60,6 +60,16 @@ namespace Plugin.Main.IPAccounting
       cAccountingRecords = new List<AccountingItem>();
       cIPAccountingPath = String.Format(@"{0}{1}", cAccountingConfig.BasisDirectory, cIPAccountingBin);
       init(pAccountingConfig);
+
+      // Create Session directory if it doesn't exist
+      try
+      {
+        if (!Directory.Exists(cPlugin.Config.SessionDir))
+          Directory.CreateDirectory(cPlugin.Config.SessionDir);
+      }
+      catch (Exception lEx)
+      {
+      }
     }
 
 

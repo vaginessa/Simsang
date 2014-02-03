@@ -34,7 +34,7 @@ namespace Simsang
       else
       {
         Directory.SetCurrentDirectory(System.Windows.Forms.Application.StartupPath);
-//        DirectoryChecks(System.Windows.Forms.Application.StartupPath);
+        DirectoryChecks(System.Windows.Forms.Application.StartupPath);
 
         Application.CurrentCulture = System.Globalization.CultureInfo.CreateSpecificCulture("en-US");
         Application.EnableVisualStyles();
@@ -52,17 +52,15 @@ namespace Simsang
     /// <param name="pBaseDir"></param>
     private static void DirectoryChecks(String pBaseDir)
     {
-      String[] lDirs = new String[] {Config.PluginDir, Config.SessionDir, Config.BinaryDir, Config.DataDir, Config.DLLDir};
-      MessageBox.Show(String.Format("start checking directories"), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-      
+      String[] lDirs = new String[] { Config.PluginDir, Config.SessionDir, Config.BinaryDir, Config.DataDir, Config.DLLDir };
+
       foreach (String lTmpDir in lDirs)
       {
-        MessageBox.Show(String.Format("checking: {0}", lTmpDir), "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
         try
         {
-          if (!Directory.Exists(String.Format(@"{0}\{1}", pBaseDir, lTmpDir)))
-            Directory.CreateDirectory(String.Format(@"{0}\{1}", pBaseDir, lTmpDir));
+          String lDir = String.Format(@"{0}\{1}", pBaseDir, lTmpDir);
+          if (!Directory.Exists(lDir))
+            Directory.CreateDirectory(lDir);
         }
         catch (Exception lEx)
         {

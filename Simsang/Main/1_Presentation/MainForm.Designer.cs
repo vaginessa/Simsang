@@ -615,6 +615,7 @@
       // 
       // TIM_Contributions
       // 
+      this.TIM_Contributions.Enabled = true;
       this.TIM_Contributions.Interval = 10000;
       this.TIM_Contributions.Tick += new System.EventHandler(this.TIM_Contributions_Tick);
       // 

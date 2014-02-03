@@ -47,6 +47,16 @@ namespace Plugin.Main.IMAP4Proxy
 
       cIMAP4RevProxyPath = String.Format(@"{0}{1}", cProxyConfig.BasisDirectory, cIMAP4RevProxyBin);
       cIMAP4SRevProxyPath = String.Format(@"{0}{1}", cProxyConfig.BasisDirectory, cIMAP4SRevProxyBin);
+
+      // Create Session directory if it doesn't exist
+      try
+      {
+        if (!Directory.Exists(cPlugin.Config.SessionDir))
+          Directory.CreateDirectory(cPlugin.Config.SessionDir);
+      }
+      catch (Exception lEx)
+      {
+      }
     }
 
 

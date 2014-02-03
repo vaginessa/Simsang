@@ -48,6 +48,16 @@ namespace Plugin.Main.HTTPProxy
 
       cHTTPRevProxyPath = String.Format("{0}{1}", pWebServerConfig.BasisDirectory, cHTTPRevProxyBin);
       cHTTPSRevProxyPath = String.Format("{0}{1}", pWebServerConfig.BasisDirectory, cHTTPSRevProxyBin);
+
+      // Create Session directory if it doesn't exist
+      try
+      {
+        if (!Directory.Exists(cPlugin.Config.SessionDir))
+          Directory.CreateDirectory(cPlugin.Config.SessionDir);
+      }
+      catch (Exception lEx)
+      {
+      }
     }
 
 

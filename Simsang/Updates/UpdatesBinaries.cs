@@ -81,7 +81,7 @@ namespace Simsang
               int lCurrentVersionInt = Int32.Parse(Regex.Replace(lCurrentVersion, @"[^\d]+", ""));
               int lToolVersionInt = Int32.Parse(Regex.Replace(Config.ToolVersion, @"[^\d]+", ""));
 
-              if (lCurrentVersion.CompareTo(lToolVersionInt) > 0)
+              if (lCurrentVersionInt.CompareTo(lToolVersionInt) > 0)
                 lRetVal = true;
             } // if (Rege...
           } // if (!St...

@@ -33,6 +33,17 @@ namespace Plugin.Main.Systems
     {
       cPlugin = pPlugin;
       cSystemPatterns = new List<ManageSystems.SystemPattern>();
+
+
+      // Create Session directory if it doesn't exist
+      try
+      {
+        if (!Directory.Exists(cPlugin.Config.SessionDir))
+          Directory.CreateDirectory(cPlugin.Config.SessionDir);
+      }
+      catch (Exception lEx)
+      {
+      }
     }
 
 

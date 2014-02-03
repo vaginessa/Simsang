@@ -617,7 +617,12 @@ namespace Simsang
       try
       {
         if (Contribute.Infrastructure.Settings.getInstance().isSSIDStatusSet())
-          lWifiName = Wifi.Wifi.getInstance().getCurrentWifiName().Trim();
+        {
+          if ((lWifiName = Wifi.Wifi.getInstance().getCurrentWifiName().Trim()).Length > 0)
+          {
+            lWifiName = Regex.Replace(lWifiName, @"[^\w\d\-]", "_");
+          } // if ((lWifi...
+        } // if (Contrib...
       }
       catch (Exception lEx)
       {

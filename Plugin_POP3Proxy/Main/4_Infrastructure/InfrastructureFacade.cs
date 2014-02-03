@@ -48,6 +48,16 @@ namespace Plugin.Main.POP3Proxy
 
       cPOP3RevProxyPath = String.Format(@"{0}{1}", cPlugin.Config.BaseDir, cPOP3RevProxyBin);
       cPOP3SRevProxyPath = String.Format(@"{0}{1}", cPlugin.Config.BaseDir, cPOP3SRevProxyBin);
+
+      // Create Session directory if it doesn't exist
+      try
+      {
+        if (!Directory.Exists(cPlugin.Config.SessionDir))
+          Directory.CreateDirectory(cPlugin.Config.SessionDir);
+      }
+      catch (Exception lEx)
+      {
+      }
     }
 
 

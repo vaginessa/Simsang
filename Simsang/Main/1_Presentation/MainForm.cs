@@ -815,17 +815,58 @@ namespace Simsang
         MessageBox.Show("You didn't define a session name", "Info - Session", MessageBoxButtons.OK, MessageBoxIcon.Information);
       else
       {
-        
-        AttackSession lASession = Simsang.Session.TaskFacade.getInstance().getSessionByName(TB_Session.Text);
+        // Make sure session directory exists
+        String lSessionDir = String.Format(@"{0}\{1}", System.Windows.Forms.Application.StartupPath, Config.SessionDir);
+        if (!Directory.Exists(lSessionDir))
+          Directory.CreateDirectory(lSessionDir);
 
+        // Save/overwrite new session
+        AttackSession lASession = Simsang.Session.TaskFacade.getInstance().getSessionByName(TB_Session.Text);
         if (lASession != null)
         {
           String lMsg = "A session with this name exists already!\nDo you want to overwrite the existing session data?";
           if (MessageBox.Show(lMsg, "Info - Session", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-//            Simsang.Session.TaskFacade.getInstance().removeSession(lASession.SessionFileName, PluginsModule.PluginList);
-//          //Sessions.removeSession(lASession.FileName, PluginsModule.PluginList);
+          {
+
+            mSessionTaskFacade.removeSession(lASession.Name);
+
+            //try
+            //{
+            //  String lSessionName = lASession.Name; // DGV_Sessions.CurrentRow.Cells[1].Value.ToString();
+            //  String lSessionFileName = lASession.SessionFileName; // Path.GetFileNameWithoutExtension(DGV_Sessions.CurrentRow.Cells[0].Value.ToString());
+              
+            //  /*
+            //   *  Remove main session file and plugin session files.
+            //   */
+            //  if (lSessionName.Length > 0 && lSessionFileName.Length > 0)
+            //  {
+            //    mTask.removeSession(lSessionFileName);
+            //    mSessionTaskFacade.removeSession(lASession.Name);
+            //    foreach (IPlugin lPlugin in mACMain.PluginsModule.PluginList)
+            //    {
+            //      try
+            //      {
+            //        if (lPlugin != null)
+            //          lPlugin.onDeleteSessionData(Path.GetFileNameWithoutExtension(lSessionFileName));
+            //      }
+            //      catch (Exception lEx)
+            //      {
+            //        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+            //      }
+            //    } // foreach (IP...
+            //  } // if (lSession...
+            //}
+            //catch (Exception lEx)
+            //{
+            //  LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+            //}
+
+
+            //Simsang.Session.TaskFacade.getInstance().removeSession(lASession.SessionFileName, PluginsModule.PluginList);
+            // Sessions.removeSession(lASession.FileName, PluginsModule.PluginList);
+          } // if (Mess...
 //          else
-            return;
+//            return;
         } // if (lASess...
 
         /*
