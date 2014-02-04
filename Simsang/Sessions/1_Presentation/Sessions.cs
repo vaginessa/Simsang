@@ -154,6 +154,34 @@ namespace Simsang.Session
       mTask.getSessionByName(pSessionName);
     }
 
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pSessionName"></param>
+    /// <param name="pSessionFileName"></param>
+    public void removeSession(String pSessionName, String pSessionFileName)
+    {
+      if (!String.IsNullOrEmpty(pSessionName) && !String.IsNullOrEmpty(pSessionFileName))
+      {
+        mTask.removeSession(pSessionFileName);
+
+        foreach (IPlugin lPlugin in mACMain.PluginsModule.PluginList)
+        {
+          try
+          {
+            if (lPlugin != null)
+              lPlugin.onDeleteSessionData(Path.GetFileNameWithoutExtension(pSessionFileName));
+          }
+          catch (Exception lEx)
+          {
+            LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+          }
+        } // foreach (IP...
+      } // if (lSession... 
+    }
+
     #endregion
 
 
@@ -237,37 +265,19 @@ namespace Simsang.Session
       {
         lSessionName = DGV_Sessions.CurrentRow.Cells[1].Value.ToString();
         lSessionFileName = Path.GetFileNameWithoutExtension(DGV_Sessions.CurrentRow.Cells[0].Value.ToString());
+        removeSession(lSessionName, lSessionFileName);
 
-        /*
-         *  Remove main session file and plugin session files.
-         */
-        if (lSessionName.Length > 0 && lSessionFileName.Length > 0)
-        {
-          mTask.removeSession(lSessionFileName);
+        // Reload session listing
+        mTask.findAllSessions();
 
-          foreach (IPlugin lPlugin in mACMain.PluginsModule.PluginList)
-          {
-            try
-            {
-              if (lPlugin != null)
-                lPlugin.onDeleteSessionData(Path.GetFileNameWithoutExtension(lSessionFileName));
-            }
-            catch (Exception lEx)
-            {
-              LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-            }
-          } // foreach (IP...
-
-          // Reload session listing
-          mTask.findAllSessions();
-        } // if (lSession...
+        MessageBox.Show("The session was deleted successfully.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
       catch (Exception lEx)
       {
-        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+        String lMsg = String.Format("Sessions: {0}", lEx.Message);
+        LogConsole.Main.LogConsole.pushMsg(lMsg);
+        MessageBox.Show(lMsg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);        
       }
-
-      MessageBox.Show("The session was deleted successfully.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
 

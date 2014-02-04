@@ -828,18 +828,19 @@ namespace Simsang
           if (MessageBox.Show(lMsg, "Info - Session", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
           {
 
-            mSessionTaskFacade.removeSession(lASession.Name);
+//            mSessionTaskFacade.removeSession(lASession.Name);
 
-            //try
-            //{
-            //  String lSessionName = lASession.Name; // DGV_Sessions.CurrentRow.Cells[1].Value.ToString();
-            //  String lSessionFileName = lASession.SessionFileName; // Path.GetFileNameWithoutExtension(DGV_Sessions.CurrentRow.Cells[0].Value.ToString());
+            try
+            {
+              String lSessionName = lASession.Name; // DGV_Sessions.CurrentRow.Cells[1].Value.ToString();
+              String lSessionFileName = lASession.SessionFileName; // Path.GetFileNameWithoutExtension(DGV_Sessions.CurrentRow.Cells[0].Value.ToString());
               
-            //  /*
-            //   *  Remove main session file and plugin session files.
-            //   */
-            //  if (lSessionName.Length > 0 && lSessionFileName.Length > 0)
-            //  {
+              /*
+               *  Remove main session file and plugin session files.
+               */
+              if (lSessionName.Length > 0 && lSessionFileName.Length > 0)
+              {
+                mSessionPresentationFacade.removeSession(lSessionName, lSessionFileName);
             //    mTask.removeSession(lSessionFileName);
             //    mSessionTaskFacade.removeSession(lASession.Name);
             //    foreach (IPlugin lPlugin in mACMain.PluginsModule.PluginList)
@@ -854,19 +855,19 @@ namespace Simsang
             //        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
             //      }
             //    } // foreach (IP...
-            //  } // if (lSession...
-            //}
-            //catch (Exception lEx)
-            //{
-            //  LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-            //}
+              } // if (lSession...
+            }
+            catch (Exception lEx)
+            {
+              LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
+            }
 
 
             //Simsang.Session.TaskFacade.getInstance().removeSession(lASession.SessionFileName, PluginsModule.PluginList);
             // Sessions.removeSession(lASession.FileName, PluginsModule.PluginList);
           } // if (Mess...
-//          else
-//            return;
+          else
+            return;
         } // if (lASess...
 
         /*
