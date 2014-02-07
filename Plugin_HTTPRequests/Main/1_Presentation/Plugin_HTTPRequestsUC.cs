@@ -27,7 +27,7 @@ namespace Plugin.Main
     #region MEMBERS
 
     private List<String> cTargetList;
-    private BindingList<HTTPRequests> cHTTPRequests;
+    private List<HTTPRequests> cHTTPRequests;
     private const int cMaxTableRows = 128;
     private List<String> cDataBatch;
     private TaskFacade cTask;
@@ -122,7 +122,7 @@ namespace Plugin.Main
       cRequestCol.Visible = false;
       DGV_HTTPRequests.Columns.Add(cRequestCol);
 
-      cHTTPRequests = new BindingList<HTTPRequests>();
+      cHTTPRequests = new List<HTTPRequests>();
       DGV_HTTPRequests.DataSource = cHTTPRequests;
 
       #endregion
@@ -835,17 +835,21 @@ namespace Plugin.Main
 
         cHTTPRequests.Clear();
         foreach (HTTPRequests lTmp in pHTTPReqList)
+        {
           cHTTPRequests.Add(lTmp);
 
-        //UseFilter();
 
-        // Filter
-        try
-        {
-          if (!CompareToFilter(DGV_HTTPRequests.Rows[lLastRowIndex + 1].Cells["URL"].Value.ToString()))
-            DGV_HTTPRequests.Rows[lLastRowIndex + 1].Visible = false;
-        }
-        catch { }
+          // Filter
+          try
+          {
+            if (!CompareToFilter(DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1].Cells["URL"].Value.ToString()))
+              DGV_HTTPRequests.Rows[DGV_HTTPRequests.Rows.Count - 1].Visible = false;
+          }
+          catch (Exception lEx)
+          {
+            PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+          }
+        } // foreach (HT...
 
         // Selected cell/row
         try

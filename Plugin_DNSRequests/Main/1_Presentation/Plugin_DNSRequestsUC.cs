@@ -24,7 +24,7 @@ namespace Plugin.Main
     #region MEMBERS
 
     private List<String> cTargetList;
-    private BindingList<DNSRequestRecord> cDNSRequests;
+    private List<DNSRequestRecord> cDNSRequests;
     private List<String> cDataBatch;
     private TaskFacade cTask;
     private DomainFacade cDomain;
@@ -88,7 +88,7 @@ namespace Plugin.Main
       cPacketTypeCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
       DGV_DNSRequests.Columns.Add(cPacketTypeCol);
 
-      cDNSRequests = new BindingList<DNSRequestRecord>();
+      cDNSRequests = new List<DNSRequestRecord>();
       DGV_DNSRequests.DataSource = cDNSRequests;
 
       #endregion
@@ -97,7 +97,7 @@ namespace Plugin.Main
       /*
        * Plugin configuration
        */
-      T_GUIUpdate.Interval = 1000;
+      T_GUIUpdate.Interval = 2000;
       PluginParameters = pPluginParams;
       String lBaseDir = String.Format(@"{0}\", (pPluginParams != null) ? pPluginParams.PluginDirectoryFullPath : Directory.GetCurrentDirectory());
       String lSessionDir = (pPluginParams != null) ? pPluginParams.SessionDirectoryFullPath : String.Format("{0}sessions", lBaseDir);
@@ -731,17 +731,24 @@ namespace Plugin.Main
 
           DGV_DNSRequests.SuspendLayout();
           cDNSRequests.Clear();
+
+
           foreach (DNSRequestRecord lTmp in pDNSReqList)
+          {
             cDNSRequests.Add(lTmp);
 
+            // Filter
+            try
+            {
+              if (!CompareToFilter(DGV_DNSRequests.Rows[DGV_DNSRequests.Rows.Count - 1].Cells["DNSHostname"].Value.ToString()))
+                DGV_DNSRequests.Rows[DGV_DNSRequests.Rows.Count - 1].Visible = false;
+            }
+            catch (Exception lEx)
+            {
+              PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
+            }
+          } // foreach (DNS...
 
-          // Filter
-          try
-          {
-            if (!CompareToFilter(DGV_DNSRequests.Rows[lLastRowIndex + 1].Cells["DNSHostname"].Value.ToString()))
-              DGV_DNSRequests.Rows[lLastRowIndex + 1].Visible = false;
-          }
-          catch (Exception) { }
 
           // Selected cell/row
           try
