@@ -159,7 +159,7 @@ int main(int argc, char **argv)
               /*
               * Wait for all ARP replies and terminate thread.
               */
-              Sleep(500);
+              Sleep(5000);
               TerminateThread(lARPReplyThreadHandle, 0);
               CloseHandle(lARPReplyThreadHandle);
 
@@ -200,6 +200,8 @@ DWORD WINAPI CaptureARPReplies(LPVOID pScanParams)
   u_char *lPktData = NULL;
   struct pcap_pkthdr *lPktHdr = NULL;
   PSCANPARAMS lScanParams = (PSCANPARAMS) pScanParams;
+  unsigned char lTmpPkt[256];
+  unsigned int lTmpSize;
   unsigned char lEthDstStr[MAX_MAC_LEN+1];
   unsigned char lEthSrcStr[MAX_MAC_LEN+1];
   unsigned char lARPEthDstStr[MAX_MAC_LEN+1];
@@ -214,9 +216,12 @@ DWORD WINAPI CaptureARPReplies(LPVOID pScanParams)
     {
       if (lPcapRetVal == 1)      
       {
-        lEHdr = (PETHDR) lPktData;
-        lARPHdr = (PARPHDR) (lPktData + sizeof(ETHDR));
+        lTmpSize = lPktHdr->len>255?255:lPktHdr->len;
+        ZeroMemory(lTmpPkt, 256);
+        CopyMemory(lTmpPkt, lPktData, lTmpSize);
 
+        lEHdr = (PETHDR) lTmpPkt;
+        lARPHdr = (PARPHDR) (lTmpPkt + sizeof(ETHDR));
 
         if (ntohs(lARPHdr->oper) == ARP_REPLY)
         {
