@@ -34,12 +34,24 @@ namespace Simsang.MiniBrowser
     #endregion
 
 
+    #region DATATYPES
+
+    enum UserAgentType
+    {
+      Custom = 0, 
+      InternetExplorer = 1
+    }
+
+    #endregion
+
+
     #region MEMBERS
 
-    private const String mDefaultUserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)";
+    private readonly String mUserAgentIE = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)"; 
+    private readonly String[] mUserAgentSettings = new String[] { "Custom", "IE" };
+    private String mUserAgentCustom;
     private static String mHeaderData;
     private String mCookies;
-    private String mUserAgent;
     private TaskFacade cTask;
 
     #endregion
@@ -59,15 +71,17 @@ namespace Simsang.MiniBrowser
       InitializeComponent();
 
       cTask = TaskFacade.getInstance();
+      CMB_UserAgent.DataSource = mUserAgentSettings;
+      CMB_UserAgent.SelectedIndex = 1;
+
 
       TB_URL.Text = pURL;
       TB_Cookies.Text = pCookie;
       mCookies = pCookie;
 
-      TB_UserAgent.Text = pUserAgent;
-      mUserAgent = pUserAgent;
-
-      this.Text = "MiniBrowser 0.1";
+      mUserAgentCustom = pUserAgent;
+      CMB_UserAgent.SelectedIndex = 0;
+      this.Text = "MiniBrowser 0.3";
 
 
       if (!String.IsNullOrEmpty(pURL))
@@ -116,7 +130,7 @@ namespace Simsang.MiniBrowser
       if (CB_UserAgent.Checked && TB_UserAgent.Text.Length > 0)
         mHeaderData = "User-Agent: " + TB_UserAgent.Text + "\r\n";
       else
-        mHeaderData = String.Format("User-Agent: {0}\r\n", mDefaultUserAgent);
+        mHeaderData = String.Format("User-Agent: {0}\r\n", TB_UserAgent.Text);
 
       if (CB_Cookies.Checked && TB_Cookies.Text.Length > 0)
         mHeaderData += "Cookie: " + TB_Cookies.Text + "\r\n";
@@ -142,6 +156,17 @@ namespace Simsang.MiniBrowser
     private void BT_Open_Click(object sender, EventArgs e)
     {
       String lURL = this.TB_URL.Text;
+
+
+      if (!String.IsNullOrEmpty(lURL))
+      {
+        if (!lURL.ToLower().StartsWith("http"))
+        {
+          lURL = String.Format("http://{0}", lURL);
+          this.TB_URL.Text = lURL;
+        } // if (!lURL....
+      } // if (!stri...
+
 
       mHeaderData = String.Empty;
 
@@ -169,10 +194,7 @@ namespace Simsang.MiniBrowser
         }
       } // if (CB_Cookie...         
 
-      if (CB_UserAgent.Checked && TB_UserAgent.Text.Length > 0)
-        mHeaderData = "User-Agent: " + TB_UserAgent.Text + "\r\n";
-      else
-        mHeaderData = String.Format("User-Agent: {0}\r\n", mDefaultUserAgent);
+      mHeaderData = "User-Agent: " + TB_UserAgent.Text + "\r\n";
 
       if (CB_Cookies.Checked && TB_Cookies.Text.Length > 0)
         mHeaderData += "Cookie: " + TB_Cookies.Text + "\r\n";
@@ -207,14 +229,14 @@ namespace Simsang.MiniBrowser
       if (pEnabled == false)
       {
         GB_Details.Enabled = false;
-        //                GB_WebPage.Enabled = false;
-        //                Cursor = Cursors.WaitCursor;
+        //GB_WebPage.Enabled = false;
+        //Cursor = Cursors.WaitCursor;
       }
       else
       {
         GB_Details.Enabled = true;
-        //                GB_WebPage.Enabled = true;
-        //                Cursor = Cursors.Default;
+        //GB_WebPage.Enabled = true;
+        //Cursor = Cursors.Default;
       }
     }
 
@@ -245,6 +267,30 @@ namespace Simsang.MiniBrowser
         e.SuppressKeyPress = true;
         BT_Open_Click(null, null);
       }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void CMB_UserAgent_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      if (CMB_UserAgent.SelectedIndex != (int)UserAgentType.Custom)
+        mUserAgentCustom = TB_UserAgent.Text;
+
+      switch (CMB_UserAgent.SelectedIndex)
+      {
+        case (int)UserAgentType.Custom:
+          TB_UserAgent.Text = mUserAgentCustom;
+          TB_UserAgent.Enabled = true;
+          break;
+        default:
+          TB_UserAgent.Text = mUserAgentIE;
+          TB_UserAgent.Enabled = false;
+          break;
+      } // switch (CM...
     }
 
     #endregion

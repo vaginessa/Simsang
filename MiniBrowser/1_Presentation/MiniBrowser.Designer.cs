@@ -42,6 +42,7 @@
       this.GB_WebPage = new System.Windows.Forms.GroupBox();
       this.WB_MiniBrowser = new System.Windows.Forms.WebBrowser();
       this.BGW_GetAccessToken = new System.ComponentModel.BackgroundWorker();
+      this.CMB_UserAgent = new System.Windows.Forms.ComboBox();
       this.GB_Details.SuspendLayout();
       this.GB_WebPage.SuspendLayout();
       this.SuspendLayout();
@@ -50,8 +51,8 @@
       // 
       this.GB_Details.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.GB_Details.Controls.Add(this.CMB_UserAgent);
       this.GB_Details.Controls.Add(this.CB_Cookies);
-      this.GB_Details.Controls.Add(this.CB_UserAgent);
       this.GB_Details.Controls.Add(this.BT_Open);
       this.GB_Details.Controls.Add(this.TB_UserAgent);
       this.GB_Details.Controls.Add(this.TB_Cookies);
@@ -84,7 +85,7 @@
       // 
       this.CB_UserAgent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.CB_UserAgent.AutoSize = true;
-      this.CB_UserAgent.Location = new System.Drawing.Point(630, 89);
+      this.CB_UserAgent.Location = new System.Drawing.Point(635, 126);
       this.CB_UserAgent.Name = "CB_UserAgent";
       this.CB_UserAgent.Size = new System.Drawing.Size(53, 17);
       this.CB_UserAgent.TabIndex = 6;
@@ -187,12 +188,23 @@
       // 
       this.BGW_GetAccessToken.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BGW_GetAccessToken_DoWork);
       // 
+      // CMB_UserAgent
+      // 
+      this.CMB_UserAgent.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.CMB_UserAgent.FormattingEnabled = true;
+      this.CMB_UserAgent.Location = new System.Drawing.Point(624, 86);
+      this.CMB_UserAgent.Name = "CMB_UserAgent";
+      this.CMB_UserAgent.Size = new System.Drawing.Size(59, 21);
+      this.CMB_UserAgent.TabIndex = 6;
+      this.CMB_UserAgent.SelectedIndexChanged += new System.EventHandler(this.CMB_UserAgent_SelectedIndexChanged);
+      // 
       // Browser
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(740, 517);
       this.Controls.Add(this.GB_WebPage);
+      this.Controls.Add(this.CB_UserAgent);
       this.Controls.Add(this.GB_Details);
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MinimizeBox = false;
@@ -203,6 +215,7 @@
       this.GB_Details.PerformLayout();
       this.GB_WebPage.ResumeLayout(false);
       this.ResumeLayout(false);
+      this.PerformLayout();
 
         }
 
@@ -221,5 +234,6 @@
         private System.Windows.Forms.CheckBox CB_UserAgent;
         private System.Windows.Forms.CheckBox CB_Cookies;
         private System.ComponentModel.BackgroundWorker BGW_GetAccessToken;
+        private System.Windows.Forms.ComboBox CMB_UserAgent;
     }
 }
