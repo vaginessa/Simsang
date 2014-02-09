@@ -52,12 +52,12 @@ namespace Plugin.Main.IPAccounting
     /// 
     /// </summary>
     /// <param name="pConfig"></param>
-    private InfrastructureFacade(IPAccountingConfig pAccountingConfig, IPlugin pPlugin)
+    private InfrastructureFacade(IPAccountingConfig pAccountingConfig, IPlugin pPlugin, List<AccountingItem> pRecords)
     {
       cAccountingConfig = pAccountingConfig;
       cPlugin = pPlugin;
+      cAccountingRecords = pRecords;
 
-      cAccountingRecords = new List<AccountingItem>();
       cIPAccountingPath = String.Format(@"{0}{1}", cAccountingConfig.BasisDirectory, cIPAccountingBin);
       init(pAccountingConfig);
 
@@ -77,10 +77,10 @@ namespace Plugin.Main.IPAccounting
     /// Create single instance
     /// </summary>
     /// <returns></returns>
-    public static InfrastructureFacade getInstance(IPAccountingConfig pConfig, IPlugin pPlugin)
+    public static InfrastructureFacade getInstance(IPAccountingConfig pConfig, IPlugin pPlugin, ref List<AccountingItem> pRecordList)
     {
       if (cInstance == null)
-        cInstance = new InfrastructureFacade(pConfig, pPlugin);
+        cInstance = new InfrastructureFacade(pConfig, pPlugin, pRecordList);
 
       return (cInstance);
     }

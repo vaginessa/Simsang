@@ -37,9 +37,9 @@ namespace Plugin.Main.IPAccounting
     private DomainFacade(IPAccountingConfig pConfig, IPlugin pPlugin)
     {
       cPlugin = pPlugin;
-      cInfrastructure = InfrastructureFacade.getInstance(pConfig, pPlugin);
       cRecordList = new List<AccountingItem>();
       cObserverList = new List<IObserver>();
+      cInfrastructure = InfrastructureFacade.getInstance(pConfig, pPlugin, ref cRecordList);
     }
 
 
