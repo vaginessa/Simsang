@@ -910,7 +910,16 @@ namespace Plugin.Main
 
         cAccounts.Clear();
         foreach (Account lTmp in pHostnameIPPair)
-          cAccounts.Add(new Account(lTmp.SrcMAC, lTmp.SrcIP, lTmp.DstIP, lTmp.DstPort, lTmp.Username, lTmp.Password));
+        {
+          try
+          {
+            cAccounts.Add(new Account(lTmp.SrcMAC, lTmp.SrcIP, lTmp.DstIP, lTmp.DstPort, lTmp.Username, lTmp.Password));
+          }
+          catch (Exception lEx)
+          {
+            PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));         
+          }
+        }
 
         // Selected cell/row
         try
