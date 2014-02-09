@@ -92,6 +92,20 @@ namespace Simsang.ARPScan.Main
       mStatusCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
       DGV_Targets.Columns.Add(mStatusCol);
 
+
+
+      DataGridViewButtonColumn mSystemFingerprint = new DataGridViewButtonColumn();
+      mSystemFingerprint.DataPropertyName = "fingerprint";
+      mSystemFingerprint.Name = "fingerprint";
+      mSystemFingerprint.HeaderText = "Fingerprint";
+      mSystemFingerprint.Visible = true;
+      //mSystemFingerprint.MinimumWidth = 72;
+      mSystemFingerprint.Text = "Scan";
+      mSystemFingerprint.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+      mSystemFingerprint.UseColumnTextForButtonValue = true;
+      DGV_Targets.Columns.Add(mSystemFingerprint);
+
+
       mTargetRecord = new BindingList<TargetRecord>();
       DGV_Targets.DataSource = mTargetRecord;
       DGV_Targets.CurrentCellDirtyStateChanged += new EventHandler(DGV_CurrentCellDirtyStateChanged);
@@ -210,6 +224,7 @@ namespace Simsang.ARPScan.Main
       /*
        * Set GUI parameters
        */
+      DGV_Targets.Enabled = true;
       BT_Close.Enabled = true;
       BT_Scan.Enabled = true;
       RB_Netrange.Enabled = true;
@@ -287,6 +302,8 @@ namespace Simsang.ARPScan.Main
       /*
        * Set GUI parameters
        */
+      DGV_Targets.Enabled = false;
+
       BT_Close.Enabled = false;
       BT_Scan.Enabled = false;
 
@@ -410,14 +427,36 @@ namespace Simsang.ARPScan.Main
         String lIP = DGV_Targets.Rows[e.RowIndex].Cells[0].Value.ToString();
         String lMAC = DGV_Targets.Rows[e.RowIndex].Cells[1].Value.ToString();
 
-        for (int i = 0; i < mTargetRecord.Count; i++)
+
+        /*
+         * (De)Activate target system
+         */
+        if (e.ColumnIndex == 3)
         {
-          if (mTargetRecord[i].MAC == lMAC && mTargetRecord[i].IP == lIP)
+          for (int i = 0; i < mTargetRecord.Count; i++)
           {
-            mTargetRecord[i].Status = mTargetRecord[i].Status ? false : true;
-            break;
-          }
+            if (mTargetRecord[i].MAC == lMAC && mTargetRecord[i].IP == lIP)
+            {
+              mTargetRecord[i].Status = mTargetRecord[i].Status ? false : true;
+              break;
+            }
+          } // for (in...
+
+
+        /*
+         * Fingerprint target system
+         */
         }
+        else if (e.ColumnIndex == 4)
+        {
+          try
+          {
+            cTask.startFingerprint(lIP);
+          }
+          catch (Exception lEx)
+          { 
+          }
+        } // if (e.ColumnIn...
       }
     }
 

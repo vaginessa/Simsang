@@ -87,6 +87,15 @@ namespace Simsang.ARPScan.Main
       cInfrastructure.killAllRunningARPScans();
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void startFingerprint(String pTargetIP)
+    {
+      cInfrastructure.startFingerprint(pTargetIP);
+    }
+
     #endregion
 
   }

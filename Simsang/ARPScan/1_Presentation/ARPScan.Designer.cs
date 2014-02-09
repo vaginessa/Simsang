@@ -83,7 +83,7 @@
       this.DGV_Targets.RowTemplate.Height = 24;
       this.DGV_Targets.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.DGV_Targets.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.DGV_Targets.Size = new System.Drawing.Size(567, 201);
+      this.DGV_Targets.Size = new System.Drawing.Size(610, 201);
       this.DGV_Targets.TabIndex = 5;
       this.DGV_Targets.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DGV_Targets_MouseUp);
       // 
@@ -201,7 +201,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(586, 335);
+      this.ClientSize = new System.Drawing.Size(629, 335);
       this.Controls.Add(this.GB_Range);
       this.Controls.Add(this.BT_Scan);
       this.Controls.Add(this.DGV_Targets);

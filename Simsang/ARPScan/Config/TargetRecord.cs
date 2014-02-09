@@ -20,6 +20,7 @@ namespace Simsang.ARPScan.Main
     private String mMAC;
     private bool mStatus;
     private String mVendor;
+    private Button mButton;
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -34,6 +35,8 @@ namespace Simsang.ARPScan.Main
       mMAC = pMAC;
       mVendor = pVendor;
       mStatus = false;
+      mButton = new Button() { Text = "Scan" };
+      mButton.Text = "Scan";
     }
 
     #endregion
@@ -81,6 +84,18 @@ namespace Simsang.ARPScan.Main
       {
         mStatus = value;
         this.NotifyPropertyChanged("Status");
+      }
+    }
+
+
+
+    public Button Fingerprint
+    {
+      get { return mButton; }
+      set
+      {
+        mButton = value;
+        this.NotifyPropertyChanged("Fingerprint");
       }
     }
 

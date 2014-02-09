@@ -38,6 +38,7 @@ namespace Simsang
     public static readonly String BinaryDir = @"\bin\";
     public static readonly String DLLDir = @"\DLL\";
     public static readonly String ARPScanBinary = "ARPScan.exe";
+    public static readonly String NmapBinary = "nmap.exe";
 
     public static readonly String SessionDir = @"\sessions\";
 

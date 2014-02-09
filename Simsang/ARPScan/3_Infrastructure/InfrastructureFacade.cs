@@ -29,6 +29,12 @@ namespace Simsang.ARPScan.Main
     private Action<String> cOnDataFunc;
     private ARPScanConfig cARPScanConf;
 
+    private String cNmapProcName = "nmap";
+    private Process cNmapProc;
+    private String cNmapBin;
+
+    private String cXMLOutputFile;
+
     #endregion
 
 
@@ -41,6 +47,7 @@ namespace Simsang.ARPScan.Main
     {
       cBaseDir = Directory.GetCurrentDirectory();
       cARPScanBin = String.Format(@"{0}\bin\{1}", cBaseDir, Simsang.Config.ARPScanBinary);
+      cNmapBin = String.Format(@"{0}\bin\nmap\{1}", cBaseDir, Simsang.Config.NmapBinary);
     }
 
 
@@ -127,6 +134,36 @@ namespace Simsang.ARPScan.Main
       }
     }
 
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void startFingerprint(String pTargetIP)
+    {
+      if (String.IsNullOrEmpty(pTargetIP))
+        throw new Exception("Something is wrong with the target IP address");
+
+      if (!File.Exists(cNmapBin))
+        throw new Exception("ARPscan binary not found");
+
+      cXMLOutputFile = Path.GetTempFileName();
+      cNmapProc = new Process();
+      cNmapProc.StartInfo.FileName = cNmapBin;
+      cNmapProc.StartInfo.Arguments = String.Format("-T4 -F --open {0} -oX {1}", pTargetIP, cXMLOutputFile);
+      cNmapProc.StartInfo.UseShellExecute = false;
+      cNmapProc.StartInfo.CreateNoWindow = cARPScanConf.IsDebuggingOn ? false : true;
+      cNmapProc.StartInfo.WindowStyle = cARPScanConf.IsDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
+      cNmapProc.EnableRaisingEvents = true;
+
+      // Configure the process exited event
+      cNmapProc.Exited += onNmapScanExited;
+      cNmapProc.Disposed += onNmapScanExited;
+
+      cNmapProc.Start();
+//      cNmapProc.BeginOutputReadLine();
+    }
+
     #endregion
 
 
@@ -142,6 +179,26 @@ namespace Simsang.ARPScan.Main
       if (cARPScanConf.OnARPScanStopped != null)
         cARPScanConf.OnARPScanStopped();
     }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void onNmapScanExited(object sender, System.EventArgs e)
+    {
+      System.Windows.Forms.MessageBox.Show(cXMLOutputFile);
+
+      try
+      {
+        if (File.Exists(cXMLOutputFile))
+          File.Delete(cXMLOutputFile);
+      }
+      catch (Exception)
+      { }
+    }
+
 
 
     /// <summary>

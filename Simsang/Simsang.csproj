@@ -114,6 +114,12 @@
     <Compile Include="Contribute\2_Infrastructure\IContribute.cs" />
     <Compile Include="Contribute\2_Infrastructure\ContributionProcessing.cs" />
     <Compile Include="Contribute\2_Infrastructure\Settings.cs" />
+    <Compile Include="Fingerprints\Fingerprints.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Fingerprints\Fingerprints.Designer.cs">
+      <DependentUpon>Fingerprints.cs</DependentUpon>
+    </Compile>
     <Compile Include="Main\1_Presentation\InputModule.cs" />
     <Compile Include="LogConsole\Presentation\LogConsole.cs">
       <SubType>Form</SubType>
@@ -177,6 +183,9 @@
     <Compile Include="WiFi\WlanApi.cs" />
     <EmbeddedResource Include="ARPScan\1_Presentation\ARPScan.resx">
       <DependentUpon>ARPScan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Fingerprints\Fingerprints.resx">
+      <DependentUpon>Fingerprints.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LogConsole\Presentation\LogConsole.resx">
       <DependentUpon>LogConsole.cs</DependentUpon>

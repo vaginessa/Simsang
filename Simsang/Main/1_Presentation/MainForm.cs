@@ -30,6 +30,7 @@ using Simsang.MiniBrowser;
 using Simsang.LogConsole.Main;
 using Simsang.SessionsExport;
 using Simsang.Session.Config;
+using Simsang.Fingerprints;
 
 
 namespace Simsang
@@ -1175,7 +1176,22 @@ namespace Simsang
       TSMI_DHCPPoisoning.Checked = true;
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void systemFingerprintsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      Fingerprints.Fingerprints lSystemFingerprints = new Fingerprints.Fingerprints();
+      lSystemFingerprints.TopMost = true;
+      lSystemFingerprints.ShowDialog();
+    }
+
     #endregion
+
+
 
   }
 }
