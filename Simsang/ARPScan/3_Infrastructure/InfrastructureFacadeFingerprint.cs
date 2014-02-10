@@ -26,8 +26,10 @@ namespace Simsang.ARPScan.SystemFingerprint
     private FingerprintConfig cFingerprintConf;
 
     private String cNmapProcName = "nmap";
-//    private String cNmapParameters = "-T4 -F -O {0} -oX {1}"; // Fast scan
-    private String cNmapParameters = "--host-timeout 15s -T4 -O {0} -oX {1}";
+////    private String cNmapParameters = "-T4 -F -O {0} -oX {1}"; // Fast scan
+//    private String cNmapParameters = "--host-timeout 15s -T4 -O {0} -oX {1}";
+////    private String cNmapParameters = "--host-timeout 15s -sV -T4 -O -F --version-light {0} -oX {1}";
+    private String cNmapParameters = "--host-timeout 15s -T5 -O --osscan-guess -F {0} -oX {1}";
     private Process cNmapProc;
     private String cNmapBin;
     private bool cProcStopRequested;

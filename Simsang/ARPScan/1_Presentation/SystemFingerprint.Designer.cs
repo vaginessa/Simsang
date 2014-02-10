@@ -30,6 +30,10 @@
     {
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SystemFingerprint));
       this.GB_Fingerprint = new System.Windows.Forms.GroupBox();
+      this.TB_ScanDate = new System.Windows.Forms.TextBox();
+      this.L_ScanDate = new System.Windows.Forms.Label();
+      this.TB_OSGuess = new System.Windows.Forms.TextBox();
+      this.TB_OpenPorts = new System.Windows.Forms.TextBox();
       this.TB_HWVendor = new System.Windows.Forms.TextBox();
       this.TB_MAC = new System.Windows.Forms.TextBox();
       this.L_OpenPorts = new System.Windows.Forms.Label();
@@ -38,10 +42,6 @@
       this.L_MACAddr = new System.Windows.Forms.Label();
       this.BT_Scan = new System.Windows.Forms.Button();
       this.BT_Close = new System.Windows.Forms.Button();
-      this.TB_OpenPorts = new System.Windows.Forms.TextBox();
-      this.TB_OSGuess = new System.Windows.Forms.TextBox();
-      this.L_ScanDate = new System.Windows.Forms.Label();
-      this.TB_ScanDate = new System.Windows.Forms.TextBox();
       this.GB_Fingerprint.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -62,6 +62,42 @@
       this.GB_Fingerprint.Size = new System.Drawing.Size(519, 246);
       this.GB_Fingerprint.TabIndex = 0;
       this.GB_Fingerprint.TabStop = false;
+      // 
+      // TB_ScanDate
+      // 
+      this.TB_ScanDate.Location = new System.Drawing.Point(86, 51);
+      this.TB_ScanDate.Name = "TB_ScanDate";
+      this.TB_ScanDate.ReadOnly = true;
+      this.TB_ScanDate.Size = new System.Drawing.Size(234, 20);
+      this.TB_ScanDate.TabIndex = 9;
+      // 
+      // L_ScanDate
+      // 
+      this.L_ScanDate.AutoSize = true;
+      this.L_ScanDate.Location = new System.Drawing.Point(18, 54);
+      this.L_ScanDate.Name = "L_ScanDate";
+      this.L_ScanDate.Size = new System.Drawing.Size(56, 13);
+      this.L_ScanDate.TabIndex = 8;
+      this.L_ScanDate.Text = "Scan date";
+      // 
+      // TB_OSGuess
+      // 
+      this.TB_OSGuess.Location = new System.Drawing.Point(21, 99);
+      this.TB_OSGuess.Multiline = true;
+      this.TB_OSGuess.Name = "TB_OSGuess";
+      this.TB_OSGuess.ReadOnly = true;
+      this.TB_OSGuess.Size = new System.Drawing.Size(299, 131);
+      this.TB_OSGuess.TabIndex = 7;
+      // 
+      // TB_OpenPorts
+      // 
+      this.TB_OpenPorts.Location = new System.Drawing.Point(333, 99);
+      this.TB_OpenPorts.Margin = new System.Windows.Forms.Padding(10);
+      this.TB_OpenPorts.Multiline = true;
+      this.TB_OpenPorts.Name = "TB_OpenPorts";
+      this.TB_OpenPorts.ReadOnly = true;
+      this.TB_OpenPorts.Size = new System.Drawing.Size(171, 131);
+      this.TB_OpenPorts.TabIndex = 6;
       // 
       // TB_HWVendor
       // 
@@ -134,42 +170,6 @@
       this.BT_Close.Text = "Close";
       this.BT_Close.UseVisualStyleBackColor = true;
       this.BT_Close.Click += new System.EventHandler(this.BT_Close_Click);
-      // 
-      // TB_OpenPorts
-      // 
-      this.TB_OpenPorts.Location = new System.Drawing.Point(333, 99);
-      this.TB_OpenPorts.Margin = new System.Windows.Forms.Padding(10);
-      this.TB_OpenPorts.Multiline = true;
-      this.TB_OpenPorts.Name = "TB_OpenPorts";
-      this.TB_OpenPorts.ReadOnly = true;
-      this.TB_OpenPorts.Size = new System.Drawing.Size(171, 131);
-      this.TB_OpenPorts.TabIndex = 6;
-      // 
-      // TB_OSGuess
-      // 
-      this.TB_OSGuess.Location = new System.Drawing.Point(21, 99);
-      this.TB_OSGuess.Multiline = true;
-      this.TB_OSGuess.Name = "TB_OSGuess";
-      this.TB_OSGuess.ReadOnly = true;
-      this.TB_OSGuess.Size = new System.Drawing.Size(299, 131);
-      this.TB_OSGuess.TabIndex = 7;
-      // 
-      // L_ScanDate
-      // 
-      this.L_ScanDate.AutoSize = true;
-      this.L_ScanDate.Location = new System.Drawing.Point(18, 54);
-      this.L_ScanDate.Name = "L_ScanDate";
-      this.L_ScanDate.Size = new System.Drawing.Size(56, 13);
-      this.L_ScanDate.TabIndex = 8;
-      this.L_ScanDate.Text = "Scan date";
-      // 
-      // TB_ScanDate
-      // 
-      this.TB_ScanDate.Location = new System.Drawing.Point(86, 51);
-      this.TB_ScanDate.Name = "TB_ScanDate";
-      this.TB_ScanDate.ReadOnly = true;
-      this.TB_ScanDate.Size = new System.Drawing.Size(234, 20);
-      this.TB_ScanDate.TabIndex = 9;
       // 
       // SystemFingerprint
       // 

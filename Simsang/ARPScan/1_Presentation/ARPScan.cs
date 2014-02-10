@@ -517,16 +517,6 @@ namespace Simsang.ARPScan.Main
     }
 
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void ARPScan_Load(object sender, EventArgs e)
-    {
-    }
-
-
 
     /// <summary>
     /// 

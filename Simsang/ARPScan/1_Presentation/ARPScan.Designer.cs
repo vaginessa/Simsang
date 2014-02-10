@@ -107,7 +107,7 @@
       this.GB_Range.Controls.Add(this.TB_Subnet1);
       this.GB_Range.Location = new System.Drawing.Point(7, 8);
       this.GB_Range.Name = "GB_Range";
-      this.GB_Range.Size = new System.Drawing.Size(567, 78);
+      this.GB_Range.Size = new System.Drawing.Size(610, 78);
       this.GB_Range.TabIndex = 0;
       this.GB_Range.TabStop = false;
       this.GB_Range.Text = "Target range";
@@ -214,7 +214,6 @@
       this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
       this.Text = " Target systems ...";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ARPScan_FormClosing);
-      this.Load += new System.EventHandler(this.ARPScan_Load);
       ((System.ComponentModel.ISupportInitialize)(this.DGV_Targets)).EndInit();
       this.GB_Range.ResumeLayout(false);
       this.GB_Range.PerformLayout();

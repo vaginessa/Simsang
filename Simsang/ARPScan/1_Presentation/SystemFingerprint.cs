@@ -42,7 +42,7 @@ namespace Simsang.ARPScan.SystemFingerprint
       mIPAddress = pIP;
       cTaskFingerprint = TaskFacadeFingerprint.getInstance();
 
-      this.Text = pMAC;
+      this.Text = String.Format("{0} / {1}", pIP, pMAC);
       loadSystemDetails();
     }
 
@@ -58,7 +58,14 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// <param name="e"></param>
     private void BT_Close_Click(object sender, EventArgs e)
     {
-      Dispose();
+      // Stopping scan process
+      cTaskFingerprint.stopFingerprint();
+
+      // Resetting GUI elements
+      activateGUIElements();
+
+      // Hiding form
+      this.Hide();
     }
 
 
@@ -98,12 +105,33 @@ namespace Simsang.ARPScan.SystemFingerprint
     {
       if (keyData == Keys.Escape)
       {
+        cTaskFingerprint.stopFingerprint();
         this.Close();
         return true;
       }
       else
         return base.ProcessDialogKey(keyData);
     }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void SystemFingerprint_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      // Stopping scan process
+      cTaskFingerprint.stopFingerprint();
+
+      // Resetting GUI elements
+      activateGUIElements();
+
+      // Hiding form
+      this.Hide();
+      e.Cancel = true;
+    }
+
 
     #endregion
 
@@ -163,15 +191,22 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// <summary>
     /// 
     /// </summary>
+    public delegate void loadSystemDetailsDelegate();
     private void loadSystemDetails()
     {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new loadSystemDetailsDelegate(loadSystemDetails), new object[] { });
+        return; 
+      }
+
       TB_HWVendor.Text = mMACHardwareVendor;
       TB_MAC.Text = mMACAddress;
 
 
       String lFilePath = cTaskFingerprint.getSystenDetailsFile(mMACAddress);
       String lPorts = "\r\n";
-      String lOSGuess = String.Empty;
+      String lOSGuess = "\r\n";
       var xdoc = new XDocument();
 
       try
@@ -199,9 +234,16 @@ namespace Simsang.ARPScan.SystemFingerprint
                          ServiceName = y.Element("service").Attribute("name").Value
                        });
 
+        int lCount = 0;
         foreach (var entry in ports)
+        {
+          if (lCount >= 7)
+            break;
+
           lPorts += String.Format("   {0}/{1,-5} {2}\r\n", entry.Protocol, entry.PortNo, entry.ServiceName);
-        
+          lCount++;
+        } // foreach(va...
+
         TB_OpenPorts.Text = lPorts;
       }
       catch (Exception) { }
