@@ -52,7 +52,7 @@ namespace Simsang
     /// <param name="pBaseDir"></param>
     private static void DirectoryChecks(String pBaseDir)
     {
-      String[] lDirs = new String[] { Config.PluginDir, Config.SessionDir, Config.BinaryDir, Config.DataDir, Config.DLLDir };
+      String[] lDirs = new String[] { Config.PluginDir, Config.SessionDir, Config.BinaryDir, Config.DataDir, Config.DLLDir, Config.FingerprintDir };
 
       foreach (String lTmpDir in lDirs)
       {

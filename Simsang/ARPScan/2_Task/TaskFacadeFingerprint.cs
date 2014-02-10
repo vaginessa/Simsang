@@ -8,7 +8,7 @@ using System.IO;
 using Simsang.ARPScan.Main.Config;
 
 
-namespace Simsang.ARPScan.Main
+namespace Simsang.ARPScan.SystemFingerprint
 {
   public class TaskFacadeFingerprint
   {
@@ -53,6 +53,10 @@ namespace Simsang.ARPScan.Main
     }
 
 
+    public String getSystenDetailsFile(String pMAC)
+    {
+      return cInfrastructure.getSystenDetailsFile(pMAC);
+    }
 
 
     /// <summary>
@@ -61,17 +65,6 @@ namespace Simsang.ARPScan.Main
     public void stopFingerprint()
     {
       cInfrastructure.stopFingerprint();
-    }
-
-
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public void killAllRunningFingerprints()
-    {
-      cInfrastructure.killAllRunningFingerprints();
     }
 
     #endregion

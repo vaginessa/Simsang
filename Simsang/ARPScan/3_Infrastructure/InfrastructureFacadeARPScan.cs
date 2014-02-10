@@ -194,7 +194,7 @@ namespace Simsang.ARPScan.MainTaskFacadeARPScan
     private void onNmapScanExited(object sender, System.EventArgs e)
     {
       String lFingerprintDir = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), Simsang.Config.FingerprintDir);
-      System.Windows.Forms.MessageBox.Show(cXMLOutputFile);
+//      System.Windows.Forms.MessageBox.Show(cXMLOutputFile);
 
       // 1. Save fingerprint file      
       if (!Directory.Exists(lFingerprintDir))

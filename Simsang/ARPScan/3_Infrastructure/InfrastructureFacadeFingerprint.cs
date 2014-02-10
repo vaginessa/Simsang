@@ -14,7 +14,7 @@ using Simsang;
 using Simsang.ARPScan.Main.Config;
 
 
-namespace Simsang.ARPScan.Main
+namespace Simsang.ARPScan.SystemFingerprint
 {
   public class InfrastructureFacadeFingerprint
   {
@@ -26,7 +26,8 @@ namespace Simsang.ARPScan.Main
     private FingerprintConfig cFingerprintConf;
 
     private String cNmapProcName = "nmap";
-    private String cNmapParameters = "-T4 -F --open {0} -O -oX {1}";
+//    private String cNmapParameters = "-T4 -F -O {0} -oX {1}"; // Fast scan
+    private String cNmapParameters = "--host-timeout 15s -T4 -O {0} -oX {1}";
     private Process cNmapProc;
     private String cNmapBin;
     private bool cProcStopRequested;
@@ -65,6 +66,16 @@ namespace Simsang.ARPScan.Main
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="pMAC"></param>
+    public String getSystenDetailsFile(String pMAC)
+    {
+      return getFileNameByMAC(pMAC);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
     public void stopFingerprint()
     {
       // Stop running process.
@@ -87,25 +98,6 @@ namespace Simsang.ARPScan.Main
       // Kill everything that looks like our fingerprint process
       killAllRunningFingerprints();
     }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public void killAllRunningFingerprints()
-    {
-      Process[] lACInstances;
-
-      if ((lACInstances = Process.GetProcessesByName(cNmapProcName)) != null && lACInstances.Length > 0)
-      {
-        foreach (Process lProc in lACInstances)
-        {
-          try { lProc.Kill(); }
-          catch (Exception) { }
-        }
-      }
-    }
-
 
 
     /// <summary>
@@ -147,7 +139,6 @@ namespace Simsang.ARPScan.Main
 
     #region EVENTS
 
-
     /// <summary>
     /// 
     /// </summary>
@@ -176,10 +167,9 @@ namespace Simsang.ARPScan.Main
         {
           if (File.Exists(cXMLOutputFile))
           {
-            String lMACAddr = Regex.Replace(cXMLMACAddress, @"[^\d\w]", "");
-            String lOutputFileName = String.Format(@"{0}\{1}.xml", lFingerprintDir, lMACAddr);
+            String lOutputFileName = getFileNameByMAC(cXMLMACAddress);
 
-            File.Copy(cXMLOutputFile, lOutputFileName);
+            File.Copy(cXMLOutputFile, lOutputFileName, true);
             File.Delete(cXMLOutputFile);
           } // if File.Ex...
         }
@@ -193,7 +183,49 @@ namespace Simsang.ARPScan.Main
       } // if (cProcSto...
     }
 
+    #endregion
 
+
+    #region PRIVATE
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void killAllRunningFingerprints()
+    {
+      Process[] lACInstances;
+
+      if ((lACInstances = Process.GetProcessesByName(cNmapProcName)) != null && lACInstances.Length > 0)
+      {
+        foreach (Process lProc in lACInstances)
+        {
+          try { lProc.Kill(); }
+          catch (Exception) { }
+        } // foreach (Pro...
+      } // if ((lA...
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMAC"></param>
+    /// <returns></returns>
+    private String getFileNameByMAC(String pMAC)
+    {
+      String lOutputFileName = String.Empty;
+      String lFingerprintDir = String.Empty;
+      String lMACAddr = String.Empty;
+
+      if (!String.IsNullOrEmpty(pMAC))
+      {
+        lFingerprintDir = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), Simsang.Config.FingerprintDir);
+        lMACAddr = Regex.Replace(pMAC, @"[^\d\w]", "");
+        lOutputFileName = String.Format(@"{0}\{1}.xml", lFingerprintDir, lMACAddr);
+      } // if (!Strin...
+
+      return (lOutputFileName);
+    }
 
     #endregion
 

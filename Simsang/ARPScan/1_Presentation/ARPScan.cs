@@ -35,7 +35,6 @@ namespace Simsang.ARPScan.Main
     private SimsangMain mACMain;
     private BindingList<TargetRecord> mTargetRecord;
     private TaskFacadeARPScan cTaskARPScan;
-    private TaskFacadeFingerprint cTaskFingerprint;
 
     #endregion
 
@@ -120,7 +119,6 @@ namespace Simsang.ARPScan.Main
       DGV_Targets.DataSource = mTargetRecord;
 
       cTaskARPScan = TaskFacadeARPScan.getInstance();
-      cTaskFingerprint = TaskFacadeFingerprint.getInstance();
     }
 
 
@@ -338,15 +336,6 @@ namespace Simsang.ARPScan.Main
     /// <summary>
     /// 
     /// </summary>
-    private void FingerprintStopped()
-    {
-      setARPScanBTOnStopped();
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="pData"></param>
     public delegate void updateTextBoxDelegate(String pData);
     public void updateTextBox(String pData)
@@ -423,7 +412,7 @@ namespace Simsang.ARPScan.Main
       {
         String lIP = DGV_Targets.Rows[e.RowIndex].Cells[0].Value.ToString();
         String lMAC = DGV_Targets.Rows[e.RowIndex].Cells[1].Value.ToString();
-
+        String lVendor = DGV_Targets.Rows[e.RowIndex].Cells[2].Value.ToString();
 
         /*
          * (De)Activate target system
@@ -446,24 +435,9 @@ namespace Simsang.ARPScan.Main
         }
         else if (e.ColumnIndex == 4)
         {
-          try
-          {
-            FingerprintConfig lScanConfig = new FingerprintConfig() 
-            {
-               IP = lIP,
-               MAC = lMAC, 
-               IsDebuggingOn = Simsang.Config.DebugOn(),
-               OnScanStopped = FingerprintStopped
-            };
-
-            setARPScanBTOnStarted();
-            cTaskFingerprint.startFingerprint(lScanConfig);
-          }
-          catch (Exception lEx)
-          {
-            LogConsole.Main.LogConsole.pushMsg(String.Format("Fingerprint : {0}", lEx.Message));
-          }
-        } // if (e.ColumnIn...
+          SystemFingerprint.SystemFingerprint lFingerprint = new SystemFingerprint.SystemFingerprint(lMAC, lIP, lVendor);
+          lFingerprint.ShowDialog();
+        }
       }
     }
 
@@ -509,7 +483,6 @@ namespace Simsang.ARPScan.Main
     {
       // Stopping scan process
       cTaskARPScan.stopARPScan();
-      cTaskFingerprint.stopFingerprint();
 
       // Resetting GUI elements
       setARPScanBTOnStopped();
@@ -531,7 +504,6 @@ namespace Simsang.ARPScan.Main
     {
       // Stopping scan process
       cTaskARPScan.stopARPScan();
-      cTaskFingerprint.stopFingerprint();
 
       // Resetting GUI elements
       setARPScanBTOnStopped();
@@ -741,7 +713,6 @@ namespace Simsang.ARPScan.Main
       if (keyData == Keys.Escape)
       {
         cTaskARPScan.stopARPScan();
-        cTaskFingerprint.stopFingerprint();
         this.Close();
         return true;
       }
