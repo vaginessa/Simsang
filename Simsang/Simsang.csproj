@@ -99,8 +99,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ARPScan\2_Task\TaskFacade.cs" />
-    <Compile Include="ARPScan\3_Infrastructure\InfrastructureFacade.cs" />
+    <Compile Include="ARPScan\1_Presentation\SystemFingerprint.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ARPScan\1_Presentation\SystemFingerprint.Designer.cs">
+      <DependentUpon>SystemFingerprint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ARPScan\2_Task\TaskFacadeFingerprint.cs" />
+    <Compile Include="ARPScan\2_Task\TaskFacadeARPScan.cs" />
+    <Compile Include="ARPScan\3_Infrastructure\InfrastructureFacadeFingerprint.cs" />
+    <Compile Include="ARPScan\3_Infrastructure\InfrastructureFacadeARPScan.cs" />
     <Compile Include="ARPScan\1_Presentation\ARPScan.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -183,6 +191,9 @@
     <Compile Include="WiFi\WlanApi.cs" />
     <EmbeddedResource Include="ARPScan\1_Presentation\ARPScan.resx">
       <DependentUpon>ARPScan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ARPScan\1_Presentation\SystemFingerprint.resx">
+      <DependentUpon>SystemFingerprint.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Fingerprints\Fingerprints.resx">
       <DependentUpon>Fingerprints.cs</DependentUpon>

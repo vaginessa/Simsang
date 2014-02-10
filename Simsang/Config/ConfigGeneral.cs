@@ -32,22 +32,17 @@ namespace Simsang
 
 
     public static readonly String PipeName = "Simsang";
-    public static readonly int PipeInstances = 16;
-    public static readonly String PluginDir = @"plugins\";
-    public static readonly String PluginVersionFile = "version.txt";
-    public static readonly String BinaryDir = @"\bin\";
-    public static readonly String DLLDir = @"\DLL\";
-    public static readonly String ARPScanBinary = "ARPScan.exe";
-    public static readonly String NmapBinary = "nmap.exe";
-
-    public static readonly String SessionDir = @"\sessions\";
-
-    public static readonly String DataDir = @"\data\";
-    public static readonly String DB_Data = "data";
-
     public static String WinPcap = String.Empty;
     public static readonly String SimsangFileExtension = "sim";
-
+    public static readonly int PipeInstances = 16;
+    public static readonly String ARPScanBinary = "ARPScan.exe";
+    public static readonly String NmapBinary = "nmap.exe";
+    public static readonly String PluginDir = @"plugins\";
+    public static readonly String BinaryDir = @"\bin\";
+    public static readonly String DLLDir = @"\DLL\";
+    public static readonly String SessionDir = @"\sessions\";
+    public static readonly String DataDir = @"\data\";
+    public static readonly String FingerprintDir = @"\fingerprints\";
     public static readonly String ContributionSenderEmail = "megapanzer@gmail.com";
     public static readonly String ContributionRecipientEmail = "ruben.unteregger@gmail.com";
     public static readonly String SMTPServer = "gmail-smtp-in.l.google.com";

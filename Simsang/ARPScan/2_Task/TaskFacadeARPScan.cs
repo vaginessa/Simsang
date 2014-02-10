@@ -6,17 +6,17 @@ using System.Net;
 using System.IO;
 
 using Simsang.ARPScan.Main.Config;
-
+using Simsang.ARPScan.MainTaskFacadeARPScan;
 
 namespace Simsang.ARPScan.Main
 {
-  public class TaskFacade
+  public class TaskFacadeARPScan
   {
 
     #region MEMBERS
 
-    private static TaskFacade cInstance;
-    private InfrastructureFacade cInfrastructure;
+    private static TaskFacadeARPScan cInstance;
+    private InfrastructureFacadeARPScan cInfrastructure;
 
     #endregion
 
@@ -26,9 +26,9 @@ namespace Simsang.ARPScan.Main
     /// <summary>
     /// 
     /// </summary>
-    public TaskFacade()
+    public TaskFacadeARPScan()
     {
-      cInfrastructure = InfrastructureFacade.getInstance();
+      cInfrastructure = InfrastructureFacadeARPScan.getInstance();
     }
 
 
@@ -36,9 +36,9 @@ namespace Simsang.ARPScan.Main
     /// 
     /// </summary>
     /// <returns></returns>
-    public static TaskFacade getInstance()
+    public static TaskFacadeARPScan getInstance()
     {
-      return cInstance ?? (cInstance = new TaskFacade());
+      return cInstance ?? (cInstance = new TaskFacadeARPScan());
     }
 
 
@@ -85,15 +85,6 @@ namespace Simsang.ARPScan.Main
     public void killAllRunningARPScans()
     {
       cInfrastructure.killAllRunningARPScans();
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public void startFingerprint(String pTargetIP)
-    {
-      cInfrastructure.startFingerprint(pTargetIP);
     }
 
     #endregion

@@ -18,4 +18,14 @@ namespace Simsang.ARPScan.Main.Config
     public OnDataCallback OnDataReceived;
     public bool IsDebuggingOn;
   }
+
+
+
+  public class FingerprintConfig
+  {
+    public String MAC;
+    public String IP;
+    public bool IsDebuggingOn;
+    public Action OnScanStopped;
+  }
 }

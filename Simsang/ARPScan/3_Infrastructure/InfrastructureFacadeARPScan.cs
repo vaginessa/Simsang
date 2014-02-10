@@ -10,17 +10,18 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 
+using Simsang;
 using Simsang.ARPScan.Main.Config;
 
 
-namespace Simsang.ARPScan.Main
+namespace Simsang.ARPScan.MainTaskFacadeARPScan
 {
-  public class InfrastructureFacade
+  public class InfrastructureFacadeARPScan
   {
 
     #region MEMBERS
 
-    private static InfrastructureFacade cInstance;
+    private static InfrastructureFacadeARPScan cInstance;
     private String cARPScanProcName = "ARPScan";
     private Process cARPScanProc;
     private String cBaseDir;
@@ -30,10 +31,12 @@ namespace Simsang.ARPScan.Main
     private ARPScanConfig cARPScanConf;
 
     private String cNmapProcName = "nmap";
+    private String cNmapParameters = "-T4 -F --open {0} -O -oX {1}";
     private Process cNmapProc;
     private String cNmapBin;
 
     private String cXMLOutputFile;
+    private String cXMLMACAddress;
 
     #endregion
 
@@ -43,7 +46,7 @@ namespace Simsang.ARPScan.Main
     /// <summary>
     /// 
     /// </summary>
-    private InfrastructureFacade()
+    private InfrastructureFacadeARPScan()
     {
       cBaseDir = Directory.GetCurrentDirectory();
       cARPScanBin = String.Format(@"{0}\bin\{1}", cBaseDir, Simsang.Config.ARPScanBinary);
@@ -55,10 +58,10 @@ namespace Simsang.ARPScan.Main
     /// 
     /// </summary>
     /// <returns></returns>
-    public static InfrastructureFacade getInstance()
+    public static InfrastructureFacadeARPScan getInstance()
     {
       if (cInstance == null)
-        cInstance = new InfrastructureFacade();
+        cInstance = new InfrastructureFacadeARPScan();
 
       return (cInstance);
     }
@@ -139,21 +142,23 @@ namespace Simsang.ARPScan.Main
     /// <summary>
     /// 
     /// </summary>
-    public void startFingerprint(String pTargetIP)
+    public void startFingerprint(FingerprintConfig pConfig)
     {
-      if (String.IsNullOrEmpty(pTargetIP))
+      if (String.IsNullOrEmpty(pConfig.IP))
         throw new Exception("Something is wrong with the target IP address");
 
       if (!File.Exists(cNmapBin))
         throw new Exception("ARPscan binary not found");
 
+      cXMLMACAddress = pConfig.MAC;
       cXMLOutputFile = Path.GetTempFileName();
+
       cNmapProc = new Process();
       cNmapProc.StartInfo.FileName = cNmapBin;
-      cNmapProc.StartInfo.Arguments = String.Format("-T4 -F --open {0} -oX {1}", pTargetIP, cXMLOutputFile);
+      cNmapProc.StartInfo.Arguments = String.Format(cNmapParameters, pConfig.IP, cXMLOutputFile);
       cNmapProc.StartInfo.UseShellExecute = false;
-      cNmapProc.StartInfo.CreateNoWindow = cARPScanConf.IsDebuggingOn ? false : true;
-      cNmapProc.StartInfo.WindowStyle = cARPScanConf.IsDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
+      cNmapProc.StartInfo.CreateNoWindow = pConfig.IsDebuggingOn ? false : true;
+      cNmapProc.StartInfo.WindowStyle = pConfig.IsDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
       cNmapProc.EnableRaisingEvents = true;
 
       // Configure the process exited event
@@ -188,15 +193,37 @@ namespace Simsang.ARPScan.Main
     /// <param name="e"></param>
     private void onNmapScanExited(object sender, System.EventArgs e)
     {
+      String lFingerprintDir = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), Simsang.Config.FingerprintDir);
       System.Windows.Forms.MessageBox.Show(cXMLOutputFile);
 
+      // 1. Save fingerprint file      
+      if (!Directory.Exists(lFingerprintDir))
+      {
+        try
+        {
+          Directory.CreateDirectory(lFingerprintDir);
+        }
+        catch (Exception)
+        { 
+        }
+      } // if (!Direc...
+      
       try
       {
         if (File.Exists(cXMLOutputFile))
+        {
+          String lMACAddr = Regex.Replace(cXMLMACAddress, @"[^\d\w]", "");
+          String lOutputFileName = String.Format(@"{0}\{1}.xml", lFingerprintDir, lMACAddr);
+
+          File.Copy(cXMLOutputFile, lOutputFileName);
           File.Delete(cXMLOutputFile);
+        }
       }
       catch (Exception)
       { }
+
+//      if (pConfig != null 
+
     }
 
 
@@ -224,7 +251,6 @@ namespace Simsang.ARPScan.Main
         } // if (e.Data...
       } // if (e.Data..
     }
-
 
     #endregion
 

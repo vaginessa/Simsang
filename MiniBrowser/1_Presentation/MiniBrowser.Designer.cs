@@ -30,8 +30,8 @@
         {
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Browser));
       this.GB_Details = new System.Windows.Forms.GroupBox();
+      this.CMB_UserAgent = new System.Windows.Forms.ComboBox();
       this.CB_Cookies = new System.Windows.Forms.CheckBox();
-      this.CB_UserAgent = new System.Windows.Forms.CheckBox();
       this.BT_Open = new System.Windows.Forms.Button();
       this.TB_UserAgent = new System.Windows.Forms.TextBox();
       this.TB_Cookies = new System.Windows.Forms.TextBox();
@@ -39,10 +39,10 @@
       this.L_Cookies = new System.Windows.Forms.Label();
       this.L_URL = new System.Windows.Forms.Label();
       this.TB_URL = new System.Windows.Forms.TextBox();
+      this.CB_UserAgent = new System.Windows.Forms.CheckBox();
       this.GB_WebPage = new System.Windows.Forms.GroupBox();
       this.WB_MiniBrowser = new System.Windows.Forms.WebBrowser();
       this.BGW_GetAccessToken = new System.ComponentModel.BackgroundWorker();
-      this.CMB_UserAgent = new System.Windows.Forms.ComboBox();
       this.GB_Details.SuspendLayout();
       this.GB_WebPage.SuspendLayout();
       this.SuspendLayout();
@@ -68,6 +68,17 @@
       this.GB_Details.TabIndex = 0;
       this.GB_Details.TabStop = false;
       // 
+      // CMB_UserAgent
+      // 
+      this.CMB_UserAgent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.CMB_UserAgent.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.CMB_UserAgent.FormattingEnabled = true;
+      this.CMB_UserAgent.Location = new System.Drawing.Point(624, 86);
+      this.CMB_UserAgent.Name = "CMB_UserAgent";
+      this.CMB_UserAgent.Size = new System.Drawing.Size(59, 21);
+      this.CMB_UserAgent.TabIndex = 6;
+      this.CMB_UserAgent.SelectedIndexChanged += new System.EventHandler(this.CMB_UserAgent_SelectedIndexChanged);
+      // 
       // CB_Cookies
       // 
       this.CB_Cookies.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -80,17 +91,6 @@
       this.CB_Cookies.TabIndex = 5;
       this.CB_Cookies.Text = "Use it";
       this.CB_Cookies.UseVisualStyleBackColor = true;
-      // 
-      // CB_UserAgent
-      // 
-      this.CB_UserAgent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.CB_UserAgent.AutoSize = true;
-      this.CB_UserAgent.Location = new System.Drawing.Point(635, 126);
-      this.CB_UserAgent.Name = "CB_UserAgent";
-      this.CB_UserAgent.Size = new System.Drawing.Size(53, 17);
-      this.CB_UserAgent.TabIndex = 6;
-      this.CB_UserAgent.Text = "Use it";
-      this.CB_UserAgent.UseVisualStyleBackColor = true;
       // 
       // BT_Open
       // 
@@ -162,6 +162,17 @@
       this.TB_URL.TabIndex = 1;
       this.TB_URL.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TB_URL_KeyDown);
       // 
+      // CB_UserAgent
+      // 
+      this.CB_UserAgent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.CB_UserAgent.AutoSize = true;
+      this.CB_UserAgent.Location = new System.Drawing.Point(635, 126);
+      this.CB_UserAgent.Name = "CB_UserAgent";
+      this.CB_UserAgent.Size = new System.Drawing.Size(53, 17);
+      this.CB_UserAgent.TabIndex = 6;
+      this.CB_UserAgent.Text = "Use it";
+      this.CB_UserAgent.UseVisualStyleBackColor = true;
+      // 
       // GB_WebPage
       // 
       this.GB_WebPage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -187,16 +198,6 @@
       // BGW_GetAccessToken
       // 
       this.BGW_GetAccessToken.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BGW_GetAccessToken_DoWork);
-      // 
-      // CMB_UserAgent
-      // 
-      this.CMB_UserAgent.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.CMB_UserAgent.FormattingEnabled = true;
-      this.CMB_UserAgent.Location = new System.Drawing.Point(624, 86);
-      this.CMB_UserAgent.Name = "CMB_UserAgent";
-      this.CMB_UserAgent.Size = new System.Drawing.Size(59, 21);
-      this.CMB_UserAgent.TabIndex = 6;
-      this.CMB_UserAgent.SelectedIndexChanged += new System.EventHandler(this.CMB_UserAgent_SelectedIndexChanged);
       // 
       // Browser
       // 

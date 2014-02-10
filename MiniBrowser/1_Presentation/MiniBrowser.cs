@@ -156,17 +156,27 @@ namespace Simsang.MiniBrowser
     private void BT_Open_Click(object sender, EventArgs e)
     {
       String lURL = this.TB_URL.Text;
-
+      String lHost = String.Empty;
+      String lHostTmp = String.Empty;
 
       if (!String.IsNullOrEmpty(lURL))
       {
-        if (!lURL.ToLower().StartsWith("http"))
+        if (!lURL.Contains(Uri.SchemeDelimiter)) 
         {
-          lURL = String.Format("http://{0}", lURL);
+          lURL = string.Concat(Uri.UriSchemeHttp, Uri.SchemeDelimiter, lURL);
           this.TB_URL.Text = lURL;
         } // if (!lURL....
       } // if (!stri...
 
+
+      try
+      {
+        Uri uri = new Uri(lURL);
+        lHost = uri.Host; // will return www.foo.com
+      }
+      catch (Exception)
+      { 
+      }
 
       mHeaderData = String.Empty;
 
@@ -195,6 +205,7 @@ namespace Simsang.MiniBrowser
       } // if (CB_Cookie...         
 
       mHeaderData = "User-Agent: " + TB_UserAgent.Text + "\r\n";
+      mHeaderData = "Host: " + lHost + "\r\n";
 
       if (CB_Cookies.Checked && TB_Cookies.Text.Length > 0)
         mHeaderData += "Cookie: " + TB_Cookies.Text + "\r\n";

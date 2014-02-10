@@ -34,7 +34,8 @@ namespace Simsang.ARPScan.Main
     private String mLocalIP;
     private SimsangMain mACMain;
     private BindingList<TargetRecord> mTargetRecord;
-    private TaskFacade cTask;
+    private TaskFacadeARPScan cTaskARPScan;
+    private TaskFacadeFingerprint cTaskFingerprint;
 
     #endregion
 
@@ -100,7 +101,7 @@ namespace Simsang.ARPScan.Main
       mSystemFingerprint.HeaderText = "Fingerprint";
       mSystemFingerprint.Visible = true;
       //mSystemFingerprint.MinimumWidth = 72;
-      mSystemFingerprint.Text = "Scan";
+      mSystemFingerprint.Text = "Show";
       mSystemFingerprint.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
       mSystemFingerprint.UseColumnTextForButtonValue = true;
       DGV_Targets.Columns.Add(mSystemFingerprint);
@@ -118,7 +119,8 @@ namespace Simsang.ARPScan.Main
       mTargetRecord = new BindingList<TargetRecord>();
       DGV_Targets.DataSource = mTargetRecord;
 
-      cTask = TaskFacade.getInstance();
+      cTaskARPScan = TaskFacadeARPScan.getInstance();
+      cTaskFingerprint = TaskFacadeFingerprint.getInstance();
     }
 
 
@@ -208,6 +210,7 @@ namespace Simsang.ARPScan.Main
       RB_Subnet_CheckedChanged(null, null);
     }
 
+
     /// <summary>
     /// 
     /// </summary>
@@ -245,7 +248,7 @@ namespace Simsang.ARPScan.Main
 
       try
       {
-        cTask.stopARPScan();
+        cTaskARPScan.stopARPScan();
       }
       catch (Exception lEx)
       {
@@ -258,7 +261,7 @@ namespace Simsang.ARPScan.Main
        */
       try
       {
-        cTask.killAllRunningARPScans();
+        cTaskARPScan.killAllRunningARPScans();
       }
       catch { }
 
@@ -320,29 +323,24 @@ namespace Simsang.ARPScan.Main
       }
       this.Cursor = Cursors.WaitCursor;
       DGV_Targets.Cursor = Cursors.WaitCursor;
+    }
 
 
-      try
-      {
-        ARPScanConfig lARPConf = new ARPScanConfig()
-        {
-          InterfaceID = mIfcID,
-          GatewayIP = mGatewayIP,
-          LocalIP = mLocalIP,
-          StartIP = mStartIP,
-          StopIP = mStopIP,
-          OnDataReceived = updateTextBox,
-          OnARPScanStopped = setARPScanBTOnStopped,
-          IsDebuggingOn = Simsang.Config.DebugOn()
-        };
-        cTask.startARPScan(lARPConf);
-      }
-      catch (Exception lEx)
-      {
-        LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
-        MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        setARPScanBTOnStopped();
-      }
+    /// <summary>
+    /// 
+    /// </summary>
+    private void ARPScanStopped()
+    {
+      setARPScanBTOnStopped();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void FingerprintStopped()
+    {
+      setARPScanBTOnStopped();
     }
 
 
@@ -408,7 +406,6 @@ namespace Simsang.ARPScan.Main
       }
     }
 
-
     #endregion
 
 
@@ -451,10 +448,20 @@ namespace Simsang.ARPScan.Main
         {
           try
           {
-            cTask.startFingerprint(lIP);
+            FingerprintConfig lScanConfig = new FingerprintConfig() 
+            {
+               IP = lIP,
+               MAC = lMAC, 
+               IsDebuggingOn = Simsang.Config.DebugOn(),
+               OnScanStopped = FingerprintStopped
+            };
+
+            setARPScanBTOnStarted();
+            cTaskFingerprint.startFingerprint(lScanConfig);
           }
           catch (Exception lEx)
-          { 
+          {
+            LogConsole.Main.LogConsole.pushMsg(String.Format("Fingerprint : {0}", lEx.Message));
           }
         } // if (e.ColumnIn...
       }
@@ -501,6 +508,10 @@ namespace Simsang.ARPScan.Main
     private void BT_Close_Click(object sender, EventArgs e)
     {
       // Stopping scan process
+      cTaskARPScan.stopARPScan();
+      cTaskFingerprint.stopFingerprint();
+
+      // Resetting GUI elements
       setARPScanBTOnStopped();
 
       // Sending target list to modules
@@ -519,6 +530,10 @@ namespace Simsang.ARPScan.Main
     private void ARPScan_FormClosing(object sender, FormClosingEventArgs e)
     {
       // Stopping scan process
+      cTaskARPScan.stopARPScan();
+      cTaskFingerprint.stopFingerprint();
+
+      // Resetting GUI elements
       setARPScanBTOnStopped();
 
       // Sending target list to modules
@@ -530,14 +545,48 @@ namespace Simsang.ARPScan.Main
     }
 
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void ARPScan_Load(object sender, EventArgs e)
     {
     }
 
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void BT_Scan_Click(object sender, EventArgs e)
     {
       mTargetRecord.Clear();
       setARPScanBTOnStarted();
+
+      try
+      {
+        ARPScanConfig lARPConf = new ARPScanConfig()
+        {
+          InterfaceID = mIfcID,
+          GatewayIP = mGatewayIP,
+          LocalIP = mLocalIP,
+          StartIP = mStartIP,
+          StopIP = mStopIP,
+          OnDataReceived = updateTextBox,
+          OnARPScanStopped = ARPScanStopped,
+          IsDebuggingOn = Simsang.Config.DebugOn()
+        };
+        cTaskARPScan.startARPScan(lARPConf);
+      }
+      catch (Exception lEx)
+      {
+        LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan : {0}", lEx.Message));
+        MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        setARPScanBTOnStopped();
+      }
     }
 
     private void RB_Subnet_CheckedChanged(object sender, EventArgs e)
@@ -559,6 +608,29 @@ namespace Simsang.ARPScan.Main
       {
         mTargetRecord.Clear();
         setARPScanBTOnStarted();
+
+        try
+        {
+          ARPScanConfig lARPConf = new ARPScanConfig()
+          {
+            InterfaceID = mIfcID,
+            GatewayIP = mGatewayIP,
+            LocalIP = mLocalIP,
+            StartIP = mStartIP,
+            StopIP = mStopIP,
+            OnDataReceived = updateTextBox,
+            OnARPScanStopped = setARPScanBTOnStopped,
+            IsDebuggingOn = Simsang.Config.DebugOn()
+          };
+          cTaskARPScan.startARPScan(lARPConf);
+        }
+        catch (Exception lEx)
+        {
+          LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan : {0}", lEx.Message));
+          MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+          setARPScanBTOnStopped();
+        }
+
       } // if (e.KeyCod...
     }
 
@@ -570,6 +642,28 @@ namespace Simsang.ARPScan.Main
       {
         mTargetRecord.Clear();
         setARPScanBTOnStarted();
+
+        try
+        {
+          ARPScanConfig lARPConf = new ARPScanConfig()
+          {
+            InterfaceID = mIfcID,
+            GatewayIP = mGatewayIP,
+            LocalIP = mLocalIP,
+            StartIP = mStartIP,
+            StopIP = mStopIP,
+            OnDataReceived = updateTextBox,
+            OnARPScanStopped = setARPScanBTOnStopped,
+            IsDebuggingOn = Simsang.Config.DebugOn()
+          };
+          cTaskARPScan.startARPScan(lARPConf);
+        }
+        catch (Exception lEx)
+        {
+          LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan : {0}", lEx.Message));
+          MessageBox.Show(lEx.Message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+          setARPScanBTOnStopped();
+        }
       } // if (e.KeyCo...
     }
 
@@ -632,8 +726,8 @@ namespace Simsang.ARPScan.Main
             DGV_Targets.Rows[i].Cells["status"].Value = false;
           }
           catch (Exception) { }
-        }
-      } // for (int i =...
+        } // for (int i =...
+      } // if (mTarg...
     }
 
 
@@ -646,6 +740,8 @@ namespace Simsang.ARPScan.Main
     {
       if (keyData == Keys.Escape)
       {
+        cTaskARPScan.stopARPScan();
+        cTaskFingerprint.stopFingerprint();
         this.Close();
         return true;
       }
