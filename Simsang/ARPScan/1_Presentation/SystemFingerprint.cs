@@ -200,77 +200,38 @@ namespace Simsang.ARPScan.SystemFingerprint
         return; 
       }
 
-      TB_HWVendor.Text = mMACHardwareVendor;
-      TB_MAC.Text = mMACAddress;
-
-
-      String lFilePath = cTaskFingerprint.getSystenDetailsFile(mMACAddress);
+      SystemDetails lSysDetails;
+      int lCount = 0;
       String lPorts = "\r\n";
       String lOSGuess = "\r\n";
-      var xdoc = new XDocument();
 
-      try
-      {
-        xdoc = XDocument.Load(lFilePath);
-        TB_ScanDate.Text = xdoc.Descendants().Elements("runstats").First().Element("finished").Attribute("timestr").Value;
-      }
-      catch (Exception lEx) 
-      {
-        String lMessage = lEx.Message;
-      }
+      lSysDetails = cTaskFingerprint.loadSystemDetails(mMACAddress);
 
-
+      TB_HWVendor.Text = mMACHardwareVendor;
+      TB_MAC.Text = mMACAddress;
+      TB_ScanDate.Text = lSysDetails.ScanDate;
 
       /*
-       * Extract open ports from XML file
+       * Listing ports
        */
-      try
+      foreach (var entry in lSysDetails.OpenPorts)
       {
-        var ports = xdoc.Descendants().Elements("port")
-                       .Select(y => new
-                       {
-                         Protocol = y.Attribute("protocol").Value,
-                         PortNo = y.Attribute("portid").Value,
-                         ServiceName = y.Element("service").Attribute("name").Value
-                       });
+        if (lCount >= 7)
+          break;
 
-        int lCount = 0;
-        foreach (var entry in ports)
-        {
-          if (lCount >= 7)
-            break;
-
-          lPorts += String.Format("   {0}/{1,-5} {2}\r\n", entry.Protocol, entry.PortNo, entry.ServiceName);
-          lCount++;
-        } // foreach(va...
-
-        TB_OpenPorts.Text = lPorts;
-      }
-      catch (Exception) { }
-
+        lPorts += String.Format("   {0}/{1,-5} {2}\r\n", entry.Protocol, entry.PortNo, entry.ServiceName);
+        lCount++;
+      } // foreach(va...
 
       /*
-       * Extract OS guess from XML file
+       * OS guess
        */
-      try
-      {
-        var OSGuess = xdoc.Descendants().Elements("os").First().Elements("osmatch")
-                       .Select(y => new
-                       {
-                         Accuracy = y.Attribute("accuracy").Value,
-                         OSName = y.Attribute("name").Value
-                       });
+      foreach (var entry in lSysDetails.OSGuess)
+        lOSGuess += String.Format(" {0} ({1}%)\r\n", entry.OSName, entry.Accuracy);
 
-        foreach (var entry in OSGuess)
-          lOSGuess += String.Format(" {0} ({1}%)\r\n", entry.OSName, entry.Accuracy);
 
-        TB_OSGuess.Text = lOSGuess;
-      }
-      catch (Exception lEx) 
-      {
-        String lMsg = lEx.Message;
-      }
-
+      TB_OSGuess.Text = lOSGuess;
+      TB_OpenPorts.Text = lPorts;
     }
 
 

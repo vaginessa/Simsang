@@ -78,6 +78,68 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="pMACAddress"></param>
+    public SystemDetails loadSystemDetails(String pMACAddress)
+    {
+      var xdoc = new XDocument();
+      String lFilePath = getSystenDetailsFile(pMACAddress);
+      SystemDetails lSysDetails = new SystemDetails();
+
+      /*
+       * Parse scan date
+       */
+      try
+      {
+        xdoc = XDocument.Load(lFilePath);
+        lSysDetails.ScanDate = xdoc.Descendants().Elements("runstats").First().Element("finished").Attribute("timestr").Value;
+      }
+      catch (Exception lEx)
+      {
+        String lMessage = lEx.Message;
+      }
+
+      /*
+       * Parse open ports
+       */
+      try
+      {
+        var ports = xdoc.Descendants().Elements("port")
+                       .Select(y => new OpenService
+                       { 
+                         Protocol = y.Attribute("protocol").Value,
+                         PortNo = y.Attribute("portid").Value,
+                         ServiceName = y.Element("service").Attribute("name").Value
+                       });
+        lSysDetails.OpenPorts = ports.ToList<OpenService>();
+      }
+      catch (Exception) { }
+
+
+      /*
+       * Extract OS guess from XML file
+       */
+      try
+      {
+        var OSGuess = xdoc.Descendants().Elements("os").First().Elements("osmatch")
+                       .Select(y => new OS
+                       {
+                         Accuracy = y.Attribute("accuracy").Value,
+                         OSName = y.Attribute("name").Value
+                       });
+        lSysDetails.OSGuess = OSGuess.ToList<OS>();
+      }
+      catch (Exception lEx)
+      {
+        String lMsg = lEx.Message;
+      }
+
+      return lSysDetails;
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
     public void stopFingerprint()
     {
       // Stop running process.

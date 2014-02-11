@@ -67,6 +67,16 @@ namespace Simsang.ARPScan.SystemFingerprint
       cInfrastructure.stopFingerprint();
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMACAddress"></param>
+    public SystemDetails loadSystemDetails(String pMACAddress)
+    {
+      return cInfrastructure.loadSystemDetails(pMACAddress);
+    }
+
     #endregion
 
   }
