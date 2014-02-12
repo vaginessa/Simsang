@@ -92,6 +92,9 @@ namespace Simsang.ARPScan.SystemFingerprint
       catch (Exception lEx)
       {
         LogConsole.Main.LogConsole.pushMsg(String.Format("Fingerprint : {0}", lEx.Message));
+        activateGUIElements();
+        String lMsg = String.Format("Error occurred while creating system fingerprint\r\nMessage: {0}", lEx.Message);
+        MessageBox.Show(lMsg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
       }
     }
 

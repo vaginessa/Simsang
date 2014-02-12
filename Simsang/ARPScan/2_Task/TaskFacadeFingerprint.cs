@@ -48,7 +48,6 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// </summary>
     public void startFingerprint(FingerprintConfig pConfig)
     {
-      // check input and throw error messages if necessary
       cInfrastructure.startFingerprint(pConfig);
     }
 

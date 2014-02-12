@@ -169,14 +169,14 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// </summary>
     public void startFingerprint(FingerprintConfig pConfig)
     {
+      if (!File.Exists(cNmapBin))
+        throw new Exception("Nmap binary not found");
+
       if (pConfig == null)
         throw new Exception("Something is wrong with the configuration parameters");
 
       if (String.IsNullOrEmpty(pConfig.IP))
         throw new Exception("Something is wrong with the target IP address");
-
-      if (!File.Exists(cNmapBin))
-        throw new Exception("ARPscan binary not found");
 
       cProcStopRequested = false;
       cFingerprintConf = pConfig;
