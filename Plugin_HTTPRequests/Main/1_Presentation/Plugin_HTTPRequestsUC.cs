@@ -27,7 +27,7 @@ namespace Plugin.Main
     #region MEMBERS
 
     private List<String> cTargetList;
-    private List<HTTPRequests> cHTTPRequests;
+    private BindingList<HTTPRequests> cHTTPRequests;
     private const int cMaxTableRows = 128;
     private List<String> cDataBatch;
     private TaskFacade cTask;
@@ -122,7 +122,7 @@ namespace Plugin.Main
       cRequestCol.Visible = false;
       DGV_HTTPRequests.Columns.Add(cRequestCol);
 
-      cHTTPRequests = new List<HTTPRequests>();
+      cHTTPRequests = new BindingList<HTTPRequests>();
       DGV_HTTPRequests.DataSource = cHTTPRequests;
 
       #endregion

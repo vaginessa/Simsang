@@ -24,7 +24,7 @@ namespace Plugin.Main
     #region MEMBERS
 
     private List<String> cTargetList;
-    private List<DNSRequestRecord> cDNSRequests;
+    private BindingList<DNSRequestRecord> cDNSRequests;
     private List<String> cDataBatch;
     private TaskFacade cTask;
     private DomainFacade cDomain;
@@ -88,7 +88,7 @@ namespace Plugin.Main
       cPacketTypeCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
       DGV_DNSRequests.Columns.Add(cPacketTypeCol);
 
-      cDNSRequests = new List<DNSRequestRecord>();
+      cDNSRequests = new BindingList<DNSRequestRecord>();
       DGV_DNSRequests.DataSource = cDNSRequests;
 
       #endregion
