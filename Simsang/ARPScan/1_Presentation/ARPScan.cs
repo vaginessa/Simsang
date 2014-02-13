@@ -88,7 +88,7 @@ namespace Simsang.ARPScan.Main
       mStatusCol.Name = "status";
       mStatusCol.HeaderText = "Status";
       mStatusCol.Visible = true;
-      mStatusCol.MinimumWidth = 72;
+      mStatusCol.Width = 72;
       mStatusCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
       DGV_Targets.Columns.Add(mStatusCol);
 
@@ -99,11 +99,29 @@ namespace Simsang.ARPScan.Main
       mSystemFingerprint.Name = "fingerprint";
       mSystemFingerprint.HeaderText = "Fingerprint";
       mSystemFingerprint.Visible = true;
-      //mSystemFingerprint.MinimumWidth = 72;
+      mSystemFingerprint.Width = 72;
       mSystemFingerprint.Text = "Show";
-      mSystemFingerprint.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
       mSystemFingerprint.UseColumnTextForButtonValue = true;
       DGV_Targets.Columns.Add(mSystemFingerprint);
+
+
+      DataGridViewTextBoxColumn mLastScanDateCol = new DataGridViewTextBoxColumn();
+      mLastScanDateCol.DataPropertyName = "LastScanDate";
+      mLastScanDateCol.Name = "LastScanDate";
+      mLastScanDateCol.HeaderText = "Scan date";
+      mLastScanDateCol.ReadOnly = true;
+      mSystemFingerprint.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+      mLastScanDateCol.MinimumWidth = 200;
+      DGV_Targets.Columns.Add(mLastScanDateCol);
+
+      DataGridViewTextBoxColumn mNote = new DataGridViewTextBoxColumn();
+      mNote.DataPropertyName = "Note";
+      mNote.Name = "Note";
+      mNote.HeaderText = "Note";
+      mNote.ReadOnly = true;
+      mNote.Visible = false;
+      mNote.Width = 0;
+      DGV_Targets.Columns.Add(mNote);
 
 
       mTargetRecord = new BindingList<TargetRecord>();
@@ -243,7 +261,25 @@ namespace Simsang.ARPScan.Main
       this.Cursor = Cursors.Default;
       DGV_Targets.Cursor = Cursors.Default;
 
+      /*
+       * Set the tool tips!
+       */
+      foreach (DataGridViewRow lTmpRow in DGV_Targets.Rows)
+      {
+        foreach (DataGridViewCell lTmpCell in lTmpRow.Cells)
+        {
+          try
+          {
+            lTmpCell.ToolTipText = lTmpRow.Cells["Note"].Value.ToString();
+          }
+          catch (Exception) { }
+        } // foreach (Dat...
+      } // foreach (Dat...
 
+
+      /*
+       * Stop ARP scan. First the regular, then the brute way.
+       */
       try
       {
         cTaskARPScan.stopARPScan();
@@ -254,9 +290,6 @@ namespace Simsang.ARPScan.Main
       }
 
 
-      /*
-       * Just to be safe, kill all other ARPScanners.
-       */
       try
       {
         cTaskARPScan.killAllRunningARPScans();
@@ -350,7 +383,10 @@ namespace Simsang.ARPScan.Main
       String lIP = String.Empty;
       String lMAC = String.Empty;
       String lVendor = String.Empty;
-
+      SystemDetails lSysDetails;
+      String lNote = String.Empty;
+      SystemFingerprint.TaskFacadeFingerprint lTaskFacadeFingerprint = SystemFingerprint.TaskFacadeFingerprint.getInstance();
+         
 
       try
       {
@@ -381,7 +417,10 @@ namespace Simsang.ARPScan.Main
               if (lIP != mGatewayIP && lIP != mLocalIP)
               {
                 mTargetList.Add(lIP);
-                mTargetRecord.Add(new TargetRecord(lIP, lMAC, lVendor));
+
+                lSysDetails = lTaskFacadeFingerprint.getSystemDetails(lMAC);
+                lNote = lTaskFacadeFingerprint.getFingerprintNote(lMAC);
+                mTargetRecord.Add(new TargetRecord(lIP, lMAC, lVendor, lSysDetails.ScanDate, lNote));
               } // if (lIP != mGa...
             }
             catch { }

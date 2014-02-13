@@ -51,7 +51,7 @@
       // 
       // BT_Close
       // 
-      this.BT_Close.Location = new System.Drawing.Point(472, 301);
+      this.BT_Close.Location = new System.Drawing.Point(730, 301);
       this.BT_Close.Name = "BT_Close";
       this.BT_Close.Size = new System.Drawing.Size(75, 23);
       this.BT_Close.TabIndex = 7;
@@ -74,7 +74,7 @@
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
       this.DGV_Targets.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.DGV_Targets.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      this.DGV_Targets.Location = new System.Drawing.Point(7, 92);
+      this.DGV_Targets.Location = new System.Drawing.Point(7, 77);
       this.DGV_Targets.MultiSelect = false;
       this.DGV_Targets.Name = "DGV_Targets";
       this.DGV_Targets.ReadOnly = true;
@@ -83,13 +83,13 @@
       this.DGV_Targets.RowTemplate.Height = 24;
       this.DGV_Targets.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.DGV_Targets.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.DGV_Targets.Size = new System.Drawing.Size(610, 201);
+      this.DGV_Targets.Size = new System.Drawing.Size(830, 210);
       this.DGV_Targets.TabIndex = 5;
       this.DGV_Targets.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DGV_Targets_MouseUp);
       // 
       // BT_Scan
       // 
-      this.BT_Scan.Location = new System.Drawing.Point(380, 301);
+      this.BT_Scan.Location = new System.Drawing.Point(638, 301);
       this.BT_Scan.Name = "BT_Scan";
       this.BT_Scan.Size = new System.Drawing.Size(75, 23);
       this.BT_Scan.TabIndex = 6;
@@ -107,7 +107,7 @@
       this.GB_Range.Controls.Add(this.TB_Subnet1);
       this.GB_Range.Location = new System.Drawing.Point(7, 8);
       this.GB_Range.Name = "GB_Range";
-      this.GB_Range.Size = new System.Drawing.Size(610, 78);
+      this.GB_Range.Size = new System.Drawing.Size(758, 56);
       this.GB_Range.TabIndex = 0;
       this.GB_Range.TabStop = false;
       this.GB_Range.Text = "Target range";
@@ -116,7 +116,7 @@
       // 
       this.RB_Netrange.AutoSize = true;
       this.RB_Netrange.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.RB_Netrange.Location = new System.Drawing.Point(14, 48);
+      this.RB_Netrange.Location = new System.Drawing.Point(398, 23);
       this.RB_Netrange.Name = "RB_Netrange";
       this.RB_Netrange.Size = new System.Drawing.Size(81, 17);
       this.RB_Netrange.TabIndex = 2;
@@ -141,7 +141,7 @@
       // 
       // TB_Netrange2
       // 
-      this.TB_Netrange2.Location = new System.Drawing.Point(247, 48);
+      this.TB_Netrange2.Location = new System.Drawing.Point(631, 23);
       this.TB_Netrange2.Name = "TB_Netrange2";
       this.TB_Netrange2.Size = new System.Drawing.Size(100, 20);
       this.TB_Netrange2.TabIndex = 0;
@@ -150,7 +150,7 @@
       // 
       // TB_Netrange1
       // 
-      this.TB_Netrange1.Location = new System.Drawing.Point(125, 48);
+      this.TB_Netrange1.Location = new System.Drawing.Point(509, 23);
       this.TB_Netrange1.Name = "TB_Netrange1";
       this.TB_Netrange1.Size = new System.Drawing.Size(102, 20);
       this.TB_Netrange1.TabIndex = 0;
@@ -201,7 +201,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(629, 335);
+      this.ClientSize = new System.Drawing.Size(849, 335);
       this.Controls.Add(this.GB_Range);
       this.Controls.Add(this.BT_Scan);
       this.Controls.Add(this.DGV_Targets);

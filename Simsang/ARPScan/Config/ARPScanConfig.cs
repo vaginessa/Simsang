@@ -45,6 +45,7 @@ namespace Simsang.ARPScan.Main.Config
   public class SystemDetails
   {
     public String ScanDate;
+    public String Note;
     public List<OpenService> OpenPorts = new List<OpenService>();
     public List<OS> OSGuess = new List<OS>();
   }

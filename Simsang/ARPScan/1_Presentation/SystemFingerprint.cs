@@ -58,14 +58,7 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// <param name="e"></param>
     private void BT_Close_Click(object sender, EventArgs e)
     {
-      // Stopping scan process
-      cTaskFingerprint.stopFingerprint();
-
-      // Resetting GUI elements
-      activateGUIElements();
-
-      // Hiding form
-      this.Hide();
+      this.Close();
     }
 
 
@@ -108,7 +101,6 @@ namespace Simsang.ARPScan.SystemFingerprint
     {
       if (keyData == Keys.Escape)
       {
-        cTaskFingerprint.stopFingerprint();
         this.Close();
         return true;
       }
@@ -124,6 +116,10 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// <param name="e"></param>
     private void SystemFingerprint_FormClosing(object sender, FormClosingEventArgs e)
     {
+      // Save note
+      if (TB_Note.Text.Length > 0)
+        cTaskFingerprint.setSystemNote(mMACAddress, TB_Note.Text);
+
       // Stopping scan process
       cTaskFingerprint.stopFingerprint();
 
@@ -132,6 +128,7 @@ namespace Simsang.ARPScan.SystemFingerprint
 
       // Hiding form
       this.Hide();
+
       e.Cancel = true;
     }
 
@@ -207,8 +204,10 @@ namespace Simsang.ARPScan.SystemFingerprint
       int lCount = 0;
       String lPorts = "\r\n";
       String lOSGuess = "\r\n";
+      String lNote = String.Empty;
 
-      lSysDetails = cTaskFingerprint.loadSystemDetails(mMACAddress);
+      lSysDetails = cTaskFingerprint.getSystemDetails(mMACAddress);
+      lNote = cTaskFingerprint.getFingerprintNote(mMACAddress);
 
       TB_HWVendor.Text = mMACHardwareVendor;
       TB_MAC.Text = mMACAddress;
@@ -235,6 +234,7 @@ namespace Simsang.ARPScan.SystemFingerprint
 
       TB_OSGuess.Text = lOSGuess;
       TB_OpenPorts.Text = lPorts;
+      TB_Note.Text = lNote;
     }
 
 

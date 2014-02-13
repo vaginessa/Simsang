@@ -68,21 +68,11 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="pMAC"></param>
-    public String getSystenDetailsFile(String pMAC)
-    {
-      return getFileNameByMAC(pMAC);
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="pMACAddress"></param>
-    public SystemDetails loadSystemDetails(String pMACAddress)
+    public SystemDetails getSystemDetails(String pMAC)
     {
       var xdoc = new XDocument();
-      String lFilePath = getSystenDetailsFile(pMACAddress);
+      String lFilePath = getFingerprintNmapFile(pMAC);
       SystemDetails lSysDetails = new SystemDetails();
 
       /*
@@ -97,6 +87,22 @@ namespace Simsang.ARPScan.SystemFingerprint
       {
         String lMessage = lEx.Message;
       }
+
+
+
+      /*
+       * Parse Note
+       */
+      try
+      {
+        xdoc = XDocument.Load(lFilePath);
+        lSysDetails.ScanDate = xdoc.Descendants().Elements("runstats").First().Element("finished").Attribute("timestr").Value;
+      }
+      catch (Exception lEx)
+      {
+        String lMessage = lEx.Message;
+      }
+
 
       /*
        * Parse open ports
@@ -134,6 +140,47 @@ namespace Simsang.ARPScan.SystemFingerprint
       }
 
       return lSysDetails;
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMACAddress"></param>
+    public String getSystemNote(String pMACAddress)
+    {
+      String lRetVal = String.Empty;
+      String lFilePath = getFingerprintNoteFile(pMACAddress);
+
+      try
+      {
+        if (File.Exists(lFilePath))
+          lRetVal = File.ReadAllText(lFilePath);
+      }
+      catch (Exception)
+      { 
+      }
+
+      return lRetVal;
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMACAddress"></param>
+    public void setSystemNote(String pMAC, String pNote)
+    {
+      if (!String.IsNullOrEmpty(pMAC) && !String.IsNullOrEmpty(pNote))
+      {
+        String lFilePath = getFingerprintNoteFile(pMAC);
+        try
+        {
+          File.WriteAllText(lFilePath, pNote);
+        }
+        catch (Exception)
+        {}
+      }
     }
 
 
@@ -231,7 +278,7 @@ namespace Simsang.ARPScan.SystemFingerprint
         {
           if (File.Exists(cXMLOutputFile))
           {
-            String lOutputFileName = getFileNameByMAC(cXMLMACAddress);
+            String lOutputFileName = getFingerprintNmapFile(cXMLMACAddress);
 
             File.Copy(cXMLOutputFile, lOutputFileName, true);
             File.Delete(cXMLOutputFile);
@@ -275,7 +322,7 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// </summary>
     /// <param name="pMAC"></param>
     /// <returns></returns>
-    private String getFileNameByMAC(String pMAC)
+    private String getFingerprintNmapFile(String pMAC)
     {
       String lOutputFileName = String.Empty;
       String lFingerprintDir = String.Empty;
@@ -285,7 +332,29 @@ namespace Simsang.ARPScan.SystemFingerprint
       {
         lFingerprintDir = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), Simsang.Config.FingerprintDir);
         lMACAddr = Regex.Replace(pMAC, @"[^\d\w]", "");
-        lOutputFileName = String.Format(@"{0}\{1}.xml", lFingerprintDir, lMACAddr);
+        lOutputFileName = String.Format(@"{0}\{1}.nmap", lFingerprintDir, lMACAddr);
+      } // if (!Strin...
+
+      return (lOutputFileName);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMAC"></param>
+    /// <returns></returns>
+    private String getFingerprintNoteFile(String pMAC)
+    {
+      String lOutputFileName = String.Empty;
+      String lFingerprintDir = String.Empty;
+      String lMACAddr = String.Empty;
+
+      if (!String.IsNullOrEmpty(pMAC))
+      {
+        lFingerprintDir = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), Simsang.Config.FingerprintDir);
+        lMACAddr = Regex.Replace(pMAC, @"[^\d\w]", "");
+        lOutputFileName = String.Format(@"{0}\{1}.note", lFingerprintDir, lMACAddr);
       } // if (!Strin...
 
       return (lOutputFileName);

@@ -42,11 +42,15 @@
       this.L_MACAddr = new System.Windows.Forms.Label();
       this.BT_Scan = new System.Windows.Forms.Button();
       this.BT_Close = new System.Windows.Forms.Button();
+      this.L_Note = new System.Windows.Forms.Label();
+      this.TB_Note = new System.Windows.Forms.TextBox();
       this.GB_Fingerprint.SuspendLayout();
       this.SuspendLayout();
       // 
       // GB_Fingerprint
       // 
+      this.GB_Fingerprint.Controls.Add(this.TB_Note);
+      this.GB_Fingerprint.Controls.Add(this.L_Note);
       this.GB_Fingerprint.Controls.Add(this.TB_ScanDate);
       this.GB_Fingerprint.Controls.Add(this.L_ScanDate);
       this.GB_Fingerprint.Controls.Add(this.TB_OSGuess);
@@ -59,7 +63,7 @@
       this.GB_Fingerprint.Controls.Add(this.L_MACAddr);
       this.GB_Fingerprint.Location = new System.Drawing.Point(13, 13);
       this.GB_Fingerprint.Name = "GB_Fingerprint";
-      this.GB_Fingerprint.Size = new System.Drawing.Size(519, 246);
+      this.GB_Fingerprint.Size = new System.Drawing.Size(615, 246);
       this.GB_Fingerprint.TabIndex = 0;
       this.GB_Fingerprint.TabStop = false;
       // 
@@ -96,7 +100,7 @@
       this.TB_OpenPorts.Multiline = true;
       this.TB_OpenPorts.Name = "TB_OpenPorts";
       this.TB_OpenPorts.ReadOnly = true;
-      this.TB_OpenPorts.Size = new System.Drawing.Size(171, 131);
+      this.TB_OpenPorts.Size = new System.Drawing.Size(259, 131);
       this.TB_OpenPorts.TabIndex = 6;
       // 
       // TB_HWVendor
@@ -112,13 +116,13 @@
       this.TB_MAC.Location = new System.Drawing.Point(406, 19);
       this.TB_MAC.Name = "TB_MAC";
       this.TB_MAC.ReadOnly = true;
-      this.TB_MAC.Size = new System.Drawing.Size(98, 20);
+      this.TB_MAC.Size = new System.Drawing.Size(186, 20);
       this.TB_MAC.TabIndex = 4;
       // 
       // L_OpenPorts
       // 
       this.L_OpenPorts.AutoSize = true;
-      this.L_OpenPorts.Location = new System.Drawing.Point(330, 76);
+      this.L_OpenPorts.Location = new System.Drawing.Point(332, 80);
       this.L_OpenPorts.Name = "L_OpenPorts";
       this.L_OpenPorts.Size = new System.Drawing.Size(59, 13);
       this.L_OpenPorts.TabIndex = 3;
@@ -153,7 +157,7 @@
       // 
       // BT_Scan
       // 
-      this.BT_Scan.Location = new System.Drawing.Point(346, 266);
+      this.BT_Scan.Location = new System.Drawing.Point(420, 266);
       this.BT_Scan.Name = "BT_Scan";
       this.BT_Scan.Size = new System.Drawing.Size(75, 23);
       this.BT_Scan.TabIndex = 1;
@@ -163,7 +167,7 @@
       // 
       // BT_Close
       // 
-      this.BT_Close.Location = new System.Drawing.Point(442, 265);
+      this.BT_Close.Location = new System.Drawing.Point(516, 265);
       this.BT_Close.Name = "BT_Close";
       this.BT_Close.Size = new System.Drawing.Size(75, 23);
       this.BT_Close.TabIndex = 2;
@@ -171,11 +175,27 @@
       this.BT_Close.UseVisualStyleBackColor = true;
       this.BT_Close.Click += new System.EventHandler(this.BT_Close_Click);
       // 
+      // L_Note
+      // 
+      this.L_Note.AutoSize = true;
+      this.L_Note.Location = new System.Drawing.Point(330, 51);
+      this.L_Note.Name = "L_Note";
+      this.L_Note.Size = new System.Drawing.Size(30, 13);
+      this.L_Note.TabIndex = 10;
+      this.L_Note.Text = "Note";
+      // 
+      // TB_Note
+      // 
+      this.TB_Note.Location = new System.Drawing.Point(406, 50);
+      this.TB_Note.Name = "TB_Note";
+      this.TB_Note.Size = new System.Drawing.Size(186, 20);
+      this.TB_Note.TabIndex = 11;
+      // 
       // SystemFingerprint
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(544, 301);
+      this.ClientSize = new System.Drawing.Size(640, 301);
       this.Controls.Add(this.BT_Close);
       this.Controls.Add(this.BT_Scan);
       this.Controls.Add(this.GB_Fingerprint);
@@ -185,6 +205,7 @@
       this.MinimizeBox = false;
       this.Name = "SystemFingerprint";
       this.Text = "System fingerprint";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SystemFingerprint_FormClosing);
       this.GB_Fingerprint.ResumeLayout(false);
       this.GB_Fingerprint.PerformLayout();
       this.ResumeLayout(false);
@@ -206,5 +227,7 @@
     private System.Windows.Forms.TextBox TB_OSGuess;
     private System.Windows.Forms.TextBox TB_ScanDate;
     private System.Windows.Forms.Label L_ScanDate;
+    private System.Windows.Forms.TextBox TB_Note;
+    private System.Windows.Forms.Label L_Note;
   }
 }

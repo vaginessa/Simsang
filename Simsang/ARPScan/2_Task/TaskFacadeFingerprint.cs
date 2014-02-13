@@ -52,9 +52,14 @@ namespace Simsang.ARPScan.SystemFingerprint
     }
 
 
-    public String getSystenDetailsFile(String pMAC)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMAC"></param>
+    /// <returns></returns>
+    public String getFingerprintNote(String pMAC)
     {
-      return cInfrastructure.getSystenDetailsFile(pMAC);
+      return cInfrastructure.getSystemNote(pMAC);
     }
 
 
@@ -71,9 +76,28 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// 
     /// </summary>
     /// <param name="pMACAddress"></param>
-    public SystemDetails loadSystemDetails(String pMACAddress)
+    public SystemDetails getSystemDetails(String pMACAddress)
     {
-      return cInfrastructure.loadSystemDetails(pMACAddress);
+      return cInfrastructure.getSystemDetails(pMACAddress);
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMACAddress"></param>
+    public String getSystemNote(String pMACAddress)
+    {
+      return cInfrastructure.getSystemNote(pMACAddress);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pMACAddress"></param>
+    public void setSystemNote(String pMACAddress, String pNote)
+    {
+      cInfrastructure.setSystemNote(pMACAddress, pNote);
     }
 
     #endregion

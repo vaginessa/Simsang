@@ -21,7 +21,8 @@ namespace Simsang.ARPScan.Main
     private bool mStatus;
     private String mVendor;
     private Button mButton;
-
+    private String mLastScanDate;
+    private String mNote;
     public event PropertyChangedEventHandler PropertyChanged;
 
     #endregion
@@ -29,14 +30,16 @@ namespace Simsang.ARPScan.Main
 
     #region PUBLIC
 
-    public TargetRecord(String pIP, String pMAC, String pVendor)
+    public TargetRecord(String pIP, String pMAC, String pVendor, String pLastScanDate, String pNote)
     {
       mIP = pIP;
       mMAC = pMAC;
       mVendor = pVendor;
       mStatus = false;
-      mButton = new Button() { Text = "Scan" };
+      mButton = new Button() { Text = "Scan", Width=40, Height= 20 };
       mButton.Text = "Scan";
+      mLastScanDate = pLastScanDate;
+      mNote = pNote;
     }
 
     #endregion
@@ -88,7 +91,6 @@ namespace Simsang.ARPScan.Main
     }
 
 
-
     public Button Fingerprint
     {
       get { return mButton; }
@@ -96,6 +98,26 @@ namespace Simsang.ARPScan.Main
       {
         mButton = value;
         this.NotifyPropertyChanged("Fingerprint");
+      }
+    }
+
+
+    public String LastScanDate
+    {
+      get { return mLastScanDate; }
+      set
+      {
+        mLastScanDate = value;
+      }
+    }
+
+
+    public String Note
+    {
+      get { return mNote; }
+      set
+      {
+        mNote = value;
       }
     }
 
