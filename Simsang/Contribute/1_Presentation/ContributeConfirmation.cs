@@ -30,8 +30,8 @@ namespace Simsang.Contribute.Main
     {
       InitializeComponent();
 
-      StringBuilder sb = new System.Text.StringBuilder();
-      sb.Append(@"{\rtf1\ansi {\b \fs30 Disclaimer}\line \line Hereby you confirm that you will use this software only for educational purpose. " +
+      StringBuilder lContributionStr = new System.Text.StringBuilder();
+      lContributionStr.Append(@"{\rtf1\ansi {\b \fs30 Disclaimer}\line \line Hereby you confirm that you will use this software only for educational purpose. " +
                 @"The creator of this program doesn't take any responsibility and is not liable for any damage caused " +
                 @"through use of this software, be it direct, indirect, incidental or consequential damages. \line \line \line" +
                 @"{\b \fs30 User contributions}\line \line This is the free version of Simsang. Hereby you confirm that by each scan " +
@@ -41,7 +41,7 @@ namespace Simsang.Contribute.Main
                 @"Only this data and nothing else, {\b \fs25 no sensitive data} that was discovered during a scan is or will be transferred to us as project contribution. " +
                 @"We fully respect your privacy and appreciate your contribution.}");
 
-      RTB_Agreement.Rtf = sb.ToString();
+      RTB_Agreement.Rtf = lContributionStr.ToString();
 
       cSettings = Settings.getInstance();
     }

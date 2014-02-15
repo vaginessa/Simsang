@@ -201,7 +201,7 @@ namespace Plugin.Main
           {
             if (!String.IsNullOrEmpty(lEntry))
             {
-              if ((lSplit = Regex.Split(lEntry, @"\|\|")).Length > 0)
+              if ((lSplit = Regex.Split(lEntry, @"\|\|")).Length >= 7)
               {
                 lProto = lSplit[0];
                 lMAC = lSplit[1];
@@ -211,14 +211,20 @@ namespace Plugin.Main
                 lDstPort = lSplit[5];
                 lData = lSplit[6];
 
-                if (((lMatchURI = Regex.Match(lData, @"(\s+|^)(GET|POST)\s+([^\s]+)\s+HTTP\/"))).Success &&
-                    ((lMatchHost = Regex.Match(lData, @"\.\.Host\s*:\s*([\w\d\.]+?)\.\.", RegexOptions.IgnoreCase))).Success &&
-                    ((lMatchCookies = Regex.Match(lData, @"\.\.Cookie\s*:\s*(.*?)(\.\.|$)", RegexOptions.IgnoreCase))).Success)
+                if (((lMatchURI = Regex.Match(lData, @"(\s+|^)(GET|POST)\s+([^\s]+)\s+HTTP\/"))).Success)                    
                 {
                   lMethod = lMatchURI.Groups[2].Value.ToString();
-                  lRemoteHost = lMatchHost.Groups[1].Value.ToString();
                   lReqString = lMatchURI.Groups[3].Value.ToString();
-                  lCookies = lMatchCookies.Groups[1].Value.ToString();
+
+                  if (((lMatchHost = Regex.Match(lData, @"\.\.Host\s*:\s*([\w\d\-_\.]+?)\.\.", RegexOptions.IgnoreCase))).Success)
+                    lRemoteHost = lMatchHost.Groups[1].Value.ToString();
+                  else
+                    lRemoteHost = lDstIP;
+
+                  if (((lMatchCookies = Regex.Match(lData, @"\.\.Cookie\s*:\s*(.*?)(\.\.|$)", RegexOptions.IgnoreCase))).Success)
+                    lCookies = lMatchCookies.Groups[1].Value.ToString();
+                  else
+                    lCookies = String.Empty;
 
                   lNewRecords.Add(new HTTPRequests(lMAC, lSrcIP, lMethod, lRemoteHost, lReqString, lCookies, lData));
 

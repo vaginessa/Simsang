@@ -71,7 +71,7 @@ namespace Simsang.ARPScan.SystemFingerprint
     /// <param name="pMACAddress"></param>
     public SystemDetails getSystemDetails(String pMAC)
     {
-      var xdoc = new XDocument();
+      var lXMLDoc = new XDocument();
       String lFilePath = getFingerprintNmapFile(pMAC);
       SystemDetails lSysDetails = new SystemDetails();
 
@@ -80,8 +80,8 @@ namespace Simsang.ARPScan.SystemFingerprint
        */
       try
       {
-        xdoc = XDocument.Load(lFilePath);
-        lSysDetails.ScanDate = xdoc.Descendants().Elements("runstats").First().Element("finished").Attribute("timestr").Value;
+        lXMLDoc = XDocument.Load(lFilePath);
+        lSysDetails.ScanDate = lXMLDoc.Descendants().Elements("runstats").First().Element("finished").Attribute("timestr").Value;
       }
       catch (Exception lEx)
       {
@@ -95,8 +95,8 @@ namespace Simsang.ARPScan.SystemFingerprint
        */
       try
       {
-        xdoc = XDocument.Load(lFilePath);
-        lSysDetails.ScanDate = xdoc.Descendants().Elements("runstats").First().Element("finished").Attribute("timestr").Value;
+        lXMLDoc = XDocument.Load(lFilePath);
+        lSysDetails.ScanDate = lXMLDoc.Descendants().Elements("runstats").First().Element("finished").Attribute("timestr").Value;
       }
       catch (Exception lEx)
       {
@@ -109,7 +109,7 @@ namespace Simsang.ARPScan.SystemFingerprint
        */
       try
       {
-        var ports = xdoc.Descendants().Elements("port")
+        var ports = lXMLDoc.Descendants().Elements("port")
                        .Select(y => new OpenService
                        { 
                          Protocol = y.Attribute("protocol").Value,
@@ -126,7 +126,7 @@ namespace Simsang.ARPScan.SystemFingerprint
        */
       try
       {
-        var OSGuess = xdoc.Descendants().Elements("os").First().Elements("osmatch")
+        var OSGuess = lXMLDoc.Descendants().Elements("os").First().Elements("osmatch")
                        .Select(y => new OS
                        {
                          Accuracy = y.Attribute("accuracy").Value,

@@ -309,9 +309,9 @@ namespace Simsang
       {
         if (NetworkInterface.GetAllNetworkInterfaces().Any(x => x.OperationalStatus == OperationalStatus.Up))
         {
-          if (UpdatesBinaries.getInstance().IsUpdateAvailable())
+          if (Updates.InfrastructureFacade.getInstance().IsUpdateAvailable())
           {
-            SimsangUpdates.FormNewVersion lNewVersion = new SimsangUpdates.FormNewVersion();
+            Simsang.Updates.FormNewVersion lNewVersion = new Simsang.Updates.FormNewVersion();
             lNewVersion.TopMost = true;
             lNewVersion.ShowDialog();
           }
@@ -725,9 +725,9 @@ namespace Simsang
         {
           if (NetworkInterface.GetAllNetworkInterfaces().Any(x => x.OperationalStatus == OperationalStatus.Up))
           {
-            if (UpdatesBinaries.getInstance().IsUpdateAvailable())
+            if (Updates.InfrastructureFacade.getInstance().IsUpdateAvailable())
             {
-              SimsangUpdates.FormNewVersion lNewVersion = new SimsangUpdates.FormNewVersion();
+              Updates.FormNewVersion lNewVersion = new Updates.FormNewVersion();
               lNewVersion.TopMost = true;
               lNewVersion.ShowDialog();
             }

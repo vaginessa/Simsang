@@ -107,7 +107,7 @@
       this.GB_Range.Controls.Add(this.TB_Subnet1);
       this.GB_Range.Location = new System.Drawing.Point(7, 8);
       this.GB_Range.Name = "GB_Range";
-      this.GB_Range.Size = new System.Drawing.Size(758, 56);
+      this.GB_Range.Size = new System.Drawing.Size(830, 56);
       this.GB_Range.TabIndex = 0;
       this.GB_Range.TabStop = false;
       this.GB_Range.Text = "Target range";
@@ -159,7 +159,7 @@
       // 
       // TB_Subnet2
       // 
-      this.TB_Subnet2.Location = new System.Drawing.Point(247, 22);
+      this.TB_Subnet2.Location = new System.Drawing.Point(230, 22);
       this.TB_Subnet2.Name = "TB_Subnet2";
       this.TB_Subnet2.ReadOnly = true;
       this.TB_Subnet2.Size = new System.Drawing.Size(100, 20);
@@ -168,7 +168,7 @@
       // 
       // TB_Subnet1
       // 
-      this.TB_Subnet1.Location = new System.Drawing.Point(124, 22);
+      this.TB_Subnet1.Location = new System.Drawing.Point(107, 22);
       this.TB_Subnet1.Name = "TB_Subnet1";
       this.TB_Subnet1.ReadOnly = true;
       this.TB_Subnet1.Size = new System.Drawing.Size(102, 20);
