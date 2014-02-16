@@ -34,8 +34,9 @@ namespace Plugin.Main.IPAccounting.ManageServices
     /// </summary>
     private InfrastructureFacade()
     {
-      ServicesFile = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), @"\plugins\IPAccounting\Service_Definitions.xml");
+      ServicesFile = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), @"\plugins\IPAccounting\Service_Definitions.txt");
     }
+
 
 
     /// <summary>
@@ -56,28 +57,15 @@ namespace Plugin.Main.IPAccounting.ManageServices
     {
       if (pRecords.Count > 0)
       {
-        XmlSerializer lSerializer;
-        FileStream lFS = null;
+        String[] lServices = new String[pRecords.Count];
+        for (int i = 0; i < pRecords.Count; i++)
+        { 
+          ServiceRecord lTmp = pRecords.ElementAt(i);
+          lServices[i] = String.Format("{0},{1},{2}", lTmp.LowerPort, lTmp.UpperPort, lTmp.ServiceName);
+        } // foreach (Serv...
 
-        try
-        {
-          String lPath = Path.GetDirectoryName(ServicesFile);
-          if (!Directory.Exists(lPath))
-            Directory.CreateDirectory(lPath);
+        File.WriteAllLines(ServicesFile, lServices);
 
-          lSerializer = new XmlSerializer(typeof(List<ServiceRecord>));
-          lFS = new FileStream(ServicesFile, FileMode.Create);
-          lSerializer.Serialize(lFS, pRecords);
-        }
-        catch (Exception lEx)
-        {
-          String lErr = lEx.Message;
-        }
-        finally
-        {
-          if (lFS != null)
-            lFS.Close();
-        }
       } // if (pSessi...
     }
 
@@ -87,25 +75,22 @@ namespace Plugin.Main.IPAccounting.ManageServices
     /// </summary>
     public List<ServiceRecord> readServicesPatterns()
     {
-      List<ServiceRecord> lRetVal = null;
-      FileStream lFS = null;
-      XmlSerializer lXMLSerial;
+      List<ServiceRecord> lRetVal = new List<ServiceRecord>();
 
       try
       {
-//        String lServicesFilePath = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), ServicesFile);
-        lFS = new FileStream(ServicesFile, FileMode.Open);
-        lXMLSerial = new XmlSerializer(typeof(List<ServiceRecord>));
-        lRetVal = (List<ServiceRecord>)lXMLSerial.Deserialize(lFS);
+        foreach (String lLine in File.ReadAllLines(ServicesFile))
+        {
+          if (lLine.Contains(','))
+          {
+            String[] lSplit = lLine.Split(new char[] { ',' }, 3);
+            lRetVal.Add(new ServiceRecord() { LowerPort = lSplit[0], UpperPort = lSplit[1], ServiceName = lSplit[2] });
+          } // if (lLi...
+        } // foreach (St...
       }
       catch (Exception lEx)
       {
         String lErr = lEx.Message;
-      }
-      finally
-      {
-        if (lFS != null)
-          lFS.Close();
       }
 
       return (lRetVal);
