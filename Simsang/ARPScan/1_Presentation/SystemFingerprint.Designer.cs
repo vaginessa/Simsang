@@ -30,6 +30,8 @@
     {
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SystemFingerprint));
       this.GB_Fingerprint = new System.Windows.Forms.GroupBox();
+      this.TB_Note = new System.Windows.Forms.TextBox();
+      this.L_Note = new System.Windows.Forms.Label();
       this.TB_ScanDate = new System.Windows.Forms.TextBox();
       this.L_ScanDate = new System.Windows.Forms.Label();
       this.TB_OSGuess = new System.Windows.Forms.TextBox();
@@ -40,10 +42,6 @@
       this.L_OSGuess = new System.Windows.Forms.Label();
       this.L_HWVendor = new System.Windows.Forms.Label();
       this.L_MACAddr = new System.Windows.Forms.Label();
-      this.BT_Scan = new System.Windows.Forms.Button();
-      this.BT_Close = new System.Windows.Forms.Button();
-      this.L_Note = new System.Windows.Forms.Label();
-      this.TB_Note = new System.Windows.Forms.TextBox();
       this.GB_Fingerprint.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -66,6 +64,22 @@
       this.GB_Fingerprint.Size = new System.Drawing.Size(615, 246);
       this.GB_Fingerprint.TabIndex = 0;
       this.GB_Fingerprint.TabStop = false;
+      // 
+      // TB_Note
+      // 
+      this.TB_Note.Location = new System.Drawing.Point(406, 50);
+      this.TB_Note.Name = "TB_Note";
+      this.TB_Note.Size = new System.Drawing.Size(186, 20);
+      this.TB_Note.TabIndex = 11;
+      // 
+      // L_Note
+      // 
+      this.L_Note.AutoSize = true;
+      this.L_Note.Location = new System.Drawing.Point(330, 51);
+      this.L_Note.Name = "L_Note";
+      this.L_Note.Size = new System.Drawing.Size(30, 13);
+      this.L_Note.TabIndex = 10;
+      this.L_Note.Text = "Note";
       // 
       // TB_ScanDate
       // 
@@ -155,49 +169,11 @@
       this.L_MACAddr.TabIndex = 0;
       this.L_MACAddr.Text = "MAC address";
       // 
-      // BT_Scan
-      // 
-      this.BT_Scan.Location = new System.Drawing.Point(420, 266);
-      this.BT_Scan.Name = "BT_Scan";
-      this.BT_Scan.Size = new System.Drawing.Size(75, 23);
-      this.BT_Scan.TabIndex = 1;
-      this.BT_Scan.Text = "Scan";
-      this.BT_Scan.UseVisualStyleBackColor = true;
-      this.BT_Scan.Click += new System.EventHandler(this.BT_Scan_Click);
-      // 
-      // BT_Close
-      // 
-      this.BT_Close.Location = new System.Drawing.Point(516, 265);
-      this.BT_Close.Name = "BT_Close";
-      this.BT_Close.Size = new System.Drawing.Size(75, 23);
-      this.BT_Close.TabIndex = 2;
-      this.BT_Close.Text = "Close";
-      this.BT_Close.UseVisualStyleBackColor = true;
-      this.BT_Close.Click += new System.EventHandler(this.BT_Close_Click);
-      // 
-      // L_Note
-      // 
-      this.L_Note.AutoSize = true;
-      this.L_Note.Location = new System.Drawing.Point(330, 51);
-      this.L_Note.Name = "L_Note";
-      this.L_Note.Size = new System.Drawing.Size(30, 13);
-      this.L_Note.TabIndex = 10;
-      this.L_Note.Text = "Note";
-      // 
-      // TB_Note
-      // 
-      this.TB_Note.Location = new System.Drawing.Point(406, 50);
-      this.TB_Note.Name = "TB_Note";
-      this.TB_Note.Size = new System.Drawing.Size(186, 20);
-      this.TB_Note.TabIndex = 11;
-      // 
       // SystemFingerprint
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(640, 301);
-      this.Controls.Add(this.BT_Close);
-      this.Controls.Add(this.BT_Scan);
+      this.ClientSize = new System.Drawing.Size(640, 274);
       this.Controls.Add(this.GB_Fingerprint);
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -215,8 +191,6 @@
     #endregion
 
     private System.Windows.Forms.GroupBox GB_Fingerprint;
-    private System.Windows.Forms.Button BT_Scan;
-    private System.Windows.Forms.Button BT_Close;
     private System.Windows.Forms.Label L_HWVendor;
     private System.Windows.Forms.Label L_MACAddr;
     private System.Windows.Forms.Label L_OpenPorts;

@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using System.Collections;
+using System.Net;
 
 using Simsang.MACVendors;
 using Simsang.ARPScan.Main.Config;
@@ -20,6 +21,7 @@ using Simsang.ARPScan.Main.Config;
 
 namespace Simsang.ARPScan.Main
 {
+
   public partial class ARPScan : Form
   {
 
@@ -89,20 +91,7 @@ namespace Simsang.ARPScan.Main
       mStatusCol.HeaderText = "Status";
       mStatusCol.Visible = true;
       mStatusCol.Width = 72;
-      mStatusCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
       DGV_Targets.Columns.Add(mStatusCol);
-
-
-
-      DataGridViewButtonColumn mSystemFingerprint = new DataGridViewButtonColumn();
-      mSystemFingerprint.DataPropertyName = "fingerprint";
-      mSystemFingerprint.Name = "fingerprint";
-      mSystemFingerprint.HeaderText = "Fingerprint";
-      mSystemFingerprint.Visible = true;
-      mSystemFingerprint.Width = 72;
-      mSystemFingerprint.Text = "Show";
-      mSystemFingerprint.UseColumnTextForButtonValue = true;
-      DGV_Targets.Columns.Add(mSystemFingerprint);
 
 
       DataGridViewTextBoxColumn mLastScanDateCol = new DataGridViewTextBoxColumn();
@@ -110,7 +99,7 @@ namespace Simsang.ARPScan.Main
       mLastScanDateCol.Name = "LastScanDate";
       mLastScanDateCol.HeaderText = "Scan date";
       mLastScanDateCol.ReadOnly = true;
-      mSystemFingerprint.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+      mLastScanDateCol.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
       mLastScanDateCol.MinimumWidth = 200;
       DGV_Targets.Columns.Add(mLastScanDateCol);
 
@@ -147,7 +136,7 @@ namespace Simsang.ARPScan.Main
     /// <param name="pACMain"></param>
     /// <param name="pTargetList"></param>
     /// <returns></returns>
-    public static ARPScan GetInstance(SimsangMain pACMain, ref BindingList<String> pTargetList)
+    public static ARPScan getInstance(SimsangMain pACMain, ref BindingList<String> pTargetList)
     {
       if (mARPScan == null)
         mARPScan = new ARPScan();
@@ -162,7 +151,7 @@ namespace Simsang.ARPScan.Main
     /// 
     /// </summary>
     /// <returns></returns>
-    public static ARPScan GetInstance()
+    public static ARPScan getInstance()
     {
       return (mARPScan);
     }
@@ -176,7 +165,7 @@ namespace Simsang.ARPScan.Main
     public static void InitARPScan(SimsangMain pACMain, ref BindingList<String> pTargetList)
     {
       if (mARPScan == null)
-        mARPScan = GetInstance(pACMain, ref pTargetList);
+        mARPScan = getInstance(pACMain, ref pTargetList);
     }
 
 
@@ -191,7 +180,7 @@ namespace Simsang.ARPScan.Main
     /// <param name="pTargetList"></param>
     public static void showARPScanGUI(SimsangMain pACMain, String pIfcID, String pStartIP, String pStopIP, String pGatewayIP, ref BindingList<String> pTargetList)
     {
-      mARPScan = GetInstance(pACMain, ref pTargetList);
+      mARPScan = getInstance(pACMain, ref pTargetList);
       mARPScan.ShowDialog();
     }
 
@@ -288,7 +277,6 @@ namespace Simsang.ARPScan.Main
       {
         LogConsole.Main.LogConsole.pushMsg(String.Format(lEx.StackTrace));
       }
-
 
       try
       {
@@ -602,7 +590,11 @@ namespace Simsang.ARPScan.Main
       TB_Netrange2.ReadOnly = false;
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void TB_Netrange2_KeyUp(object sender, KeyEventArgs e)
     {
       if (e.KeyCode == Keys.Enter)
@@ -636,7 +628,11 @@ namespace Simsang.ARPScan.Main
     }
 
 
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void TB_Netrange1_KeyUp(object sender, KeyEventArgs e)
     {
       if (e.KeyCode == Keys.Enter)
@@ -749,7 +745,144 @@ namespace Simsang.ARPScan.Main
         return base.ProcessDialogKey(keyData);
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void allToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      List<Tuple<String, String>> lTargetList = new List<Tuple<String, String>>();
+      String lIP = String.Empty;
+      String lMAC = String.Empty;
+
+      foreach (DataGridViewRow lTmp in DGV_Targets.Rows)
+      {
+        try
+        {
+          lIP = lTmp.Cells["IP"].Value.ToString();
+          lMAC = lTmp.Cells["MAC"].Value.ToString();
+          lTargetList.Add(new Tuple<String, String>(lMAC, lIP));
+        }
+        catch (Exception lEx)
+        { }
+      }  // if (lTmp...
+
+      ScanMultipleSystems lScan = ScanMultipleSystems.getInstance(lTargetList);
+      lScan.ShowDialog();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void unscanedSystemsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      List<Tuple<String, String>> lTargetList = new List<Tuple<String, String>>();
+      String lIP = String.Empty;
+      String lMAC = String.Empty;
+
+      foreach (DataGridViewRow lTmp in DGV_Targets.Rows)
+      {
+        try
+        {
+          if (lTmp.Cells["LastScanDate"] == null || lTmp.Cells["LastScanDate"].Value == null || lTmp.Cells["LastScanDate"].Value.ToString().Length <= 0)
+          {
+            lIP = lTmp.Cells["IP"].Value.ToString();
+            lMAC = lTmp.Cells["MAC"].Value.ToString();
+            lTargetList.Add(new Tuple<String, String>(lMAC, lIP));
+          } // if (lTmp...
+        }
+        catch (Exception) 
+        {
+        }
+      } // foreach (DataGri...
+
+      ScanMultipleSystems lScan = ScanMultipleSystems.getInstance(lTargetList);
+      lScan.ShowDialog();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void thisSystemToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      List<Tuple<String, String>> lTargetList = new List<Tuple<String, String>>();
+      String lIP = String.Empty;
+      String lMAC = String.Empty;
+
+      try
+      {
+        lIP = DGV_Targets.SelectedRows[0].Cells["IP"].Value.ToString();
+        lMAC = DGV_Targets.SelectedRows[0].Cells["MAC"].Value.ToString();
+        lTargetList.Add(new Tuple<String, String>(lMAC, lIP));
+      }
+      catch (Exception lEx)
+      { }
+
+      ScanMultipleSystems lScan = ScanMultipleSystems.getInstance(lTargetList);
+      lScan.ShowDialog();
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void DGV_Targets_MouseDown(object sender, MouseEventArgs e)
+    {
+      try
+      {
+        DataGridView.HitTestInfo hti = DGV_Targets.HitTest(e.X, e.Y);
+
+        if (hti.RowIndex >= 0)
+        {
+          DGV_Targets.ClearSelection();
+          DGV_Targets.Rows[hti.RowIndex].Selected = true;
+          DGV_Targets.CurrentCell = DGV_Targets.Rows[hti.RowIndex].Cells[0];
+        }
+      }
+      catch (Exception lEx)
+      {
+        LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan: {1}", lEx.Message));
+        DGV_Targets.ClearSelection();
+      }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void DGV_Targets_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+    {
+      try
+      {
+        DataGridViewRow lCurrentRow = DGV_Targets.SelectedRows[0];
+        String lIP = lCurrentRow.Cells["IP"].Value.ToString();
+        String lMAC = lCurrentRow.Cells["MAC"].Value.ToString();
+        String lVendor = lCurrentRow.Cells["vendor"].Value.ToString();
+
+        SystemFingerprint.SystemFingerprint lFingerprint = new SystemFingerprint.SystemFingerprint(lMAC, lIP, lVendor);
+        lFingerprint.ShowDialog();
+      }
+      catch (Exception lEx)
+      {
+        LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan: {1}", lEx.Message));
+        DGV_Targets.ClearSelection();
+      }
+    }
+
     #endregion
+
 
   }
 }

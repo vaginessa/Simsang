@@ -386,7 +386,7 @@ namespace Simsang
       ARPScan.Main.ARPScan lARPScan;
 
 
-      if ((lARPScan = ARPScan.Main.ARPScan.GetInstance()) != null)
+      if ((lARPScan = ARPScan.Main.ARPScan.getInstance()) != null)
       {
         /*
          * Write APE Target list fileAPETargetHosts

@@ -358,7 +358,7 @@ namespace Simsang
     public void UpdatePlugins()
     {
       List<String> lStrTargetList = new List<String>();
-      BindingList<TargetRecord> lTargetList = ARPScan.Main.ARPScan.GetInstance().TargetList();
+      BindingList<TargetRecord> lTargetList = ARPScan.Main.ARPScan.getInstance().TargetList();
 
       if (lTargetList != null && lTargetList.Count > 0)
       {
@@ -1001,7 +1001,7 @@ namespace Simsang
       }
       else
       {
-        if (targetCounter(ARPScan.Main.ARPScan.GetInstance().TargetList()) <= 0)
+        if (targetCounter(ARPScan.Main.ARPScan.getInstance().TargetList()) <= 0)
         {
           this.Cursor = Cursors.WaitCursor;
           setSniffingBTOnStopped();

@@ -44,6 +44,10 @@
       this.CMS_ManageTargets = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.unselectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.fingerprintToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.thisSystemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.unscanedSystemsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       ((System.ComponentModel.ISupportInitialize)(this.DGV_Targets)).BeginInit();
       this.GB_Range.SuspendLayout();
       this.CMS_ManageTargets.SuspendLayout();
@@ -51,7 +55,7 @@
       // 
       // BT_Close
       // 
-      this.BT_Close.Location = new System.Drawing.Point(730, 301);
+      this.BT_Close.Location = new System.Drawing.Point(647, 294);
       this.BT_Close.Name = "BT_Close";
       this.BT_Close.Size = new System.Drawing.Size(75, 23);
       this.BT_Close.TabIndex = 7;
@@ -83,13 +87,15 @@
       this.DGV_Targets.RowTemplate.Height = 24;
       this.DGV_Targets.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.DGV_Targets.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-      this.DGV_Targets.Size = new System.Drawing.Size(830, 210);
+      this.DGV_Targets.Size = new System.Drawing.Size(731, 210);
       this.DGV_Targets.TabIndex = 5;
+      this.DGV_Targets.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DGV_Targets_CellDoubleClick);
+      this.DGV_Targets.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DGV_Targets_MouseDown);
       this.DGV_Targets.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DGV_Targets_MouseUp);
       // 
       // BT_Scan
       // 
-      this.BT_Scan.Location = new System.Drawing.Point(638, 301);
+      this.BT_Scan.Location = new System.Drawing.Point(555, 294);
       this.BT_Scan.Name = "BT_Scan";
       this.BT_Scan.Size = new System.Drawing.Size(75, 23);
       this.BT_Scan.TabIndex = 6;
@@ -107,7 +113,7 @@
       this.GB_Range.Controls.Add(this.TB_Subnet1);
       this.GB_Range.Location = new System.Drawing.Point(7, 8);
       this.GB_Range.Name = "GB_Range";
-      this.GB_Range.Size = new System.Drawing.Size(830, 56);
+      this.GB_Range.Size = new System.Drawing.Size(731, 56);
       this.GB_Range.TabIndex = 0;
       this.GB_Range.TabStop = false;
       this.GB_Range.Text = "Target range";
@@ -141,7 +147,7 @@
       // 
       // TB_Netrange2
       // 
-      this.TB_Netrange2.Location = new System.Drawing.Point(631, 23);
+      this.TB_Netrange2.Location = new System.Drawing.Point(612, 23);
       this.TB_Netrange2.Name = "TB_Netrange2";
       this.TB_Netrange2.Size = new System.Drawing.Size(100, 20);
       this.TB_Netrange2.TabIndex = 0;
@@ -150,7 +156,7 @@
       // 
       // TB_Netrange1
       // 
-      this.TB_Netrange1.Location = new System.Drawing.Point(509, 23);
+      this.TB_Netrange1.Location = new System.Drawing.Point(490, 23);
       this.TB_Netrange1.Name = "TB_Netrange1";
       this.TB_Netrange1.Size = new System.Drawing.Size(102, 20);
       this.TB_Netrange1.TabIndex = 0;
@@ -159,7 +165,7 @@
       // 
       // TB_Subnet2
       // 
-      this.TB_Subnet2.Location = new System.Drawing.Point(230, 22);
+      this.TB_Subnet2.Location = new System.Drawing.Point(211, 22);
       this.TB_Subnet2.Name = "TB_Subnet2";
       this.TB_Subnet2.ReadOnly = true;
       this.TB_Subnet2.Size = new System.Drawing.Size(100, 20);
@@ -168,7 +174,7 @@
       // 
       // TB_Subnet1
       // 
-      this.TB_Subnet1.Location = new System.Drawing.Point(107, 22);
+      this.TB_Subnet1.Location = new System.Drawing.Point(88, 22);
       this.TB_Subnet1.Name = "TB_Subnet1";
       this.TB_Subnet1.ReadOnly = true;
       this.TB_Subnet1.Size = new System.Drawing.Size(102, 20);
@@ -179,9 +185,10 @@
       // 
       this.CMS_ManageTargets.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.selectAllToolStripMenuItem,
-            this.unselectAllToolStripMenuItem});
+            this.unselectAllToolStripMenuItem,
+            this.fingerprintToolStripMenuItem});
       this.CMS_ManageTargets.Name = "CMS_ManageTargets";
-      this.CMS_ManageTargets.Size = new System.Drawing.Size(135, 48);
+      this.CMS_ManageTargets.Size = new System.Drawing.Size(135, 70);
       // 
       // selectAllToolStripMenuItem
       // 
@@ -197,11 +204,42 @@
       this.unselectAllToolStripMenuItem.Text = "Unselect all";
       this.unselectAllToolStripMenuItem.Click += new System.EventHandler(this.unselectAllToolStripMenuItem_Click);
       // 
+      // fingerprintToolStripMenuItem
+      // 
+      this.fingerprintToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.thisSystemToolStripMenuItem,
+            this.unscanedSystemsToolStripMenuItem,
+            this.allToolStripMenuItem});
+      this.fingerprintToolStripMenuItem.Name = "fingerprintToolStripMenuItem";
+      this.fingerprintToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+      this.fingerprintToolStripMenuItem.Text = "Fingerprint";
+      // 
+      // thisSystemToolStripMenuItem
+      // 
+      this.thisSystemToolStripMenuItem.Name = "thisSystemToolStripMenuItem";
+      this.thisSystemToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+      this.thisSystemToolStripMenuItem.Text = "This system";
+      this.thisSystemToolStripMenuItem.Click += new System.EventHandler(this.thisSystemToolStripMenuItem_Click);
+      // 
+      // unscanedSystemsToolStripMenuItem
+      // 
+      this.unscanedSystemsToolStripMenuItem.Name = "unscanedSystemsToolStripMenuItem";
+      this.unscanedSystemsToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+      this.unscanedSystemsToolStripMenuItem.Text = "Unscaned systems";
+      this.unscanedSystemsToolStripMenuItem.Click += new System.EventHandler(this.unscanedSystemsToolStripMenuItem_Click);
+      // 
+      // allToolStripMenuItem
+      // 
+      this.allToolStripMenuItem.Name = "allToolStripMenuItem";
+      this.allToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+      this.allToolStripMenuItem.Text = "All systems";
+      this.allToolStripMenuItem.Click += new System.EventHandler(this.allToolStripMenuItem_Click);
+      // 
       // ARPScan
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(849, 335);
+      this.ClientSize = new System.Drawing.Size(750, 329);
       this.Controls.Add(this.GB_Range);
       this.Controls.Add(this.BT_Scan);
       this.Controls.Add(this.DGV_Targets);
@@ -237,5 +275,9 @@
     private System.Windows.Forms.ContextMenuStrip CMS_ManageTargets;
     private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem unselectAllToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem fingerprintToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem allToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem unscanedSystemsToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem thisSystemToolStripMenuItem;
   }
 }

@@ -98,7 +98,6 @@
       this.TIM_Contributions = new System.Windows.Forms.Timer(this.components);
       this.OFD_ImportSession = new System.Windows.Forms.OpenFileDialog();
       this.WB_Ads = new System.Windows.Forms.WebBrowser();
-      this.systemFingerprintsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.GB_Interfaces.SuspendLayout();
       this.GB_TargetRange.SuspendLayout();
       this.TC_Plugins.SuspendLayout();
@@ -511,8 +510,7 @@
       // TSMI_Tools
       // 
       this.TSMI_Tools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.TSMI_Minibrowser,
-            this.systemFingerprintsToolStripMenuItem});
+            this.TSMI_Minibrowser});
       this.TSMI_Tools.Name = "TSMI_Tools";
       this.TSMI_Tools.Size = new System.Drawing.Size(48, 20);
       this.TSMI_Tools.Text = "Tools";
@@ -520,7 +518,7 @@
       // TSMI_Minibrowser
       // 
       this.TSMI_Minibrowser.Name = "TSMI_Minibrowser";
-      this.TSMI_Minibrowser.Size = new System.Drawing.Size(185, 22);
+      this.TSMI_Minibrowser.Size = new System.Drawing.Size(152, 22);
       this.TSMI_Minibrowser.Text = "Minibrowser ...";
       this.TSMI_Minibrowser.Click += new System.EventHandler(this.TSMI_Minibrowser_Click);
       // 
@@ -644,13 +642,6 @@
       this.WB_Ads.Visible = false;
       this.WB_Ads.WebBrowserShortcutsEnabled = false;
       // 
-      // systemFingerprintsToolStripMenuItem
-      // 
-      this.systemFingerprintsToolStripMenuItem.Name = "systemFingerprintsToolStripMenuItem";
-      this.systemFingerprintsToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-      this.systemFingerprintsToolStripMenuItem.Text = "System fingerprints ..";
-      this.systemFingerprintsToolStripMenuItem.Click += new System.EventHandler(this.systemFingerprintsToolStripMenuItem_Click);
-      // 
       // SimsangMain
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -736,7 +727,6 @@
         private System.Windows.Forms.ToolStripMenuItem TSMI_AttackingMode;
         private System.Windows.Forms.ToolStripMenuItem TSMI_ARPPoisoning;
         private System.Windows.Forms.ToolStripMenuItem TSMI_DHCPPoisoning;
-        private System.Windows.Forms.ToolStripMenuItem systemFingerprintsToolStripMenuItem;
     }
 }
 

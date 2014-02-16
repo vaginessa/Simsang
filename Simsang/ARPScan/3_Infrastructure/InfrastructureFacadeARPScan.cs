@@ -133,40 +133,8 @@ namespace Simsang.ARPScan.MainTaskFacadeARPScan
         {
           try { lProc.Kill(); }
           catch (Exception) { }
-        }
-      }
-    }
-
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public void startFingerprint(FingerprintConfig pConfig)
-    {
-      if (String.IsNullOrEmpty(pConfig.IP))
-        throw new Exception("Something is wrong with the target IP address");
-
-      if (!File.Exists(cNmapBin))
-        throw new Exception("ARPscan binary not found");
-
-      cXMLMACAddress = pConfig.MAC;
-      cXMLOutputFile = Path.GetTempFileName();
-
-      cNmapProc = new Process();
-      cNmapProc.StartInfo.FileName = cNmapBin;
-      cNmapProc.StartInfo.Arguments = String.Format(cNmapParameters, pConfig.IP, cXMLOutputFile);
-      cNmapProc.StartInfo.UseShellExecute = false;
-      cNmapProc.StartInfo.CreateNoWindow = pConfig.IsDebuggingOn ? false : true;
-      cNmapProc.StartInfo.WindowStyle = pConfig.IsDebuggingOn ? ProcessWindowStyle.Normal : ProcessWindowStyle.Hidden;
-      cNmapProc.EnableRaisingEvents = true;
-
-      // Configure the process exited event
-      cNmapProc.Exited += onNmapScanExited;
-      cNmapProc.Disposed += onNmapScanExited;
-
-      cNmapProc.Start();
-//      cNmapProc.BeginOutputReadLine();
+        } // foreach (Proc...
+      } // if ((lACIn..
     }
 
     #endregion
@@ -184,48 +152,6 @@ namespace Simsang.ARPScan.MainTaskFacadeARPScan
       if (cARPScanConf.OnARPScanStopped != null)
         cARPScanConf.OnARPScanStopped();
     }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void onNmapScanExited(object sender, System.EventArgs e)
-    {
-      String lFingerprintDir = String.Format(@"{0}\{1}", Directory.GetCurrentDirectory(), Simsang.Config.FingerprintDir);
-//      System.Windows.Forms.MessageBox.Show(cXMLOutputFile);
-
-      // 1. Save fingerprint file      
-      if (!Directory.Exists(lFingerprintDir))
-      {
-        try
-        {
-          Directory.CreateDirectory(lFingerprintDir);
-        }
-        catch (Exception)
-        { 
-        }
-      } // if (!Direc...
-      
-      try
-      {
-        if (File.Exists(cXMLOutputFile))
-        {
-          String lMACAddr = Regex.Replace(cXMLMACAddress, @"[^\d\w]", "");
-          String lOutputFileName = String.Format(@"{0}\{1}.xml", lFingerprintDir, lMACAddr);
-
-          File.Copy(cXMLOutputFile, lOutputFileName);
-          File.Delete(cXMLOutputFile);
-        }
-      }
-      catch (Exception)
-      { }
-
-//      if (pConfig != null 
-
-    }
-
 
 
     /// <summary>

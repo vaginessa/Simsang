@@ -52,47 +52,6 @@ namespace Simsang.ARPScan.SystemFingerprint
     #region EVENTS
 
     /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void BT_Close_Click(object sender, EventArgs e)
-    {
-      this.Close();
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void BT_Scan_Click(object sender, EventArgs e)
-    {
-      try
-      {
-        FingerprintConfig lScanConfig = new FingerprintConfig()
-        {
-          IP = mIPAddress,
-          MAC = mMACAddress,
-          IsDebuggingOn = Simsang.Config.DebugOn(),
-          OnScanStopped = FingerprintStopped
-        };
-
-        deactivateGUIElements();
-        cTaskFingerprint.startFingerprint(lScanConfig);
-      }
-      catch (Exception lEx)
-      {
-        LogConsole.Main.LogConsole.pushMsg(String.Format("Fingerprint : {0}", lEx.Message));
-        activateGUIElements();
-        String lMsg = String.Format("Error occurred while creating system fingerprint\r\nMessage: {0}", lEx.Message);
-        MessageBox.Show(lMsg, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-      }
-    }
-
-
-    /// <summary>
     /// Close Sessions GUI on Escape.
     /// </summary>
     /// <param name="keyData"></param>
@@ -120,12 +79,6 @@ namespace Simsang.ARPScan.SystemFingerprint
       if (TB_Note.Text.Length > 0)
         cTaskFingerprint.setSystemNote(mMACAddress, TB_Note.Text);
 
-      // Stopping scan process
-      cTaskFingerprint.stopFingerprint();
-
-      // Resetting GUI elements
-      activateGUIElements();
-
       // Hiding form
       this.Hide();
 
@@ -137,56 +90,6 @@ namespace Simsang.ARPScan.SystemFingerprint
 
 
     #region PRIVATE
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public delegate void deactivateGUIElementsDelegate();
-    private void deactivateGUIElements()
-    {
-      if (InvokeRequired)
-      {
-        BeginInvoke(new deactivateGUIElementsDelegate(deactivateGUIElements), new object[] { });
-        return;
-      }
-
-      this.Cursor = Cursors.WaitCursor;
-
-      BT_Close.Enabled = false;
-      BT_Scan.Enabled = false;
-
-      TB_OSGuess.Cursor = Cursors.WaitCursor;
-      TB_OpenPorts.Cursor = Cursors.WaitCursor;
-      TB_HWVendor.Cursor = Cursors.WaitCursor;
-      TB_MAC.Cursor = Cursors.WaitCursor;
-      TB_ScanDate.Cursor = Cursors.WaitCursor;
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public delegate void activateGUIElementsDelegate();
-    private void activateGUIElements()
-    {
-      if (InvokeRequired)
-      {
-        BeginInvoke(new activateGUIElementsDelegate(activateGUIElements), new object[] { });
-        return;
-      }
-      this.Cursor = Cursors.Default;
-
-      BT_Close.Enabled = true;
-      BT_Scan.Enabled = true;
-
-      TB_OSGuess.Cursor = Cursors.Default;
-      TB_OpenPorts.Cursor = Cursors.Default;
-      TB_HWVendor.Cursor = Cursors.Default;
-      TB_MAC.Cursor = Cursors.Default;
-      TB_ScanDate.Cursor = Cursors.Default;
-    }
-
-
 
     /// <summary>
     /// 
@@ -257,16 +160,6 @@ namespace Simsang.ARPScan.SystemFingerprint
       } // if (!Strin...
 
       return (lOutputFileName);
-    }
-
-
-    /// <summary>
-    /// 
-    /// </summary>
-    private void FingerprintStopped()
-    {
-      activateGUIElements();
-      loadSystemDetails();
     }
 
     #endregion

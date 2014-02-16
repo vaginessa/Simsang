@@ -279,7 +279,7 @@ namespace Simsang
     public List<Tuple<String, String, String>> GetAllReachableSystems()
     {
       List<Tuple<String, String, String>> lRetVal = new List<Tuple<String, String, String>>();
-      foreach (ARPScan.Main.TargetRecord lTmp in ARPScan.Main.ARPScan.GetInstance().TargetList())
+      foreach (ARPScan.Main.TargetRecord lTmp in ARPScan.Main.ARPScan.getInstance().TargetList())
         lRetVal.Add(new Tuple<String, String, String>(lTmp.MAC, lTmp.IP, lTmp.Vendor));
 
       return (lRetVal);
