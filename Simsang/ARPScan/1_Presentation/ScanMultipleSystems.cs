@@ -22,6 +22,7 @@ namespace Simsang.ARPScan
     private List<ScanSystem> mTargetSystems = new List<ScanSystem>();
     private TaskFacadeFingerprint cTaskFingerprint;
     private AutoResetEvent mFingerprintingFinished = new AutoResetEvent(false);
+    private SystemFingerprintStatus mFingerprintStatus;
 
     #endregion
 
@@ -60,6 +61,9 @@ namespace Simsang.ARPScan
       InitializeComponent();
 
       cTaskFingerprint = TaskFacadeFingerprint.getInstance();
+      mFingerprintStatus = new SystemFingerprintStatus();
+      TSSL_CurrentSystem.Text = String.Empty;
+      TSSL_Title.Text = String.Empty;
     }
 
 
@@ -69,8 +73,7 @@ namespace Simsang.ARPScan
     /// <returns></returns>
     public static ScanMultipleSystems getInstance(List<Tuple<String, String>> pSystems)
     {
-      if (mInstance == null)
-        mInstance = new ScanMultipleSystems();
+      mInstance = new ScanMultipleSystems();
 
       mInstance.TargetSystems = pSystems;
       mInstance.startFingerprintingProcess();
@@ -86,15 +89,70 @@ namespace Simsang.ARPScan
     /// <param name="e"></param>
     private void ScanMultipleSystems_FormClosing(object sender, FormClosingEventArgs e)
     {
-      // Stopping scan process
-      cTaskFingerprint.stopFingerprint();
+      // Setting cancelation in BGW
+      this.stopFingerprintingProcess();
 
       // Hiding form
       this.Hide();
-
-      e.Cancel = true;
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void BGW_Scanner_DoWork(object sender, DoWorkEventArgs e)
+    {
+      PGB_Systems.Minimum = 0;
+      PGB_Systems.Maximum = mTargetSystems.Count;
+
+      mFingerprintStatus.CurrentIndexNo = 0;
+      mFingerprintStatus.MaxIndex = mTargetSystems.Count;
+
+
+      foreach (ScanSystem lTmp in mTargetSystems)
+      {                 
+        mFingerprintingFinished.Reset();
+        SystemFingerprint.TaskFacadeFingerprint lTaskFacadeFingerprint = SystemFingerprint.TaskFacadeFingerprint.getInstance();
+
+        mFingerprintStatus.CurrentIndexNo++;
+        mFingerprintStatus.CurrentSystemIP = lTmp.TargetIP;
+        mFingerprintStatus.CurrentSystemMAC = lTmp.TargetMAC;
+
+        incrementProgress(mFingerprintStatus);
+
+
+        if (!BGW_Scanner.CancellationPending)
+        {
+          FingerprintConfig lConfig = new FingerprintConfig()
+          {
+            IP = lTmp.TargetIP,
+            MAC = lTmp.TargetMAC,
+            OnScanStopped = FingerprintStoppedCallback,
+            IsDebuggingOn = Config.DebugOn()
+          };
+
+          lTaskFacadeFingerprint.startFingerprint(lConfig);
+
+          try
+          {
+            mFingerprintingFinished.WaitOne(30 * 1000);
+          }
+          catch (Exception lEx)
+          {
+            MessageBox.Show(String.Format("scan ({0}) aborted: {1}", lTmp.TargetIP, lEx.Message));
+          }
+        } // if (BGW_Sca...
+      } // foreach (Scan...
+
+      mFingerprintStatus.CurrentSystemIP = String.Empty;
+      mFingerprintStatus.CurrentSystemMAC = String.Empty;
+      incrementProgress(mFingerprintStatus);
+
+      if (!BGW_Scanner.CancellationPending)
+        stopFingerprintingProcess();
+    }
 
     /// <summary>
     /// Close Sessions GUI on Escape.
@@ -105,6 +163,8 @@ namespace Simsang.ARPScan
     {
       if (keyData == Keys.Escape)
       {
+        TSSL_CurrentSystem.Text = "Stopping processes ...";
+        stopFingerprintingProcess();
         this.Close();
         return true;
       }
@@ -121,45 +181,80 @@ namespace Simsang.ARPScan
     /// 
     /// </summary>
     private void startFingerprintingProcess()
-    {
-      int lCounter = 0;
-      PGB_Systems.Minimum = 0;
-      PGB_Systems.Maximum = mTargetSystems.Count;
-      
-      if (mTargetSystems != null && mTargetSystems.Count > 0)
+    {      
+      if (mTargetSystems != null) // && mTargetSystems.Count > 0)
       {
-        foreach (ScanSystem lTmp in mTargetSystems)
-        {
-          lCounter++;
-          mFingerprintingFinished.Reset();
-          SystemFingerprint.TaskFacadeFingerprint lTaskFacadeFingerprint = SystemFingerprint.TaskFacadeFingerprint.getInstance();
-
-          TSSL_Title.Text = String.Format("System {0} of {1}", lCounter, mTargetSystems.Count);
-          TSSL_CurrentSystem.Text = String.Format("Current system: {0}  ({1})", lTmp.TargetIP, lTmp.TargetMAC);
-
-          FingerprintConfig lConfig = new FingerprintConfig () 
-          { 
-            IP = lTmp.TargetIP, 
-            MAC = lTmp.TargetMAC, 
-            OnScanStopped = FingerprintStoppedCallback,
-            IsDebuggingOn = Config.DebugOn()
-          };
-
-          lTaskFacadeFingerprint.startFingerprint(lConfig);
-
-          try
-          {
-            mFingerprintingFinished.WaitOne(30*1000);
-          }
-          catch (Exception lEx)
-          {
-//            MessageBox.Show(String.Format("scan ({0}) aborted: {1}", lTmp.TargetIP, lEx.Message));
-          }
-
-          PGB_Systems.Increment(1);
-
-        } // foreach (Scan...
+        this.Cursor = Cursors.WaitCursor;
+        BGW_Scanner.RunWorkerAsync();
       } // if (mTarge...
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    delegate void stopFingerprintingProcessDelegate();
+    private void stopFingerprintingProcess()
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new stopFingerprintingProcessDelegate(stopFingerprintingProcess), new object[] { });
+        return; 
+      }
+
+
+      try
+      {
+        BGW_Scanner.CancelAsync();
+      }
+      catch (Exception lEx)
+      {
+        String lMsg = lEx.Message;
+      }
+
+
+
+      try
+      {
+        cTaskFingerprint.stopFingerprint();
+      }
+      catch (Exception lEx)
+      {
+        String lMsg = lEx.Message;
+      }
+   
+
+      try
+      {
+        this.Cursor = Cursors.Default;
+      }
+      catch (Exception lEx)
+      {
+        String lMsg = lEx.Message;
+      }
+
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    delegate void incrementProgressDelegate(SystemFingerprintStatus pFingerprintStatus);
+    private void incrementProgress(SystemFingerprintStatus pFingerprintStatus)
+    {
+      if (InvokeRequired)
+      {
+        BeginInvoke(new incrementProgressDelegate(incrementProgress), new object[] { pFingerprintStatus });
+        return;
+      }
+
+      TSSL_Title.Text = String.Format("System {0} of {1}", pFingerprintStatus.CurrentIndexNo, pFingerprintStatus.MaxIndex);
+      PGB_Systems.Increment(1);
+
+      if (String.IsNullOrEmpty(pFingerprintStatus.CurrentSystemIP) && String.IsNullOrEmpty(pFingerprintStatus.CurrentSystemIP))
+        TSSL_CurrentSystem.Text = "Done";
+      else
+        TSSL_CurrentSystem.Text = String.Format("Current system: {0}  ({1})", pFingerprintStatus.CurrentSystemIP, pFingerprintStatus.CurrentSystemMAC);  
     }
 
 
@@ -172,6 +267,23 @@ namespace Simsang.ARPScan
     }
 
     #endregion
+
+
+    #region DATATYPES
+
+    public struct SystemFingerprintStatus
+    {
+      public int MaxIndex;
+      public int CurrentIndexNo;
+      public String CurrentSystemIP;
+      public String CurrentSystemMAC;
+    }
+
+    #endregion
+
+    private void BGW_Scanner_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+    {
+    }
 
   }
 }

@@ -769,8 +769,7 @@ namespace Simsang.ARPScan.Main
         { }
       }  // if (lTmp...
 
-      ScanMultipleSystems lScan = ScanMultipleSystems.getInstance(lTargetList);
-      lScan.ShowDialog();
+      ScanMultipleSystems.getInstance(lTargetList).ShowDialog();
     }
 
 
@@ -826,8 +825,14 @@ namespace Simsang.ARPScan.Main
       catch (Exception lEx)
       { }
 
-      ScanMultipleSystems lScan = ScanMultipleSystems.getInstance(lTargetList);
-      lScan.ShowDialog();
+      try
+      {
+        ScanMultipleSystems.getInstance(lTargetList).ShowDialog();
+      }
+      catch (Exception lEx)
+      {
+        String lMsg = lEx.Message;
+      }
     }
 
 

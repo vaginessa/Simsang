@@ -33,6 +33,7 @@
       this.TSSL_Title = new System.Windows.Forms.ToolStripStatusLabel();
       this.PGB_Systems = new System.Windows.Forms.ProgressBar();
       this.TSSL_CurrentSystem = new System.Windows.Forms.ToolStripStatusLabel();
+      this.BGW_Scanner = new System.ComponentModel.BackgroundWorker();
       this.SS_Fingerprinting.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -77,6 +78,12 @@
       this.TSSL_CurrentSystem.Text = "TSSL_CurrentSystem";
       this.TSSL_CurrentSystem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
+      // BGW_Scanner
+      // 
+      this.BGW_Scanner.WorkerSupportsCancellation = true;
+      this.BGW_Scanner.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BGW_Scanner_DoWork);
+      this.BGW_Scanner.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BGW_Scanner_RunWorkerCompleted);
+      // 
       // ScanMultipleSystems
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -103,6 +110,7 @@
     private System.Windows.Forms.ToolStripStatusLabel TSSL_Title;
     private System.Windows.Forms.ToolStripStatusLabel TSSL_CurrentSystem;
     private System.Windows.Forms.ProgressBar PGB_Systems;
+    private System.ComponentModel.BackgroundWorker BGW_Scanner;
 
   }
 }
