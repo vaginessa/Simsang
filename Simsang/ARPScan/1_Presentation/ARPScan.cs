@@ -88,7 +88,7 @@ namespace Simsang.ARPScan.Main
       DataGridViewCheckBoxColumn mStatusCol = new DataGridViewCheckBoxColumn();
       mStatusCol.DataPropertyName = "status";
       mStatusCol.Name = "status";
-      mStatusCol.HeaderText = "Status";
+      mStatusCol.HeaderText = "Attack";
       mStatusCol.Visible = true;
       mStatusCol.Width = 72;
       DGV_Targets.Columns.Add(mStatusCol);
