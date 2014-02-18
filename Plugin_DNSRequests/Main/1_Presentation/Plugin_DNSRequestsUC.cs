@@ -108,7 +108,7 @@ namespace Plugin.Main
         SessionDir = lSessionDir,
         PluginName = "DNS requests",
         PluginDescription = "Listing client systems DNS requests.",
-        PluginVersion = "0.6",
+        PluginVersion = "0.7",
         Ports = "UDP:53;",
         IsActive = true
       };
@@ -438,13 +438,13 @@ namespace Plugin.Main
         List<DNSRequestRecord> lNewRecords = new List<DNSRequestRecord>();
         List<String> lNewData;
         String[] lSplitter;
-        String lProto; 
-        String lSMAC;
-        String lSIP;
-        String lSrcPort; 
-        String lDstIP;
-        String lDstPort;
-        String lHostName;
+        String lProto = String.Empty;
+        String lSMAC = String.Empty;
+        String lSIP = String.Empty;
+        String lSrcPort = String.Empty;
+        String lDstIP = String.Empty;
+        String lDstPort = String.Empty;
+        String lHostName = String.Empty;
 
         lock (this)
         {
@@ -482,8 +482,17 @@ namespace Plugin.Main
         } // foreach(...
 
         if (lNewRecords.Count > 0)
-          cTask.addRecord(lNewRecords);
-
+        {
+          try
+          {
+            cTask.addRecord(lNewRecords);
+          }
+          catch (Exception lEx)
+          { 
+            if (PluginParameters.HostApplication != null)
+              PluginParameters.HostApplication.LogMessage(String.Format("{0}: {1} (Host name: \"{2}\")", Config.PluginName, lEx.Message, lHostName));
+          }
+        } // if (lNewR...
       } // if (cDataBatch...
     }
 

@@ -180,8 +180,14 @@ namespace Simsang.ARPScan.Main
     /// <param name="pTargetList"></param>
     public static void showARPScanGUI(SimsangMain pACMain, String pIfcID, String pStartIP, String pStopIP, String pGatewayIP, ref BindingList<String> pTargetList)
     {
-      mARPScan = getInstance(pACMain, ref pTargetList);
-      mARPScan.ShowDialog();
+      try
+      {
+        getInstance(pACMain, ref pTargetList).ShowDialog();
+      }
+      catch (Exception lEx)
+      {
+        LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan.ShowDialog(): {0}", lEx.Message)); 
+      }
     }
 
     #endregion

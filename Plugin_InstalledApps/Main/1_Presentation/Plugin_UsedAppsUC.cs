@@ -114,7 +114,7 @@ namespace Plugin.Main
         SessionDir = lSessionDir,
         PluginName = "Used apps",
         PluginDescription = "Listing with installed applications per client system.",
-        PluginVersion = "0.6",
+        PluginVersion = "0.7",
         Ports = "TCP:80;UDP:53;",
         IsActive = true
       };
@@ -127,6 +127,7 @@ namespace Plugin.Main
       
       cApplicationPatterns = new List<MngApplication.ApplicationPattern>();
       cTask = TaskFacade.getInstance(this);
+      DomainFacade.getInstance(this).addObserver(this);
     }
 
     #endregion
@@ -207,11 +208,14 @@ namespace Plugin.Main
                   {
                     if (Regex.Match(lRemoteString, @lPattern.ApplicationPatternString).Success)
                     {
-                      ApplicationRecord lNewApplication = new ApplicationRecord(lSMAC, lSIP, lDPort, lRemoteHost, lReqString, lPattern.ApplicationName, lPattern.CompanyURL);
-                      if (!cApplications.Contains(lNewApplication))
+                      try
                       {
-                        cApplications.Add(lNewApplication);                        
-                      } // if (!cApp...
+                        cTask.addRecord(new ApplicationRecord(lSMAC, lSIP, lDPort, lRemoteHost, lReqString, lPattern.ApplicationName, lPattern.CompanyURL));
+                      }
+                      catch (Exception lEx)
+                      {
+                        cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message)); 
+                      }
                     } // if (lSplit2.L...
                   } //foreach (st...                 
                 } // if (lRemoteString...
@@ -220,7 +224,7 @@ namespace Plugin.Main
           }
           catch (Exception lEx)
           {
-            MessageBox.Show(String.Format("{0} : {1}", Config.PluginName, lEx.ToString()));
+            cPluginParams.HostApplication.LogMessage(String.Format("{0}: {1}", Config.PluginName, lEx.Message));
           }
         } // foreach (...
       } // if (cDataBa...
