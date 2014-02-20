@@ -34,13 +34,14 @@
       // 
       // TB_Request
       // 
-      this.TB_Request.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                  | System.Windows.Forms.AnchorStyles.Left)
-                  | System.Windows.Forms.AnchorStyles.Right)));
+      this.TB_Request.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.TB_Request.Location = new System.Drawing.Point(8, 9);
       this.TB_Request.Multiline = true;
       this.TB_Request.Name = "TB_Request";
       this.TB_Request.ReadOnly = true;
+      this.TB_Request.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
       this.TB_Request.Size = new System.Drawing.Size(484, 312);
       this.TB_Request.TabIndex = 0;
       this.TB_Request.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PluginHTTPProxyUC_KeyUp);

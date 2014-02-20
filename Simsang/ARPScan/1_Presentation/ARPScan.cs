@@ -142,6 +142,7 @@ namespace Simsang.ARPScan.Main
         mARPScan = new ARPScan();
 
       mARPScan.resetValues(pACMain, ref pTargetList);
+      mARPScan.reloadDGVValues();
 
       return (mARPScan);
     }
@@ -238,7 +239,7 @@ namespace Simsang.ARPScan.Main
       /*
        * Set GUI parameters
        */
-      DGV_Targets.Enabled = true;
+//      DGV_Targets.Enabled = true;
       BT_Close.Enabled = true;
       BT_Scan.Enabled = true;
       RB_Netrange.Enabled = true;
@@ -271,6 +272,7 @@ namespace Simsang.ARPScan.Main
         } // foreach (Dat...
       } // foreach (Dat...
 
+      DGV_Targets.Refresh();
 
       /*
        * Stop ARP scan. First the regular, then the brute way.
@@ -330,7 +332,6 @@ namespace Simsang.ARPScan.Main
       /*
        * Set GUI parameters
        */
-      DGV_Targets.Enabled = false;
 
       BT_Close.Enabled = false;
       BT_Scan.Enabled = false;
@@ -417,7 +418,10 @@ namespace Simsang.ARPScan.Main
                 mTargetRecord.Add(new TargetRecord(lIP, lMAC, lVendor, lSysDetails.ScanDate, lNote));
               } // if (lIP != mGa...
             }
-            catch { }
+            catch (Exception lEx)
+            {
+              LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan: {0}", lEx.Message));
+            }
 
           } // foreach (var lEnt...
         } // if (lv1s ...
@@ -426,6 +430,67 @@ namespace Simsang.ARPScan.Main
       {
         LogConsole.Main.LogConsole.pushMsg(lEx.StackTrace);
       }
+    }
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void reloadDGVValues()
+    {
+      String lType = String.Empty;
+      String lIP = String.Empty;
+      String lMAC = String.Empty;
+      String lVendor = String.Empty;
+      String lNote = String.Empty;
+      SystemDetails lSysDetails;
+      SystemFingerprint.TaskFacadeFingerprint lTaskFacadeFingerprint = SystemFingerprint.TaskFacadeFingerprint.getInstance();
+
+      try
+      {
+        for (int i = 0; i < DGV_Targets.Rows.Count; i++)
+        {
+          try
+          {
+            lMAC = DGV_Targets.Rows[i].Cells["MAC"].Value.ToString();
+
+
+            // Reset Fingerprint value
+            try
+            {
+              if ((lSysDetails = lTaskFacadeFingerprint.getSystemDetails(lMAC)) != null)
+                DGV_Targets.Rows[i].Cells["LastScanDate"].Value = lSysDetails.ScanDate;
+            }
+            catch (Exception lEx)
+            {
+              LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan: {0}", lEx.Message));
+            }
+
+            // Reset Note value
+            try
+            {
+              if ((lNote = lTaskFacadeFingerprint.getSystemNote(lMAC)) != null)
+              {
+                DGV_Targets.Rows[i].Cells["Note"].Value = lNote;
+                DGV_Targets.Rows[i].Cells["vendor"].ToolTipText = lNote;
+              }
+            }
+            catch (Exception lEx)
+            {
+              LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan: {0}", lEx.Message));
+            }
+
+          }
+          catch (Exception lEx)
+          {
+            LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan: {0}", lEx.Message));
+          }
+        } // foreach (DataG...
+      }
+      catch (Exception lEx)
+      {
+        LogConsole.Main.LogConsole.pushMsg(String.Format("ARPScan: {1}", lEx.Message));
+      } 
     }
 
     #endregion
@@ -470,6 +535,7 @@ namespace Simsang.ARPScan.Main
         {
           SystemFingerprint.SystemFingerprint lFingerprint = new SystemFingerprint.SystemFingerprint(lMAC, lIP, lVendor);
           lFingerprint.ShowDialog();
+          reloadDGVValues();
         }
       }
     }
@@ -776,6 +842,7 @@ namespace Simsang.ARPScan.Main
       }  // if (lTmp...
 
       ScanMultipleSystems.getInstance(lTargetList).ShowDialog();
+      reloadDGVValues();
     }
 
 
@@ -806,8 +873,8 @@ namespace Simsang.ARPScan.Main
         }
       } // foreach (DataGri...
 
-      ScanMultipleSystems lScan = ScanMultipleSystems.getInstance(lTargetList);
-      lScan.ShowDialog();
+      ScanMultipleSystems.getInstance(lTargetList).ShowDialog();
+      reloadDGVValues();
     }
 
 
@@ -834,6 +901,7 @@ namespace Simsang.ARPScan.Main
       try
       {
         ScanMultipleSystems.getInstance(lTargetList).ShowDialog();
+        reloadDGVValues();
       }
       catch (Exception lEx)
       {
@@ -884,6 +952,7 @@ namespace Simsang.ARPScan.Main
 
         SystemFingerprint.SystemFingerprint lFingerprint = new SystemFingerprint.SystemFingerprint(lMAC, lIP, lVendor);
         lFingerprint.ShowDialog();
+        reloadDGVValues();
       }
       catch (Exception lEx)
       {
